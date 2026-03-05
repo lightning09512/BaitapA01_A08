@@ -1,0 +1,10 @@
+[
+  {
+    "username": "admin",
+    "password": "123",
+    "email": "admin@test.com",
+    "name": "Admin",
+    "phone": "0909000111",
+    "avatar": "https://i.pravatar.cc/150?img=3"
+  }
+]

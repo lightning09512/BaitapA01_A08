@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-
+import ForgotPasswordScreen from '../screens/Auth/ForgotPasswordScreen'; // Import thêm
 import LoginScreen from '../screens/Auth/LoginScreen';
 import RegisterScreen from '../screens/Auth/RegisterScreen';
 import HomeScreen from '../screens/Main/HomeScreen';
@@ -33,6 +33,7 @@ export default function AppNavigator() {
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName="Login">
+                <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ title: 'Khôi Phục Mật Khẩu' }} />
                 <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Đăng Ký' }} />
                 <Stack.Screen name="MainApp" component={MainTabs} options={{ headerShown: false }} />

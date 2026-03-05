@@ -11,6 +11,10 @@ export default function LoginScreen({ navigation }) {
     const handleLogin = async () => {
         try {
             const res = await api.post('/login', { username, password });
+            // Chèn dưới nút Đăng nhập
+            <Button mode="text" onPress={() => navigation.navigate('ForgotPassword')} style={{marginTop:10}}>
+                Quên mật khẩu?
+            </Button>
             await AsyncStorage.setItem('TOKEN', res.data.token);
             navigation.replace('MainApp'); // Chuyển vào luồng Bottom Tabs
         } catch (e) { Alert.alert("Lỗi", "Sai tài khoản"); }

@@ -82,5 +82,31 @@ app.post('/profile/verify-email', authenticateToken, (req, res) => {
 
 app.get('/products', (req, res) => res.json(products));
 app.get('/products/:id', (req, res) => res.json(products.find(p => p.id == req.params.id)));
+// --- BỔ SUNG TÍNH NĂNG QUÊN MẬT KHẨU (TỪ TUẦN 2) ---
+app.post('/forgot-password', (req, res) => {
+    const { email } = req.body;
+    const user = users.find(u => u.email === email);
+    if (!user) return res.status(400).json({ message: "Email chưa được đăng ký!" });
 
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otp = otp;
+    saveData();
+
+    console.log(`\n=== OTP KHÔI PHỤC MẬT KHẨU CỦA ${email}: ${otp} ===\n`);
+    res.json({ message: "Đã gửi OTP khôi phục (Xem console)" });
+});
+
+app.post('/reset-password', (req, res) => {
+    const { email, otp, newPassword } = req.body;
+    const user = users.find(u => u.email === email);
+
+    if (!user) return res.status(400).json({ message: "User không tồn tại" });
+    if (user.otp !== otp) return res.status(400).json({ message: "Mã OTP không đúng" });
+
+    user.password = newPassword;
+    user.otp = null; // Xóa OTP sau khi dùng xong
+    saveData();
+
+    res.json({ message: "Khôi phục mật khẩu thành công!" });
+});
 app.listen(PORT, () => console.log(`Server chạy tại port ${PORT}`));
