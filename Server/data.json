@@ -3,8 +3,81 @@
     "username": "admin",
     "password": "123",
     "email": "admin@test.com",
-    "name": "Admin",
+    "name": "Admin User",
     "phone": "0909000111",
     "avatar": "https://i.pravatar.cc/150?img=3"
+  },
+  {
+    "username": "khanh123",
+    "password": "123456",
+    "email": "khanh1@gmail.com",
+    "name": "Người dùng mới",
+    "phone": "",
+    "avatar": "https://i.pravatar.cc/150?img=12"
+  },
+  {
+    "username": "Kkkkk095",
+    "password": "k11145095",
+    "email": "kkkkk@gmail.com",
+    "name": "Người dùng mới",
+    "phone": "",
+    "avatar": "https://i.pravatar.cc/150?img=12",
+    "isVerified": true,
+    "verifyOtp": null,
+    "resetOtp": null
+  },
+  {
+    "username": "khanh095",
+    "password": "123456",
+    "email": "khanh@gmail.com",
+    "name": "Rrrr",
+    "phone": "123123123",
+    "avatar": "https://i.pravatar.cc/150?img=12",
+    "isVerified": true,
+    "verifyOtp": null,
+    "tempPhone": null,
+    "tempName": null,
+    "otpPhone": null,
+    "cart": [],
+    "orders": [
+      {
+        "id": "1772984181525",
+        "status": "CANCELLED",
+        "createdAt": 1772984181525,
+        "paymentMethod": "COD",
+        "address": "Jdjdhf",
+        "phone": "8365959591",
+        "note": "Jsjsjue",
+        "items": [
+          {
+            "productId": 2,
+            "name": "Samsung Galaxy S24 Ultra",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSI9OihvPcEuLhhnO9aV7hjjwQjOy-P8UgKQ&s",
+            "unitPrice": 33990000,
+            "quantity": 1,
+            "lineTotal": 33990000
+          },
+          {
+            "productId": 8,
+            "name": "OPPO Find X7 Ultra",
+            "image": "https://cdn.viettablet.com/images/detailed/59/oppo-find-x7-ultra-1.jpg",
+            "unitPrice": 26990000,
+            "quantity": 1,
+            "lineTotal": 26990000
+          },
+          {
+            "productId": 10,
+            "name": "ASUS ROG Zephyrus G16",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTT-FPlsI-qhjGQomKf0ODIRhSqmjJwyrrTwQ&s",
+            "unitPrice": 42990000,
+            "quantity": 1,
+            "lineTotal": 42990000
+          }
+        ],
+        "totalAmount": 103970000,
+        "cancelRequested": false,
+        "cancelledAt": 1772984197775
+      }
+    ]
   }
 ]
