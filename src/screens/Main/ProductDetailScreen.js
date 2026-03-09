@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { View, ScrollView, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
-import { Image } from 'expo-image';
-import { Button, Text, Badge } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
+import { useEffect, useState } from 'react';
+import { Dimensions, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Badge, Button, Text } from 'react-native-paper';
 import api from '../../services/api';
 
 const { width } = Dimensions.get('window');
@@ -148,13 +148,6 @@ export default function ProductDetailScreen({ route, navigation }) {
                     <TouchableOpacity style={styles.bottomIconButton}>
                         <Ionicons name="call-outline" size={20} color="#dc2626" />
                     </TouchableOpacity>
-                    <Button
-                        mode="outlined"
-                        textColor="#dc2626"
-                        style={styles.bottomOutlineButton}
-                    >
-                        Trả góp 0%
-                    </Button>
                     <Button
                         mode="contained"
                         style={styles.bottomPrimaryButton}
@@ -327,8 +320,8 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
-        paddingHorizontal: 10,
-        paddingVertical: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
         backgroundColor: '#ffffff',
         borderTopWidth: StyleSheet.hairlineWidth,
         borderTopColor: '#e5e7eb',
@@ -337,11 +330,13 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     bottomPrice: {
-        flexDirection: 'column',
+        flex: 1,
+        marginRight: 12,
     },
     bottomPriceLabel: {
-        fontSize: 12,
+        fontSize: 11,
         color: '#6b7280',
+        marginBottom: 2,
     },
     bottomPriceText: {
         fontSize: 16,
@@ -351,22 +346,21 @@ const styles = StyleSheet.create({
     bottomActions: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
+        gap: 8,
+        flex: 2,
     },
     bottomIconButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
         borderWidth: 1,
         borderColor: '#fecaca',
         alignItems: 'center',
         justifyContent: 'center',
     },
-    bottomOutlineButton: {
-        borderColor: '#fecaca',
-        backgroundColor: '#fff7ed',
-    },
     bottomPrimaryButton: {
         backgroundColor: '#dc2626',
+        flex: 1,
+        height: 40,
     },
 });

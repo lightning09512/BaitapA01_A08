@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  View,
-  Image,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  ScrollView,
+    FlatList,
+    Image,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { ActivityIndicator, Button, Text, TextInput } from 'react-native-paper';
 import api from '../../services/api';

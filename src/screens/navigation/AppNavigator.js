@@ -8,10 +8,10 @@ import RegisterScreen from '../Auth/RegisterScreen';
 import VerifyAccountScreen from '../Auth/VerifyAccountScreen';
 import HomepageScreen from '../HomepageScreen';
 import IntroScreen from '../IntroScreen';
-import HomeScreen from '../Main/HomeScreen';
-import ProductDetailScreen from '../Main/ProductDetailScreen';
 import CartScreen from '../Main/CartScreen';
+import HomeScreen from '../Main/HomeScreen';
 import OrdersScreen from '../Main/OrdersScreen';
+import ProductDetailScreen from '../Main/ProductDetailScreen';
 import ProfileScreen from '../Profile/ProfileScreen';
 
 const Stack = createNativeStackNavigator();
