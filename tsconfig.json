@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "src/screens/Auth/ForgotPasswordScreen.js", "src/screens/Auth/LoginScreen.js", "src/screens/Auth/VerifyAccountScreen.js", "src/screens/Main/CartScreen.js", "src/screens/Main/HomeScreen.js", "src/screens/Main/OrdersScreen.js", "src/screens/Main/ProductDetailScreen.js", "src/screens/navigation/AppNavigator.js", "src/screens/HomepageScreen.js", "src/screens/IntroScreen.js", "src/services/api.js", "src/stores/cartStore.js", "App.js"  ]
 }

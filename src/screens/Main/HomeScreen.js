@@ -136,7 +136,7 @@ export default function HomeScreen({ navigation }) {
             {/* Thanh header giống app thương mại */}
             <View style={styles.header}>
                 <View style={styles.logoRow}>
-                    <Text style={styles.logoText}>E-Shop</Text>
+                    <Text style={styles.logoText}>SellPhoneK</Text>
                     <View style={styles.locationBadge}>
                         <Ionicons name="location-outline" size={16} color="#fff" />
                         <Text style={styles.locationText}>TP. HCM</Text>
@@ -176,7 +176,7 @@ export default function HomeScreen({ navigation }) {
                 {/* Top 10 bán chạy (ngang) */}
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Bán chạy nhất</Text>
+                        <Text style={styles.sectionTitle}>Sản phẩm bán chạy nhất</Text>
                         <Text style={styles.sectionSubtitle}>Top 10</Text>
                     </View>
                     {loadingBest ? (

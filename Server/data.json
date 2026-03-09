@@ -28,7 +28,7 @@
   },
   {
     "username": "khanh095",
-    "password": "123456",
+    "password": "k11145095",
     "email": "khanh@gmail.com",
     "name": "Rrrr",
     "phone": "123123123",
@@ -176,6 +176,17 @@
         "cancelRequested": false,
         "cancelledAt": 1772991249718
       }
-    ]
+    ],
+    "resetOtp": null
+  },
+  {
+    "username": "khanh0951",
+    "password": "123456",
+    "email": "khanh0951@gmail.com",
+    "name": "khanh0951",
+    "phone": "",
+    "avatar": "https://i.pravatar.cc/150?img=12",
+    "isVerified": true,
+    "verifyOtp": null
   }
 ]
