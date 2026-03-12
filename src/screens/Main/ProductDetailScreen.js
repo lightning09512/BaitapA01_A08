@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Badge, Button, Text } from 'react-native-paper';
 import api from '../../services/api';
@@ -320,8 +320,8 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
         backgroundColor: '#ffffff',
         borderTopWidth: StyleSheet.hairlineWidth,
         borderTopColor: '#e5e7eb',
@@ -330,13 +330,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     bottomPrice: {
-        flex: 1,
-        marginRight: 12,
+        flexDirection: 'column',
     },
     bottomPriceLabel: {
-        fontSize: 11,
+        fontSize: 12,
         color: '#6b7280',
-        marginBottom: 2,
     },
     bottomPriceText: {
         fontSize: 16,
@@ -346,13 +344,12 @@ const styles = StyleSheet.create({
     bottomActions: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-        flex: 2,
+        gap: 6,
     },
     bottomIconButton: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
         borderWidth: 1,
         borderColor: '#fecaca',
         alignItems: 'center',
@@ -360,7 +357,5 @@ const styles = StyleSheet.create({
     },
     bottomPrimaryButton: {
         backgroundColor: '#dc2626',
-        flex: 1,
-        height: 40,
     },
 });

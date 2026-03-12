@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated, Dimensions, StyleSheet } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { Image } from 'expo-image';
+import { StatusBar } from 'expo-status-bar';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Dimensions, StyleSheet, Text, View } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window'); // Lấy kích thước màn hình
 
 export default function IntroScreen({ navigation }) {
   // Animation values
@@ -136,13 +136,13 @@ export default function IntroScreen({ navigation }) {
           <Text style={styles.progressText}>Đang tải...</Text>
         </View>
 
-        {/* Footer text */}
+        {/* Footer text */} 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Bài tập Lập trình Di động Nâng cao</Text>
         </View>
       </View>
 
-      {/* Decorative elements */}
+      {/* Decorative elements */} 
       <View style={styles.decorativeCircles}>
         <View style={[styles.circle, styles.circle1]} />
         <View style={[styles.circle, styles.circle2]} />

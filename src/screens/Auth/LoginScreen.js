@@ -51,12 +51,12 @@ function AnimatedOrb({ style, delay = 0 }) {
 }
 
 // ── Custom Input ───────────────────────────────────────────────────────────────
-function GlassInput({ label, icon, value, onChangeText, secureTextEntry, disabled, autoCapitalize }) {
-    const [focused, setFocused] = useState(false);
+function GlassInput({ label, icon, value, onChangeText, secureTextEntry, disabled, autoCapitalize }) { 
+    const [focused, setFocused] = useState(false); 
     const [showPassword, setShowPassword] = useState(false);
     const borderAnim = useRef(new Animated.Value(0)).current;
 
-    const handleFocus = () => {
+    const handleFocus = () => { //Khi input được focus
         setFocused(true);
         Animated.timing(borderAnim, {
             toValue: 1,
@@ -65,7 +65,7 @@ function GlassInput({ label, icon, value, onChangeText, secureTextEntry, disable
         }).start();
     };
 
-    const handleBlur = () => {
+    const handleBlur = () => { //Khi input bị blur
         setFocused(false);
         Animated.timing(borderAnim, {
             toValue: 0,
@@ -97,7 +97,7 @@ function GlassInput({ label, icon, value, onChangeText, secureTextEntry, disable
                     {icon}
                 </Text>
 
-                <TextInput
+                <TextInput 
                     style={styles.input}
                     value={value}
                     onChangeText={onChangeText}

@@ -30,7 +30,7 @@
     "username": "khanh095",
     "password": "k11145095",
     "email": "khanh@gmail.com",
-    "name": "Rrrr",
+    "name": "Khanh",
     "phone": "123123123",
     "avatar": "https://i.pravatar.cc/150?img=12",
     "isVerified": true,
@@ -184,6 +184,33 @@
     "password": "123456",
     "email": "khanh0951@gmail.com",
     "name": "khanh0951",
+    "phone": "",
+    "avatar": "https://i.pravatar.cc/150?img=12",
+    "isVerified": true,
+    "verifyOtp": null
+  },
+  {
+    "username": "khanh2",
+    "password": "123456",
+    "email": "khanh2@gmail.com",
+    "phone": "",
+    "avatar": "https://i.pravatar.cc/150?img=12",
+    "isVerified": false,
+    "verifyOtp": "261767"
+  },
+  {
+    "username": "khanh3",
+    "password": "123456",
+    "email": "khanh3@gmail.com",
+    "phone": "",
+    "avatar": "https://i.pravatar.cc/150?img=12",
+    "isVerified": false,
+    "verifyOtp": "239764"
+  },
+  {
+    "username": "khanh4",
+    "password": "123456",
+    "email": "khanh4@gmail.com",
     "phone": "",
     "avatar": "https://i.pravatar.cc/150?img=12",
     "isVerified": true,

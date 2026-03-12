@@ -176,7 +176,7 @@ export default function HomeScreen({ navigation }) {
                 {/* Top 10 bán chạy (ngang) */}
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Sản phẩm bán chạy nhất</Text>
+                        <Text style={styles.sectionTitle}>Bán chạy nhất</Text>
                         <Text style={styles.sectionSubtitle}>Top 10</Text>
                     </View>
                     {loadingBest ? (
