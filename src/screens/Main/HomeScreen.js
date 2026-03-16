@@ -9,8 +9,10 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { ActivityIndicator, Badge, Text, TextInput } from 'react-native-paper';
+import { ActivityIndicator, Badge, Text, TextInput, IconButton } from 'react-native-paper';
 import api from '../../services/api';
+import { initSocket, disconnectSocket } from '../../services/socket';
+import { useFocusEffect } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
@@ -27,6 +29,7 @@ export default function HomeScreen({ navigation }) {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
+    const [unreadNotifCount, setUnreadNotifCount] = useState(0);
     const PAGE_SIZE = 10;
 
     // Load category, best-selling, discount list lần đầu
@@ -92,10 +95,46 @@ export default function HomeScreen({ navigation }) {
         }
     };
 
-    // Load danh sách sản phẩm theo search + category (reset về trang 1)
     useEffect(() => {
         fetchProducts(1, false);
     }, [search, selectedCategory]);
+
+    // Load số lượng thông báo chưa đọc và Init Socket
+    useFocusEffect(
+        React.useCallback(() => {
+            const loadUnreadCount = async () => {
+                try {
+                    const res = await api.get('/notifications');
+                    const unreadList = (res.data || []).filter(n => !n.isRead);
+                    setUnreadNotifCount(unreadList.length);
+                } catch (e) {
+                    console.log('Load unread notifications error:', e);
+                }
+            };
+            loadUnreadCount();
+
+            const setupSocket = async () => {
+                try {
+                    const profRes = await api.get('/profile');
+                    const user = profRes.data;
+                    if (user && user.username) {
+                        const socket = initSocket(user.username);
+                        socket.on('new_notification', (notif) => {
+                            console.log('Received notification:', notif);
+                            setUnreadNotifCount(prev => prev + 1);
+                        });
+                    }
+                } catch (e) {
+                    console.log('Setup socket error:', e);
+                }
+            };
+            setupSocket();
+
+            return () => {
+                disconnectSocket();
+            };
+        }, [])
+    );
 
     const handleLoadMore = () => {
         if (!hasMore || loadingMore || loadingMain) return;
@@ -141,7 +180,16 @@ export default function HomeScreen({ navigation }) {
                         <Ionicons name="location-outline" size={16} color="#fff" />
                         <Text style={styles.locationText}>TP. HCM</Text>
                     </View>
-                    <Ionicons name="notifications-outline" size={22} color="#fee2e2" />
+                    <TouchableOpacity onPress={() => navigation.navigate('Notifications')}>
+                        <View>
+                            <Ionicons name="notifications-outline" size={24} color="#fee2e2" />
+                            {unreadNotifCount > 0 && (
+                                <Badge size={16} style={styles.badgeAbsolute}>
+                                    {unreadNotifCount}
+                                </Badge>
+                            )}
+                        </View>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.searchRow}>
                     <TextInput
@@ -440,4 +488,11 @@ const styles = StyleSheet.create({
         flex: 1,
         marginRight: 4,
     },
+    badgeAbsolute: {
+        position: 'absolute',
+        top: -4,
+        right: -4,
+        backgroundColor: '#facc15',
+        color: '#b91c1c'
+    }
 });

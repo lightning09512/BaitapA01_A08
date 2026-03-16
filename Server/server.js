@@ -3,8 +3,13 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const http = require('http'); // added for socket.io
+const { Server } = require('socket.io'); // added for socket.io
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: '*' } });
+
 const PORT = 3000;
 const SECRET_KEY = "SECRET_KEY_A04";
 const DATA_FILE = './data.json';
@@ -52,7 +57,8 @@ const initDefault = () => {
             name: "Admin User",
             phone: "0909000111",
             avatar: "https://i.pravatar.cc/150?img=3",
-            isVerified: true
+            isVerified: true,
+            notifications: []
         }
     ];
     reviews = [];
@@ -127,7 +133,8 @@ app.post('/register', (req, res) => {
         points: 0,
         coupons: [],
         favorites: [],
-        viewedProducts: []
+        viewedProducts: [],
+        notifications: []
     });
 
     saveData();
@@ -287,7 +294,54 @@ const ensureUserData = (user) => {
     if (!user.coupons) user.coupons = [];
     if (!user.favorites) user.favorites = [];
     if (!user.viewedProducts) user.viewedProducts = [];
+    if (!user.notifications) user.notifications = [];
 };
+
+// --- SOCKET.IO NOTIFICATION LOGIC ---
+const userSockets = new Map();
+
+io.on('connection', (socket) => {
+    console.log(`[Socket] Client connected: ${socket.id}`);
+
+    socket.on('register', (userId) => {
+        userSockets.set(userId, socket.id);
+        console.log(`[Socket] User ${userId} registered to socket ${socket.id}`);
+    });
+
+    socket.on('disconnect', () => {
+        console.log(`[Socket] Client disconnected: ${socket.id}`);
+        for (let [uid, sid] of userSockets.entries()) {
+            if (sid === socket.id) {
+                userSockets.delete(uid);
+                break;
+            }
+        }
+    });
+});
+
+function sendNotification(userId, title, message) {
+    const user = users.find(u => u.username === userId || u.id === userId); // fallback to username or id
+    if (!user) return;
+
+    if (!user.notifications) user.notifications = [];
+    
+    const newNotif = {
+        id: Date.now().toString(),
+        title,
+        message,
+        createdAt: new Date().toISOString(),
+        isRead: false
+    };
+
+    user.notifications.unshift(newNotif);
+    saveData();
+
+    // Map by username since we don't have user.id in registration logic
+    const socketId = userSockets.get(user.username);
+    if (socketId) {
+        io.to(socketId).emit('new_notification', newNotif);
+    }
+}
 
 const ORDER_STATUS = {
     NEW: 'NEW',
@@ -462,6 +516,9 @@ app.post('/orders/checkout-cod', authenticateToken, (req, res) => {
     user.cart = [];
     saveData();
 
+    // SOCKET: Send notification on successful order
+    sendNotification(user.username, 'Đặt hàng thành công!', `Đơn hàng mới với tổng tiền ${finalAmount.toLocaleString()}đ đã được đặt thành công.`);
+
     res.json({ message: "Đặt hàng COD thành công", order });
 });
 
@@ -602,6 +659,10 @@ app.post('/products/:id/reviews', authenticateToken, (req, res) => {
     user.coupons.push(newCoupon);
     
     saveData();
+
+    // SOCKET: Send notification for review reward
+    sendNotification(user.username, 'Đánh giá thành công!', `Bạn đã được thưởng 100 điểm và 1 mã giảm giá 10% (Mã: ${newCoupon.code}).`);
+
     res.json({ message: "Đánh giá thành công! Bạn được tặng 100 điểm và mã giảm giá 10%", review: newReview });
 });
 
@@ -693,7 +754,73 @@ app.get('/categories', (req, res) => {
     res.json(categories);
 });
 
-app.listen(PORT, () => {
+// --- NEW APIs FOR NOTIFICATIONS ---
+app.get('/notifications', authenticateToken, (req, res) => {
+    const user = users.find(u => u.username === req.user.username);
+    if (!user) return res.status(404).json({ message: "Lỗi user" });
+    ensureUserData(user);
+    res.json(user.notifications || []);
+});
+
+app.post('/notifications/read-all', authenticateToken, (req, res) => {
+    const user = users.find(u => u.username === req.user.username);
+    if (!user) return res.status(404).json({ message: "Lỗi user" });
+    ensureUserData(user);
+    
+    if (user.notifications) {
+        user.notifications.forEach(n => n.isRead = true);
+    }
+    saveData();
+    res.json({ message: 'Đã đánh dấu đọc tất cả.' });
+});
+
+// --- NEW API FOR ORDER STATISTICS ---
+app.get('/orders/statistics', authenticateToken, (req, res) => {
+    const user = users.find(u => u.username === req.user.username);
+    if (!user) return res.status(404).json({ message: "Lỗi user" });
+    ensureUserData(user);
+    
+    const orders = user.orders || [];
+
+    let totalPending = 0;
+    let totalShipping = 0;
+    let totalDelivered = 0;
+    
+    let countPending = 0;
+    let countShipping = 0;
+    let countDelivered = 0;
+
+    orders.forEach(order => {
+        const amount = order.totalAmount || 0;
+        switch (order.status) {
+            case 'NEW':
+            case 'CONFIRMED':
+            case 'PREPARING':
+                totalPending += amount;
+                countPending++;
+                break;
+            case 'SHIPPING':
+                totalShipping += amount;
+                countShipping++;
+                break;
+            case 'DELIVERED':
+                totalDelivered += amount;
+                countDelivered++;
+                break;
+        }
+    });
+
+    res.json({
+        totalAmount: totalPending + totalShipping + totalDelivered,
+        summary: {
+            PENDING: { total: totalPending, count: countPending },
+            SHIPPING: { total: totalShipping, count: countShipping },
+            DELIVERED: { total: totalDelivered, count: countDelivered },
+        }
+    });
+});
+
+server.listen(PORT, () => {
     console.log(`Server đang chạy tại http://localhost:${PORT}`);
     console.log("Dữ liệu sẽ được lưu tự động vào file data.json");
 });

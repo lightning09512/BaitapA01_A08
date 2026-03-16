@@ -39,12 +39,7 @@
       "tempPhone": null,
       "tempName": null,
       "otpPhone": null,
-      "cart": [
-        {
-          "productId": 3,
-          "quantity": 1
-        }
-      ],
+      "cart": [],
       "orders": [
         {
           "id": "1772984181525",
@@ -228,7 +223,7 @@
         },
         {
           "id": "1773298211878",
-          "status": "NEW",
+          "status": "CONFIRMED",
           "createdAt": 1773298211878,
           "paymentMethod": "COD",
           "address": "Ufigsigsv",
@@ -253,11 +248,45 @@
             }
           ],
           "totalAmount": 49930000,
+          "cancelRequested": false,
+          "confirmedAt": 1773630780997
+        },
+        {
+          "id": "1773630780536",
+          "status": "NEW",
+          "createdAt": 1773630780536,
+          "paymentMethod": "COD",
+          "address": "Jejejjr",
+          "phone": "6161662",
+          "note": "Jwjeje",
+          "items": [
+            {
+              "productId": 3,
+              "name": "MacBook Air M3 13 inch",
+              "image": "https://cdn2.fptshop.com.vn/unsafe/macbook_air_13_m2_midnight_1_35053fbcf9.png",
+              "unitPrice": 27990000,
+              "quantity": 1,
+              "lineTotal": 27990000
+            },
+            {
+              "productId": 11,
+              "name": "Lenovo ThinkPad X1 Carbon",
+              "image": "https://ttcenter.com.vn/uploads/product/a7gv07yw-935-thinkpad-x1-carbon-gen-8-i7-16gb-512gb-2k-99.jpg",
+              "unitPrice": 38990000,
+              "quantity": 1,
+              "lineTotal": 38990000
+            }
+          ],
+          "subTotal": 66980000,
+          "discountAmount": 2000,
+          "totalAmount": 66978000,
+          "usedCoupon": null,
+          "usedPoints": 2,
           "cancelRequested": false
         }
       ],
       "resetOtp": null,
-      "points": 100,
+      "points": 98,
       "coupons": [
         {
           "code": "REVIEW8273",
@@ -268,6 +297,7 @@
       ],
       "favorites": [],
       "viewedProducts": [
+        11,
         3
       ]
     },

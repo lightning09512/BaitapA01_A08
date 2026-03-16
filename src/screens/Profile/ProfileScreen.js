@@ -228,6 +228,11 @@ export default function ProfileScreen({ navigation }) {
                     <Text style={styles.menuText}>Kho điểm & Khuyến mãi</Text>
                     <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('OrderStats')}>
+                    <Ionicons name="analytics-outline" size={24} color="#10b981" style={{ marginRight: 15 }} />
+                    <Text style={styles.menuText}>Thống kê dòng tiền</Text>
+                    <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+                </TouchableOpacity>
             </View>
 
             <Button mode="contained" buttonColor="#ef4444" onPress={logout} style={{ marginBottom: 40 }}>

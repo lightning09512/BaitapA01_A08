@@ -12,10 +12,12 @@ import HomeScreen from '../Main/HomeScreen';
 import ProductDetailScreen from '../Main/ProductDetailScreen';
 import CartScreen from '../Main/CartScreen';
 import OrdersScreen from '../Main/OrdersScreen';
+import NotificationScreen from '../Main/NotificationScreen';
 import FavoritesScreen from '../Profile/FavoritesScreen';
 import ProfileScreen from '../Profile/ProfileScreen';
 import ViewedProductsScreen from '../Profile/ViewedProductsScreen';
 import WalletScreen from '../Profile/WalletScreen';
+import OrderStatsScreen from '../Profile/OrderStatsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -53,9 +55,11 @@ export default function AppNavigator() {
                 <Stack.Screen name="MainApp" component={MainTabs} />
                 <Stack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ title: 'Chi Tiết' }} />
                 <Stack.Screen name="Orders" component={OrdersScreen} options={{ title: 'Đơn Hàng' }} />
+                <Stack.Screen name="Notifications" component={NotificationScreen} options={{ title: 'Thông Báo', headerShown: false }} />
                 <Stack.Screen name="Favorites" component={FavoritesScreen} options={{ title: 'Yêu Thích' }} />
                 <Stack.Screen name="ViewedProducts" component={ViewedProductsScreen} options={{ title: 'Đã Xem' }} />
                 <Stack.Screen name="Wallet" component={WalletScreen} options={{ title: 'Kho Điểm & Ưu Đãi' }} />
+                <Stack.Screen name="OrderStats" component={OrderStatsScreen} options={{ title: 'Thống Kê Dòng Tiền', headerShown: false }} />
             </Stack.Navigator>
         </NavigationContainer>
     );
