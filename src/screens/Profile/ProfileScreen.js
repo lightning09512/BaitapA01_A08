@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Image, Alert, StyleSheet } from 'react-native';
 import { TextInput, Button, Text, IconButton } from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import api from '../../services/api';
 
@@ -211,9 +212,46 @@ export default function ProfileScreen({ navigation }) {
                 </>
             )}
 
-            <Button mode="contained" buttonColor="#ef4444" onPress={logout}>
+            <View style={{ width: '100%', marginBottom: 20, marginTop: 10 }}>
+                <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Favorites')}>
+                    <Ionicons name="heart-outline" size={24} color="#ef4444" style={{ marginRight: 15 }} />
+                    <Text style={styles.menuText}>Sản phẩm yêu thích</Text>
+                    <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('ViewedProducts')}>
+                    <Ionicons name="time-outline" size={24} color="#3b82f6" style={{ marginRight: 15 }} />
+                    <Text style={styles.menuText}>Sản phẩm đã xem</Text>
+                    <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Wallet')}>
+                    <Ionicons name="wallet-outline" size={24} color="#f59e0b" style={{ marginRight: 15 }} />
+                    <Text style={styles.menuText}>Kho điểm & Khuyến mãi</Text>
+                    <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+                </TouchableOpacity>
+            </View>
+
+            <Button mode="contained" buttonColor="#ef4444" onPress={logout} style={{ marginBottom: 40 }}>
                 Đăng Xuất
             </Button>
         </ScrollView>
     );
 }
+
+const styles = StyleSheet.create({
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#f9fafb',
+        padding: 15,
+        borderRadius: 8,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: '#e5e7eb'
+    },
+    menuText: {
+        flex: 1,
+        fontSize: 16,
+        color: '#374151',
+        fontWeight: '500'
+    }
+});

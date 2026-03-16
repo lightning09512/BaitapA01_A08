@@ -10,19 +10,30 @@ SellphoneK là một ứng dụng di động được phát triển bằng React
 
 ## Tính năng chính
 
-###  Xác thực người dùng
+### 1. Xác thực người dùng
 - **Đăng nhập:** Đăng nhập với tài khoản và mật khẩu
 - **Đăng ký:** Tạo tài khoản mới với xác thực email
 - **Quên mật khẩu:** Khôi phục mật khẩu qua OTP gửi qua email
 - **Xác minh tài khoản:** Xác thực email trước khi sử dụng dịch vụ
 
-###  Giao diện người dùng
+### 2. Quản lý Hồ sơ (Profile)
+- **Đổi Avatar:** Cập nhật ảnh đại diện tức thời
+- **Cập nhật thông tin:** OTP bảo vệ 2 lớp khi đổi Tên, SĐT, Mật khẩu, Email
+
+### 3. Tìm kiếm và Khám phá Sản phẩm
+- **Tìm kiếm Real-time:** Bộ lọc siêu nhạy theo từ khóa
+- **Lọc danh mục:** Trượt dọc thanh Category ngang để tìm mảng công nghệ.
+- **Top 10 Bán Chạy:** Dải Slider ngang hiển thị các sản phẩm Hot nhất (`soldQuantity`).
+- **Săn Deal Khủng (Grid 2 Cột):** Bày trí 20 sản phẩm giảm giá mạnh nhất (`discountPercent`) thông qua Layout 2 cột đẹp mắt.
+- **Chi tiết sản phẩm:** Trải nghiệm xem hình ảnh và cấu hình chi tiết
+
+### 4. Giao diện người dùng
 - **Thiết kế hiện đại:** Giao diện tối với hiệu ứng glassmorphism
 - **Animation mượt mà:** Hiệu ứng chuyển động mượt mà và thu hút
 - **Responsive:** Tương thích tốt trên nhiều kích thước màn hình
 - **Dark theme:** Giao diện tối chuyên nghiệp, giảm mỏi mắt
 
-###  Bảo mật
+### 5. Bảo mật
 - **Mã OTP:** Hệ thống bảo mật 2 lớp với mã OTP
 - **Token xác thực:** Sử dụng JWT token để bảo vệ session
 - **Xác thực email:** Bắt buộc xác thực email để tăng cường bảo mật

@@ -19,6 +19,9 @@ export default function CartScreen({ navigation }) {
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [note, setNote] = useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const [pointsToUse, setPointsToUse] = useState('');
+  const [availablePoints, setAvailablePoints] = useState(0);
 
   const loadCart = async () => {
     setLoading(true);
@@ -28,6 +31,11 @@ export default function CartScreen({ navigation }) {
       setItems(data.items || []);
       setTotalAmount(data.totalAmount || 0);
       setTotalQuantity(data.totalQuantity || 0);
+
+      const walletRes = await api.get('/users/wallet').catch(() => null);
+      if (walletRes && walletRes.data) {
+          setAvailablePoints(walletRes.data.points || 0);
+      }
     } catch (e) {
       console.log('Load cart error:', e);
     } finally {
@@ -80,6 +88,8 @@ export default function CartScreen({ navigation }) {
         address,
         phone,
         note,
+        couponCode: couponCode.trim() || undefined,
+        pointsToUse: Number(pointsToUse) || undefined
       });
       alert(res.data?.message || 'Đặt hàng thành công!');
       // Sau khi đặt hàng, reload giỏ và chuyển sang màn đơn hàng
@@ -181,6 +191,23 @@ export default function CartScreen({ navigation }) {
             mode="outlined"
             multiline
             style={{ marginTop: 8 }}
+          />
+          <TextInput
+            label="Mã giảm giá (nếu có)"
+            value={couponCode}
+            onChangeText={setCouponCode}
+            mode="outlined"
+            style={{ marginTop: 8 }}
+            autoCapitalize="characters"
+          />
+          <TextInput
+            label={`Trừ điểm (Bạn có: ${availablePoints} điểm)`}
+            value={pointsToUse}
+            onChangeText={setPointsToUse}
+            mode="outlined"
+            keyboardType="number-pad"
+            style={{ marginTop: 8 }}
+            placeholder="1 điểm = 1000đ"
           />
 
           <Button
