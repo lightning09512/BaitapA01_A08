@@ -211,29 +211,19 @@ api.put = async (url, data, config) => {
     const response = await axios.put(`${api.defaults.baseURL}${url}`, data, mergedConfig);
     return response;
   } catch (error) {
-    console.log('API failed, using mock profile update:', error.message);
+    console.log('PUT API failed:', error.message);
+    throw error;
+  }
+};
 
-    // Handle profile update endpoint
-    if (url === '/profile/update') {
-      return {
-        data: {
-          message: 'Profile updated successfully',
-          user: {
-            id: 1,
-            name: data.name || 'John Doe',
-            email: 'john@example.com',
-            phone: data.phone || '0123456789',
-            avatar: data.avatar || 'https://via.placeholder.com/120x120/2196F3/FFFFFF?text=Profile'
-          }
-        },
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {},
-        request: {}
-      };
-    }
-
+// DELETE method (dùng cho admin xóa sản phẩm, v.v.)
+api.delete = async (url, config) => {
+  try {
+    const mergedConfig = mergeConfigWithDefaults(config);
+    const response = await axios.delete(`${api.defaults.baseURL}${url}`, mergedConfig);
+    return response;
+  } catch (error) {
+    console.log('DELETE API failed:', error.message);
     throw error;
   }
 };

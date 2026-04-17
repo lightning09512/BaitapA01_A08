@@ -13,6 +13,7 @@ const User = sequelize.define('User', {
     verifyOtp: { type: DataTypes.STRING },
     resetOtp: { type: DataTypes.STRING },
     points: { type: DataTypes.INTEGER, defaultValue: 0 },
+    role: { type: DataTypes.STRING, defaultValue: 'customer' }, // 'customer' | 'admin'
     // Các field phụ
     tempEmail: { type: DataTypes.STRING },
     otp: { type: DataTypes.STRING },

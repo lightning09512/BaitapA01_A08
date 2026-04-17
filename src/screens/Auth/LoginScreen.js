@@ -193,13 +193,20 @@ export default function LoginScreen({ navigation }) {
 
             try {
                 await AsyncStorage.setItem('TOKEN', res.data.token);
+                await AsyncStorage.setItem('USER_ROLE', res.data.role || 'customer');
             } catch (e) {
                 console.log('AsyncStorage error:', e);
             }
 
             setLoading(false);
             Alert.alert('Thành công', `Chào mừng ${res.data?.user?.name || username}!`);
-            navigation.replace('MainApp');
+
+            // Điều hướng theo role
+            if (res.data?.role === 'admin') {
+                navigation.replace('AdminDashboard');
+            } else {
+                navigation.replace('MainApp');
+            }
         } catch (e) {
             setLoading(false);
             const isNetworkErr =

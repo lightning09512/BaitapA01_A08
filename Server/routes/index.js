@@ -6,6 +6,7 @@ const productController = require('../controllers/productController');
 const cartController = require('../controllers/cartController');
 const orderController = require('../controllers/orderController');
 const userController = require('../controllers/userController');
+const adminController = require('../controllers/adminController');
 
 const jwt = require('jsonwebtoken');
 
@@ -14,11 +15,27 @@ const authenticateToken = (req, res, next) => {
     const token = authHeader && authHeader.split(' ')[1];
     if (!token) return res.sendStatus(401);
 
-    jwt.verify(token, authController.SECRET_KEY, (err, user) => {
+    jwt.verify(token, authController.SECRET_KEY, async (err, decoded) => {
         if (err) return res.sendStatus(403);
-        req.user = user;
+        req.user = decoded;
+
+        // Lấy role từ DB để phân quyền chính xác
+        try {
+            const { User } = require('../models');
+            const user = await User.findOne({ where: { username: decoded.username }, attributes: ['role'] });
+            req.userRole = user ? user.role : 'customer';
+        } catch {
+            req.userRole = 'customer';
+        }
         next();
     });
+};
+
+const requireAdmin = (req, res, next) => {
+    if (req.userRole !== 'admin') {
+        return res.status(403).json({ message: 'Bạn không có quyền truy cập chức năng Admin.' });
+    }
+    next();
 };
 
 // --- AUTH ---
@@ -36,7 +53,7 @@ router.get('/users/viewed', authenticateToken, userController.getViewed);
 router.get('/notifications', authenticateToken, userController.getNotifications);
 router.post('/notifications/read-all', authenticateToken, userController.readAllNotifications);
 
-// --- PRODUCTS ---
+// --- PRODUCTS (public read, admin write) ---
 router.get('/products', productController.getProducts);
 router.get('/products/best-selling', productController.getBestSelling);
 router.get('/products/by-discount', productController.getByDiscount);
@@ -61,11 +78,29 @@ router.put('/cart/update', authenticateToken, cartController.updateCart);
 router.post('/cart/remove', authenticateToken, cartController.removeFromCart);
 router.post('/cart/clear', authenticateToken, cartController.clearCart);
 
-// --- ORDERS ---
+// --- ORDERS (customer) ---
 router.post('/orders/checkout-cod', authenticateToken, orderController.checkoutCod);
-router.get('/orders', authenticateToken, orderController.getUserOrders);
 router.get('/orders/statistics', authenticateToken, orderController.getOrderStatistics);
+router.get('/orders', authenticateToken, orderController.getUserOrders);
 router.get('/orders/:id', authenticateToken, orderController.getOrderById);
 router.post('/orders/cancel', authenticateToken, orderController.cancelOrder);
+
+// ============ ADMIN ROUTES ============
+// Tất cả route /admin/* yêu cầu token + role admin
+router.get('/admin/dashboard', authenticateToken, requireAdmin, adminController.getDashboardStats);
+
+// Admin quản lý sản phẩm
+router.get('/admin/products', authenticateToken, requireAdmin, adminController.getAllProducts);
+router.post('/admin/products', authenticateToken, requireAdmin, adminController.createProduct);
+router.put('/admin/products/:id', authenticateToken, requireAdmin, adminController.updateProduct);
+router.delete('/admin/products/:id', authenticateToken, requireAdmin, adminController.deleteProduct);
+
+// Admin quản lý đơn hàng
+router.get('/admin/orders', authenticateToken, requireAdmin, adminController.getAllOrders);
+router.post('/admin/orders/status', authenticateToken, requireAdmin, adminController.updateOrderStatus);
+
+// Admin quản lý người dùng
+router.get('/admin/users', authenticateToken, requireAdmin, adminController.getAllUsers);
+router.post('/admin/users/role', authenticateToken, requireAdmin, adminController.updateUserRole);
 
 module.exports = router;

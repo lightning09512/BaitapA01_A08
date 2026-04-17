@@ -48,9 +48,8 @@ const login = async (req, res) => {
             });
         }
 
-        const token = jwt.sign({ username: user.username }, SECRET_KEY);
-        // Để không trả về null quá nhiều, có thể map thủ công hoặc mặc định db đã ổn.
-        res.json({ token, user });
+        const token = jwt.sign({ username: user.username, role: user.role || 'customer' }, SECRET_KEY);
+        res.json({ token, user, role: user.role || 'customer' });
     } catch (e) {
         res.status(500).json({ message: e.message });
     }

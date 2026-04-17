@@ -18,6 +18,11 @@ import ProfileScreen from '../Profile/ProfileScreen';
 import ViewedProductsScreen from '../Profile/ViewedProductsScreen';
 import WalletScreen from '../Profile/WalletScreen';
 import OrderStatsScreen from '../Profile/OrderStatsScreen';
+// Admin Screens
+import AdminDashboardScreen from '../Admin/AdminDashboardScreen';
+import AdminProductsScreen from '../Admin/AdminProductsScreen';
+import AdminOrdersScreen from '../Admin/AdminOrdersScreen';
+import AdminUsersScreen from '../Admin/AdminUsersScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -60,6 +65,11 @@ export default function AppNavigator() {
                 <Stack.Screen name="ViewedProducts" component={ViewedProductsScreen} options={{ title: 'Đã Xem' }} />
                 <Stack.Screen name="Wallet" component={WalletScreen} options={{ title: 'Kho Điểm & Ưu Đãi' }} />
                 <Stack.Screen name="OrderStats" component={OrderStatsScreen} options={{ title: 'Thống Kê Dòng Tiền', headerShown: false }} />
+                {/* Admin Screens */}
+                <Stack.Screen name="AdminDashboard" component={AdminDashboardScreen} options={{ title: 'Admin Dashboard' }} />
+                <Stack.Screen name="AdminProducts" component={AdminProductsScreen} options={{ title: 'Quản lý Sản phẩm' }} />
+                <Stack.Screen name="AdminOrders" component={AdminOrdersScreen} options={{ title: 'Quản lý Đơn hàng' }} />
+                <Stack.Screen name="AdminUsers" component={AdminUsersScreen} options={{ title: 'Quản lý Người dùng' }} />
             </Stack.Navigator>
         </NavigationContainer>
     );
