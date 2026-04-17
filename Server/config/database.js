@@ -10,9 +10,9 @@ const sequelize = new Sequelize('app_ban_hang_db', 'root', '123456', {
 const connectDB = async () => {
     try {
         await sequelize.authenticate();
-        console.log('✅ Kết nối đến MySQL (app_ban_hang_db) thành công.');
+        console.log('[SUCCESS] Kết nối đến MySQL (app_ban_hang_db) thành công.');
     } catch (error) {
-        console.error('❌ Không thể kết nối tới MySQL:', error);
+        console.error('[ERROR] Không thể kết nối tới MySQL:', error);
     }
 };
 

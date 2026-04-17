@@ -11,12 +11,16 @@ const ORDER_STATUS = {
 
 const checkoutCod = async (req, res) => {
     try {
-        const { address, phone, note, couponCode, pointsToUse } = req.body;
+        const { address, phone, note, couponCode, pointsToUse, selectedProductIds } = req.body;
         const user = await User.findOne({ where: { username: req.user.username }, include: ['CartItems', 'Coupons'] });
         if (!user) return res.status(404).json({ message: "Lỗi user" });
 
-        const cartItems = user.CartItems || [];
-        if (cartItems.length === 0) return res.status(400).json({ message: "Giỏ hàng trống" });
+        let cartItems = user.CartItems || [];
+        if (selectedProductIds && Array.isArray(selectedProductIds) && selectedProductIds.length > 0) {
+            cartItems = cartItems.filter(item => selectedProductIds.includes(item.productId));
+        }
+
+        if (cartItems.length === 0) return res.status(400).json({ message: "Không có sản phẩm nào được chọn để thanh toán" });
         if (!address || !address.trim()) return res.status(400).json({ message: "Vui lòng nhập địa chỉ nhận hàng" });
         if (!phone || !phone.trim()) return res.status(400).json({ message: "Vui lòng nhập số điện thoại" });
 

@@ -89,7 +89,7 @@ export default function IntroScreen({ navigation }) {
         >
           <View style={styles.logoWrapper}>
             <Image
-              source="https://spkthcm.com/wp-content/uploads/2025/01/Logo_Truong_Dai_Hoc_Su_Pham_Ky_Thuat_TP_Ho_Chi_Mi1nh.jpg"
+              source={{ uri: 'https://brasol.vn/wp-content/uploads/2022/09/logo-dai-hoc-su-pham-ky-thuat-tp-hcm.jpg' }}
               style={styles.logo}
               contentFit="contain"
             />
@@ -116,8 +116,9 @@ export default function IntroScreen({ navigation }) {
           
           <View style={styles.divider} />
           
+          <Text style={styles.groupName}>Nhóm 10</Text>
           <Text style={styles.studentName}>Nguyễn Minh Quốc Khánh</Text>
-          <Text style={styles.studentId}>MSSV: 23110113</Text>
+          <Text style={styles.studentName}>Phạm Minh Khánh</Text>
           <Text style={styles.major}>Chuyên ngành: Công nghệ Phần mềm</Text>
         </Animated.View>
 
@@ -232,15 +233,24 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     borderRadius: 2,
   },
-  studentName: {
-    fontSize: 28,
+  groupName: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: '#60a5fa',
     textAlign: 'center',
-    marginBottom: 8,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 1.5,
+  },
+  studentName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#f8fafc',
+    textAlign: 'center',
+    marginBottom: 6,
+    textShadowColor: 'rgba(0, 0, 0, 0.4)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   studentId: {
     fontSize: 16,

@@ -1,9 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, ScrollView, StyleSheet, TouchableOpacity, View, FlatList } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet, TouchableOpacity, View, FlatList, KeyboardAvoidingView, Platform } from 'react-native';
 import { Badge, Button, Text, TextInput } from 'react-native-paper';
 import api from '../../services/api';
+import { getProductSpecs } from '../../data/productSpecs';
 
 const { width } = Dimensions.get('window');
 
@@ -84,6 +85,9 @@ export default function ProductDetailScreen({ route, navigation }) {
     const sold = product.soldQuantity || 0;
     const views = product.viewCount || 0;
     const reviewCount = product.reviewCount || reviews.length;
+    const oldPrice = product.price / (1 - discount / 100);
+
+    const specs = getProductSpecs(product.name);
 
     const renderSimilarItem = ({ item }) => (
         <TouchableOpacity 
@@ -97,25 +101,25 @@ export default function ProductDetailScreen({ route, navigation }) {
     );
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
             {/* Header */}
             <View style={styles.header}>
-                <Ionicons name="arrow-back" size={22} color="#111827" onPress={() => navigation.goBack()} />
+                <Ionicons name="arrow-back" size={24} color="#111827" onPress={() => navigation.goBack()} />
                 <Text style={styles.headerTitle} numberOfLines={1}>Thông tin sản phẩm</Text>
                 <View style={styles.headerIcons}>
-                    <Ionicons name="share-outline" size={22} color="#111827" />
+                    <Ionicons name="share-outline" size={24} color="#111827" />
                     <TouchableOpacity onPress={toggleFavorite}>
                         <Ionicons
                             name={isFavorite ? "heart" : "heart-outline"}
-                            size={22}
-                            color="#ef4444"
-                            style={{ marginLeft: 12 }}
+                            size={24}
+                            color="#dc2626"
+                            style={{ marginLeft: 16 }}
                         />
                     </TouchableOpacity>
                 </View>
             </View>
 
-            <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 90 }} showsVerticalScrollIndicator={false}>
+            <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
                 {/* Hình sản phẩm */}
                 <View style={styles.imageWrapper}>
                     <Image source={{ uri: product.image }} style={styles.mainImage} contentFit="contain" />
@@ -124,99 +128,84 @@ export default function ProductDetailScreen({ route, navigation }) {
                 {/* Thông tin cơ bản */}
                 <View style={styles.infoCard}>
                     <Text style={styles.productName}>{product.name}</Text>
-                    <View style={styles.priceRow}>
-                        <Text style={styles.priceText}>{product.price.toLocaleString()} ₫</Text>
-                        {discount > 0 && <Badge style={styles.discountBadge}>Giảm {discount}%</Badge>}
-                    </View>
-                    <View style={styles.metaRow}>
-                        <View style={styles.ratingRow}>
-                            <Ionicons name="star" size={16} color="#facc15" />
-                            <Text style={styles.ratingText}>5.0</Text>
-                            <Text style={styles.ratingCount}>({reviewCount} ĐGNX)</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', gap: 10 }}>
-                            <Text style={styles.soldText}>{views} lượt xem</Text>
-                            {sold > 0 && <Text style={styles.soldText}>Đã bán {sold.toLocaleString()}</Text>}
-                        </View>
-                    </View>
-                </View>
-
-                {/* Khung nhập đánh giá (Khuyến khích review) */}
-                <View style={styles.section}>
-                    <View style={styles.sectionHeaderRow}>
-                        <Text style={styles.sectionTitle}>Viết đánh giá sản phẩm</Text>
-                    </View>
-                    <Text style={{ fontSize: 13, color: '#16a34a', marginBottom: 8 }}>Nhận ngay 100 điểm & Mã KM 10% khi duyệt!</Text>
-                    <View style={{ flexDirection: 'row', marginBottom: 8, alignItems: 'center' }}>
-                        <Text style={{ marginRight: 8, color: '#374151' }}>Số sao:</Text>
-                        {[1, 2, 3, 4, 5].map(star => (
-                            <TouchableOpacity key={star} onPress={() => setRating(star)}>
-                                <Ionicons name={star <= rating ? "star" : "star-outline"} size={24} color="#facc15" />
-                            </TouchableOpacity>
+                    <View style={styles.ratingRow}>
+                        {[1, 2, 3, 4, 5].map(s => (
+                            <Ionicons key={s} name="star" size={14} color="#f59e0b" />
                         ))}
+                        <Text style={styles.ratingCount}> ({reviewCount} đánh giá)</Text>
+                        <Text style={styles.soldText}> • Đã bán {sold.toLocaleString()}</Text>
                     </View>
-                    <TextInput
-                        mode="outlined"
-                        placeholder="Nội dung đánh giá của bạn (tối thiểu 10 ký tự)..."
-                        multiline
-                        numberOfLines={3}
-                        value={comment}
-                        onChangeText={setComment}
-                        style={{ backgroundColor: '#fff', marginBottom: 8 }}
-                    />
-                    <Button 
-                        mode="contained" 
-                        onPress={submitReview} 
-                        loading={submitting} 
-                        disabled={submitting}
-                        style={{ backgroundColor: '#2563eb' }}
-                    >
-                        Gửi Đánh Giá
-                    </Button>
+                    
+                    <View style={styles.priceContainer}>
+                        <Text style={styles.priceText}>{product.price.toLocaleString()} ₫</Text>
+                        {discount > 0 && (
+                            <Text style={styles.oldPriceText}>{oldPrice.toLocaleString()} ₫</Text>
+                        )}
+                        {discount > 0 && <Badge style={styles.discountBadge}>-{discount}%</Badge>}
+                    </View>
                 </View>
 
-                {/* Danh sách Đánh giá */}
-                {reviews.length > 0 && (
-                    <View style={styles.section}>
-                        <View style={styles.sectionHeaderRow}>
-                            <Text style={styles.sectionTitle}>Khách hàng nhận xét ({reviews.length})</Text>
+                {/* Khuyến mãi hấp dẫn */}
+                <View style={styles.promoSection}>
+                    <View style={styles.promoHeader}>
+                        <MaterialCommunityIcons name="gift-outline" size={20} color="#dc2626" />
+                        <Text style={styles.promoTitle}>Khuyến mãi hấp dẫn</Text>
+                    </View>
+                    <View style={styles.promoBody}>
+                        <View style={styles.promoItemRow}>
+                            <View style={styles.promoDot} />
+                            <Text style={styles.promoItemText}>Giảm thêm đến 5% tối đa 500.000đ khi thanh toán qua ứng dụng Momo.</Text>
                         </View>
-                        {reviews.slice(0, 5).map(rev => (
-                            <View key={rev.id} style={styles.reviewItem}>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <Image source={{ uri: rev.avatar || 'https://i.pravatar.cc/150' }} style={{ width: 24, height: 24, borderRadius: 12, marginRight: 8 }} />
-                                        <Text style={{ fontWeight: '600', color: '#111827' }}>{rev.name}</Text>
-                                    </View>
-                                    <View style={{ flexDirection: 'row' }}>
-                                        {[1, 2, 3, 4, 5].map(s => (
-                                            <Ionicons key={s} name={s <= rev.rating ? "star" : "star-outline"} size={14} color="#facc15" />
-                                        ))}
-                                    </View>
-                                </View>
-                                <Text style={{ fontSize: 14, color: '#374151' }}>{rev.comment}</Text>
+                        <View style={styles.promoItemRow}>
+                            <View style={styles.promoDot} />
+                            <Text style={styles.promoItemText}>Mở thẻ tín dụng VIB nhận E-voucher đến 600K.</Text>
+                        </View>
+                        <View style={styles.promoItemRow}>
+                            <View style={styles.promoDot} />
+                            <Text style={styles.promoItemText}>Trợ giá thu cũ đổi mới lên đến 2.000.000đ.</Text>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Cam kết bán hàng */}
+                <View style={styles.commitSection}>
+                    <Text style={styles.commitTitle}>Cam kết CellphoneK</Text>
+                    <View style={styles.commitGrid}>
+                        <View style={styles.commitItem}>
+                            <MaterialCommunityIcons name="shield-check-outline" size={24} color="#dc2626" />
+                            <Text style={styles.commitText}>Hàng chính hãng</Text>
+                        </View>
+                        <View style={styles.commitItem}>
+                            <MaterialCommunityIcons name="truck-fast-outline" size={24} color="#dc2626" />
+                            <Text style={styles.commitText}>Giao hàng cực siêu tốc</Text>
+                        </View>
+                        <View style={styles.commitItem}>
+                            <MaterialCommunityIcons name="sync-circle" size={24} color="#dc2626" />
+                            <Text style={styles.commitText}>Lỗi 1 đổi 1 30 ngày</Text>
+                        </View>
+                        <View style={styles.commitItem}>
+                            <MaterialCommunityIcons name="wallet-outline" size={24} color="#dc2626" />
+                            <Text style={styles.commitText}>Trả góp 0% cực dễ</Text>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Thông số kỹ thuật */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitleSpec}>Thông số kỹ thuật</Text>
+                    <View style={styles.specTable}>
+                        {specs.map((spec, index) => (
+                            <View key={index} style={[styles.specRow, index % 2 === 0 ? styles.specRowEven : styles.specRowOdd]}>
+                                <Text style={styles.specLabel}>{spec.label}</Text>
+                                <Text style={styles.specValue}>{spec.value}</Text>
                             </View>
                         ))}
                     </View>
-                )}
-
-                {/* Khuyến mãi */}
-                <View style={styles.section}>
-                    <View style={styles.sectionHeaderRow}>
-                        <Text style={styles.sectionTitle}>Khuyến mãi hấp dẫn</Text>
-                    </View>
-                    <View style={styles.promoCard}>
-                        <Text style={styles.promoItem}>1. Trả góp 0% lãi suất, kỳ hạn tới 12 tháng.</Text>
-                        <Text style={styles.promoItem}>2. Giảm thêm 5% khi mua kèm phụ kiện.</Text>
-                        <Text style={styles.promoItem}>3. Miễn phí giao hàng nội thành cho đơn từ 2.000.000đ.</Text>
-                    </View>
                 </View>
 
-                {/* Mô tả */}
+                {/* Mô tả sản phẩm */}
                 <View style={styles.section}>
-                    <View style={styles.sectionHeaderRow}>
-                        <Text style={styles.sectionTitle}>Mô tả sản phẩm</Text>
-                    </View>
+                    <Text style={styles.sectionTitle}>Đặc điểm nổi bật</Text>
                     <View style={styles.descriptionCard}>
                         <Text style={styles.descriptionText}>{product.description}</Text>
                     </View>
@@ -225,9 +214,7 @@ export default function ProductDetailScreen({ route, navigation }) {
                 {/* Sản phẩm tương tự */}
                 {similarProducts.length > 0 && (
                     <View style={styles.section}>
-                        <View style={styles.sectionHeaderRow}>
-                            <Text style={styles.sectionTitle}>Sản phẩm tương tự</Text>
-                        </View>
+                        <Text style={styles.sectionTitle}>Sản phẩm tương tự</Text>
                         <FlatList
                             data={similarProducts}
                             keyExtractor={item => item.id.toString()}
@@ -238,76 +225,175 @@ export default function ProductDetailScreen({ route, navigation }) {
                         />
                     </View>
                 )}
+
+                {/* Đánh giá sản phẩm */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Đánh giá sản phẩm</Text>
+                    
+                    {/* Header Đánh giá tổng quan */}
+                    <View style={styles.reviewSummaryRow}>
+                        <View style={{ alignItems: 'center' }}>
+                            <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#111827' }}>5.0<Text style={{fontSize:16, color:'#6b7280'}}>/5</Text></Text>
+                            <View style={{ flexDirection: 'row', marginVertical: 4 }}>
+                                {[1, 2, 3, 4, 5].map(s => <Ionicons key={s} name="star" size={18} color="#f59e0b" />)}
+                            </View>
+                            <Text style={{ fontSize: 13, color: '#6b7280' }}>{reviewCount} đánh giá</Text>
+                        </View>
+                    </View>
+
+                    {/* Danh sách bình luận */}
+                    {reviews.length > 0 ? (
+                        <View style={{ marginTop: 16 }}>
+                            {reviews.slice(0, 5).map(rev => (
+                                <View key={rev.id} style={styles.reviewItem}>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                            <Image source={{ uri: rev.avatar || 'https://i.pravatar.cc/150' }} style={{ width: 28, height: 28, borderRadius: 14, marginRight: 8 }} />
+                                            <Text style={{ fontWeight: 'bold', color: '#111827' }}>{rev.name}</Text>
+                                            <Badge style={{backgroundColor: '#10b981', color: '#fff', marginLeft: 8}} size={16}>Đã mua</Badge>
+                                        </View>
+                                        <View style={{ flexDirection: 'row' }}>
+                                            {[1, 2, 3, 4, 5].map(s => (
+                                                <Ionicons key={s} name={s <= rev.rating ? "star" : "star-outline"} size={14} color="#facc15" />
+                                            ))}
+                                        </View>
+                                    </View>
+                                    <Text style={{ fontSize: 14, color: '#374151', marginTop: 4, paddingLeft: 36 }}>{rev.comment}</Text>
+                                </View>
+                            ))}
+                        </View>
+                    ) : (
+                        <Text style={{ color: '#6b7280', alignSelf: 'center', marginVertical: 10 }}>Chưa có đánh giá nào.</Text>
+                    )}
+
+                    {/* Khung viết review */}
+                    <View style={styles.writeReviewBox}>
+                        <Text style={{ fontSize: 14, fontWeight: '600', marginBottom: 8 }}>Viết đánh giá của bạn</Text>
+                        <View style={{ flexDirection: 'row', marginBottom: 12, alignItems: 'center' }}>
+                            <Text style={{ marginRight: 8, color: '#374151' }}>Chọn sao:</Text>
+                            {[1, 2, 3, 4, 5].map(star => (
+                                <TouchableOpacity key={star} onPress={() => setRating(star)}>
+                                    <Ionicons name={star <= rating ? "star" : "star-outline"} size={26} color="#facc15" />
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                        <TextInput
+                            mode="outlined"
+                            placeholder="Xin mời chia sẻ một số cảm nhận..."
+                            multiline
+                            numberOfLines={3}
+                            value={comment}
+                            onChangeText={setComment}
+                            style={{ backgroundColor: '#fff', marginBottom: 12 }}
+                            outlineColor="#d1d5db"
+                        />
+                        <Button 
+                            mode="contained" 
+                            onPress={submitReview} 
+                            loading={submitting} 
+                            disabled={submitting}
+                            style={{ backgroundColor: '#dc2626', borderRadius: 8 }}
+                        >
+                            Gửi Đánh Giá
+                        </Button>
+                    </View>
+                </View>
+
             </ScrollView>
 
-            {/* Bottom Bar */}
-            <View style={styles.bottomBar}>
-                <View style={styles.bottomPrice}>
-                    <Text style={styles.bottomPriceLabel}>Giá</Text>
-                    <Text style={styles.bottomPriceText}>{product.price.toLocaleString()} ₫</Text>
-                </View>
-                <View style={styles.bottomActions}>
-                    <TouchableOpacity style={styles.bottomIconButton}>
-                        <Ionicons name="call-outline" size={20} color="#dc2626" />
-                    </TouchableOpacity>
-                    <Button
-                        mode="contained"
-                        style={styles.bottomPrimaryButton}
-                        labelStyle={{ fontWeight: 'bold' }}
-                        onPress={async () => {
-                            try {
-                                await api.post('/cart/add', { productId: product.id, quantity: 1 });
-                                alert('Đã thêm sản phẩm vào giỏ hàng.');
-                                navigation.navigate('MainApp', { screen: 'CartTab' });
-                            } catch (e) {
-                                console.log('Add to cart error:', e);
-                                alert(e.response?.data?.message || 'Không thể thêm vào giỏ hàng');
-                            }
-                        }}
-                    >
-                        Thêm vào giỏ
-                    </Button>
-                </View>
+            {/* Bottom Bar giống CellphoneS */}
+            <View style={styles.bottomBarFixed}>
+                <TouchableOpacity style={styles.iconActionBtn}>
+                    <Ionicons name="call-outline" size={24} color="#dc2626" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.iconActionBtnCenter}>
+                    <Text style={styles.iconActionBtnCenterText}>Trả góp 0%</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                    style={styles.buyNowBtn}
+                    onPress={async () => {
+                        try {
+                            await api.post('/cart/add', { productId: product.id, quantity: 1 });
+                            alert('Đã thêm sản phẩm vào giỏ hàng.');
+                        } catch (e) {
+                            console.log('Add to cart error:', e);
+                            alert(e.response?.data?.message || 'Không thể thêm vào giỏ hàng');
+                        }
+                    }}
+                >
+                    <Text style={styles.buyNowBtnTitle}>Mua ngay</Text>
+                    <Text style={styles.buyNowBtnSub}>Giao tận nơi hoặc nhận tại cửa hàng</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.iconActionBtn}>
+                    <Ionicons name="cart-outline" size={24} color="#dc2626" />
+                </TouchableOpacity>
             </View>
-        </View>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f3f4f6' },
-    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 40, paddingHorizontal: 16, paddingBottom: 8, backgroundColor: '#ffffff', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#e5e7eb' },
-    headerTitle: { flex: 1, marginHorizontal: 12, fontSize: 16, fontWeight: '600', color: '#111827' },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 40, paddingHorizontal: 16, paddingBottom: 12, backgroundColor: '#ffffff', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#e5e7eb' },
+    headerTitle: { flex: 1, marginHorizontal: 12, fontSize: 16, fontWeight: 'bold', color: '#111827' },
     headerIcons: { flexDirection: 'row', alignItems: 'center' },
     scroll: { flex: 1 },
     imageWrapper: { backgroundColor: '#ffffff', paddingVertical: 16, alignItems: 'center' },
-    mainImage: { width: width * 0.8, height: 260 },
-    infoCard: { backgroundColor: '#ffffff', paddingHorizontal: 16, paddingVertical: 12, marginTop: 8 },
-    productName: { fontSize: 18, fontWeight: 'bold', color: '#111827', marginBottom: 8 },
-    priceRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
-    priceText: { fontSize: 20, fontWeight: 'bold', color: '#dc2626' },
-    discountBadge: { backgroundColor: '#fee2e2', color: '#b91c1c' },
-    metaRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 },
-    ratingRow: { flexDirection: 'row', alignItems: 'center' },
-    ratingText: { marginLeft: 4, fontSize: 13, fontWeight: '600', color: '#111827' },
-    ratingCount: { marginLeft: 4, fontSize: 12, color: '#6b7280' },
-    soldText: { fontSize: 12, color: '#6b7280' },
-    section: { marginTop: 10, backgroundColor: '#ffffff', paddingHorizontal: 16, paddingVertical: 12 },
-    sectionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
-    sectionTitle: { fontSize: 16, fontWeight: '600', color: '#111827' },
-    promoCard: { backgroundColor: '#eff6ff', borderRadius: 8, padding: 10 },
-    promoItem: { fontSize: 13, color: '#1e3a8a', marginBottom: 4 },
-    descriptionCard: { borderRadius: 8, backgroundColor: '#f9fafb', padding: 10 },
-    descriptionText: { fontSize: 14, color: '#374151', lineHeight: 20 },
-    reviewItem: { paddingVertical: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#e5e7eb' },
-    similarCard: { width: 140, marginRight: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#f3f4f6', padding: 8 },
-    similarImage: { width: '100%', height: 100, marginBottom: 8 },
-    similarName: { fontSize: 13, fontWeight: '500', color: '#1f2937', marginBottom: 4 },
+    mainImage: { width: width * 0.85, height: 300 },
+    
+    infoCard: { backgroundColor: '#ffffff', paddingHorizontal: 16, paddingVertical: 16, marginBottom: 8 },
+    productName: { fontSize: 20, fontWeight: 'bold', color: '#111827', marginBottom: 8, lineHeight: 28 },
+    ratingRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+    ratingCount: { fontSize: 13, color: '#2563eb' },
+    soldText: { fontSize: 13, color: '#6b7280' },
+    
+    priceContainer: { flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
+    priceText: { fontSize: 24, fontWeight: 'bold', color: '#dc2626' },
+    oldPriceText: { fontSize: 14, color: '#9ca3af', textDecorationLine: 'line-through', marginBottom: 4 },
+    discountBadge: { backgroundColor: '#fee2e2', color: '#dc2626', marginBottom: 4, fontWeight: 'bold' },
+
+    promoSection: { backgroundColor: '#ffffff', padding: 16, marginBottom: 8 },
+    promoHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+    promoTitle: { fontSize: 16, fontWeight: 'bold', color: '#dc2626', marginLeft: 6 },
+    promoBody: { borderWidth: 1, borderColor: '#fca5a5', borderRadius: 8, padding: 12, backgroundColor: '#fef2f2' },
+    promoItemRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 },
+    promoDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#dc2626', marginTop: 6, marginRight: 8 },
+    promoItemText: { fontSize: 13, color: '#111827', flex: 1, lineHeight: 20 },
+
+    commitSection: { backgroundColor: '#ffffff', padding: 16, marginBottom: 8 },
+    commitTitle: { fontSize: 16, fontWeight: 'bold', color: '#111827', marginBottom: 12 },
+    commitGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+    commitItem: { width: '48%', flexDirection: 'row', alignItems: 'center', backgroundColor: '#f9fafb', padding: 10, borderRadius: 8, marginBottom: 8 },
+    commitText: { fontSize: 12, color: '#374151', marginLeft: 8, flex: 1 },
+
+    section: { backgroundColor: '#ffffff', padding: 16, marginBottom: 8 },
+    sectionTitle: { fontSize: 16, fontWeight: 'bold', color: '#111827', marginBottom: 12 },
+    sectionTitleSpec: { fontSize: 18, fontWeight: 'bold', color: '#111827', marginBottom: 12, textAlign: 'center' },
+    
+    specTable: { borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8, overflow: 'hidden' },
+    specRow: { flexDirection: 'row', paddingVertical: 10, paddingHorizontal: 12 },
+    specRowEven: { backgroundColor: '#f3f4f6' },
+    specRowOdd: { backgroundColor: '#ffffff' },
+    specLabel: { flex: 1, fontSize: 13, color: '#4b5563', fontWeight: '500' },
+    specValue: { flex: 2, fontSize: 13, color: '#111827', fontWeight: '500' },
+
+    descriptionCard: { backgroundColor: '#f9fafb', padding: 12, borderRadius: 8 },
+    descriptionText: { fontSize: 14, color: '#374151', lineHeight: 24 },
+
+    similarCard: { width: 140, marginRight: 12, padding: 8, borderWidth: 1, borderColor: '#f3f4f6', borderRadius: 8 },
+    similarImage: { width: '100%', height: 120, marginBottom: 8 },
+    similarName: { fontSize: 13, fontWeight: '500', color: '#111827', marginBottom: 4 },
     similarPrice: { fontSize: 14, fontWeight: 'bold', color: '#dc2626' },
-    bottomBar: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 10, paddingVertical: 8, backgroundColor: '#ffffff', borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: '#e5e7eb', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-    bottomPrice: { flexDirection: 'column' },
-    bottomPriceLabel: { fontSize: 12, color: '#6b7280' },
-    bottomPriceText: { fontSize: 16, fontWeight: 'bold', color: '#dc2626' },
-    bottomActions: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-    bottomIconButton: { width: 40, height: 40, borderRadius: 20, borderWidth: 1, borderColor: '#fecaca', alignItems: 'center', justifyContent: 'center' },
-    bottomPrimaryButton: { backgroundColor: '#dc2626' },
+
+    reviewSummaryRow: { alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#f3f4f6', paddingBottom: 16 },
+    reviewItem: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
+    writeReviewBox: { padding: 16, backgroundColor: '#f9fafb', borderRadius: 12, marginTop: 16 },
+
+    bottomBarFixed: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#ffffff', flexDirection: 'row', padding: 8, borderTopWidth: 1, borderTopColor: '#e5e7eb', elevation: 10, shadowColor: '#000', shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.1, shadowRadius: 4, alignItems: 'stretch' },
+    iconActionBtn: { paddingHorizontal: 12, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#fca5a5', borderRadius: 8, marginRight: 8, backgroundColor: '#fff' },
+    iconActionBtnCenter: { flex: 1, paddingVertical: 10, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#2563eb', borderRadius: 8, marginRight: 8, backgroundColor: '#fff' },
+    iconActionBtnCenterText: { color: '#2563eb', fontWeight: 'bold', fontSize: 12 },
+    buyNowBtn: { flex: 2, backgroundColor: '#dc2626', borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginRight: 8 },
+    buyNowBtnTitle: { color: '#ffffff', fontWeight: 'bold', fontSize: 14 },
+    buyNowBtnSub: { color: '#ffffff', fontSize: 10, opacity: 0.9 },
 });

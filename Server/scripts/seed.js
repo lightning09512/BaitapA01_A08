@@ -29,7 +29,7 @@ const productsData = [
 const seedData = async () => {
     try {
         await sequelize.sync({ force: true });
-        console.log('✅ Cơ sở dữ liệu đồng bộ thành công. Bắt đầu seed data...');
+        console.log('[SUCCESS] Cơ sở dữ liệu đồng bộ thành công. Bắt đầu seed data...');
 
         // Insert Products
         for (const p of productsData) {
@@ -45,7 +45,7 @@ const seedData = async () => {
                 viewCount: 0 // Default
             });
         }
-        console.log('✅ Đã nạp danh sách sản phẩm mẫu.');
+        console.log('[SUCCESS] Đã nạp danh sách sản phẩm mẫu.');
 
         // Đọc từ data.json
         const dataPath = path.join(__dirname, '../data.json');
@@ -152,7 +152,7 @@ const seedData = async () => {
                     }
                 }
             }
-            console.log('✅ Đã nạp danh sách tài khoản, giỏ hàng, thông báo, đơn hàng, coupon.');
+            console.log('[SUCCESS] Đã nạp danh sách tài khoản, giỏ hàng, thông báo, đơn hàng, coupon.');
 
             // Insert Reviews
             for (const r of reviews) {
@@ -169,7 +169,7 @@ const seedData = async () => {
                     createdAt: r.createdAt ? new Date(r.createdAt) : new Date()
                 });
             }
-            console.log('✅ Đã nạp danh sách đánh giá sản phẩm.');
+            console.log('[SUCCESS] Đã nạp danh sách đánh giá sản phẩm.');
             
             // Handle User Favorites & ViewedHistory logic later if needed
             // Currently they are arrays of productIDs inside User json.
@@ -187,11 +187,11 @@ const seedData = async () => {
                 }
             }
         }
-        console.log('✅ Quá trình Seed hoàn tất! Bạn có thể khởi động Server.');
+        console.log('[SUCCESS] Quá trình Seed hoàn tất! Bạn có thể khởi động Server.');
         process.exit();
 
     } catch (error) {
-        console.error('❌ Lỗi quá trình Seed:', error);
+        console.error('[ERROR] Lỗi quá trình Seed:', error);
         process.exit(1);
     }
 };

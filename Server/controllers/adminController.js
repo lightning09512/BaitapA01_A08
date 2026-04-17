@@ -147,7 +147,7 @@ const updateOrderStatus = async (req, res) => {
                 await Notification.create({
                     id: Date.now().toString(),
                     userId: user.username,
-                    title: 'Đơn hàng đã giao thành công! 🎉',
+                    title: 'Đơn hàng đã giao thành công!',
                     message: `Đơn hàng #${order.id.slice(-6)} đã được giao thành công. Cảm ơn bạn đã mua hàng!`,
                     isRead: false,
                 });

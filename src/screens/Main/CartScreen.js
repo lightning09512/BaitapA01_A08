@@ -5,23 +5,17 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  ScrollView,
 } from 'react-native';
-import { ActivityIndicator, Button, Text, TextInput } from 'react-native-paper';
+import { ActivityIndicator, Button, Text } from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
 import api from '../../services/api';
 
 export default function CartScreen({ navigation }) {
   const [items, setItems] = useState([]);
-  const [totalAmount, setTotalAmount] = useState(0);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [placing, setPlacing] = useState(false);
-  const [address, setAddress] = useState('');
-  const [phone, setPhone] = useState('');
-  const [note, setNote] = useState('');
-  const [couponCode, setCouponCode] = useState('');
-  const [pointsToUse, setPointsToUse] = useState('');
   const [availablePoints, setAvailablePoints] = useState(0);
+  const [selectedItems, setSelectedItems] = useState([]);
 
   const loadCart = async () => {
     setLoading(true);
@@ -68,70 +62,81 @@ export default function CartScreen({ navigation }) {
     }
   };
 
-  const handleCheckout = async () => {
-    if (!items.length) {
-      alert('Giỏ hàng đang trống.');
+  const navigateToCheckout = () => {
+    if (selectedItems.length === 0) {
+      alert('Vui lòng chọn ít nhất 1 sản phẩm để thanh toán.');
       return;
     }
-    if (!address.trim()) {
-      alert('Vui lòng nhập địa chỉ nhận hàng.');
-      return;
-    }
-    if (!phone.trim()) {
-      alert('Vui lòng nhập số điện thoại nhận hàng.');
-      return;
-    }
+    navigation.navigate('Checkout', {
+      selectedItems,
+      displayTotalQuantity,
+      displayTotalAmount,
+      availablePoints
+    });
+  };
 
-    setPlacing(true);
-    try {
-      const res = await api.post('/orders/checkout-cod', {
-        address,
-        phone,
-        note,
-        couponCode: couponCode.trim() || undefined,
-        pointsToUse: Number(pointsToUse) || undefined
-      });
-      alert(res.data?.message || 'Đặt hàng thành công!');
-      // Sau khi đặt hàng, reload giỏ và chuyển sang màn đơn hàng
-      await loadCart();
-      navigation.navigate('Orders');
-    } catch (e) {
-      console.log('Checkout error:', e);
-      alert(e.response?.data?.message || e.message || 'Đặt hàng thất bại');
-    } finally {
-      setPlacing(false);
+  const toggleSelect = (productId) => {
+    setSelectedItems(prev => 
+      prev.includes(productId) 
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedItems.length === items.length && items.length > 0) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(items.map(item => item.productId));
     }
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.itemCard}>
-      <Image source={{ uri: item.image }} style={styles.itemImage} resizeMode="contain" />
-      <View style={styles.itemInfo}>
-        <Text style={styles.itemName} numberOfLines={2}>
-          {item.name}
-        </Text>
-        <Text style={styles.itemPrice}>{item.price.toLocaleString()} ₫</Text>
-        <View style={styles.qtyRow}>
-          <TouchableOpacity
-            style={styles.qtyButton}
-            onPress={() => changeQuantity(item.productId, item.quantity - 1)}
-          >
-            <Text style={styles.qtyButtonText}>-</Text>
-          </TouchableOpacity>
-          <Text style={styles.qtyValue}>{item.quantity}</Text>
-          <TouchableOpacity
-            style={styles.qtyButton}
-            onPress={() => changeQuantity(item.productId, item.quantity + 1)}
-          >
-            <Text style={styles.qtyButtonText}>+</Text>
-          </TouchableOpacity>
+  const displayTotalAmount = items
+    .filter(item => selectedItems.includes(item.productId))
+    .reduce((sum, item) => sum + item.lineTotal, 0);
+
+  const displayTotalQuantity = items
+    .filter(item => selectedItems.includes(item.productId))
+    .reduce((sum, item) => sum + item.quantity, 0);
+
+  const renderItem = ({ item }) => {
+    const isSelected = selectedItems.includes(item.productId);
+    return (
+      <View style={styles.itemCard}>
+        <TouchableOpacity 
+           onPress={() => toggleSelect(item.productId)}
+           style={{ justifyContent: 'center', marginRight: 10 }}
+        >
+           <Ionicons name={isSelected ? "checkbox" : "square-outline"} size={26} color={isSelected ? "#dc2626" : "#9ca3af"} />
+        </TouchableOpacity>
+        <Image source={{ uri: item.image }} style={styles.itemImage} resizeMode="contain" />
+        <View style={styles.itemInfo}>
+          <Text style={styles.itemName} numberOfLines={2}>
+            {item.name}
+          </Text>
+          <Text style={styles.itemPrice}>{item.price.toLocaleString()} ₫</Text>
+          <View style={styles.qtyRow}>
+            <TouchableOpacity
+              style={styles.qtyButton}
+              onPress={() => changeQuantity(item.productId, item.quantity - 1)}
+            >
+              <Text style={styles.qtyButtonText}>-</Text>
+            </TouchableOpacity>
+            <Text style={styles.qtyValue}>{item.quantity}</Text>
+            <TouchableOpacity
+              style={styles.qtyButton}
+              onPress={() => changeQuantity(item.productId, item.quantity + 1)}
+            >
+              <Text style={styles.qtyButtonText}>+</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.lineTotalBox}>
+          <Text style={styles.lineTotalText}>{item.lineTotal.toLocaleString()} ₫</Text>
         </View>
       </View>
-      <View style={styles.lineTotalBox}>
-        <Text style={styles.lineTotalText}>{item.lineTotal.toLocaleString()} ₫</Text>
-      </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -156,79 +161,38 @@ export default function CartScreen({ navigation }) {
 
       {/* Khối thanh toán */}
       <View style={styles.bottomSheet}>
-        <ScrollView
-          contentContainerStyle={{ paddingBottom: 8 }}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Tổng số lượng</Text>
-            <Text style={styles.summaryValue}>{totalQuantity} sản phẩm</Text>
-          </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Tạm tính</Text>
-            <Text style={styles.summaryValue}>{totalAmount.toLocaleString()} ₫</Text>
-          </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          
+          <TouchableOpacity 
+             style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
+             onPress={toggleSelectAll}
+          >
+             <Ionicons 
+                name={selectedItems.length === items.length && items.length > 0 ? "checkbox" : "square-outline"} 
+                size={24} 
+                color={selectedItems.length === items.length && items.length > 0 ? "#dc2626" : "#9ca3af"} 
+             />
+             <Text style={{ fontWeight: '600', marginLeft: 8 }}>Chọn tất cả</Text>
+          </TouchableOpacity>
 
-          <TextInput
-            label="Địa chỉ nhận hàng (COD)"
-            value={address}
-            onChangeText={setAddress}
-            mode="outlined"
-            style={{ marginTop: 8 }}
-          />
-          <TextInput
-            label="Số điện thoại"
-            value={phone}
-            onChangeText={setPhone}
-            mode="outlined"
-            keyboardType="phone-pad"
-            style={{ marginTop: 8 }}
-          />
-          <TextInput
-            label="Ghi chú cho đơn hàng (tùy chọn)"
-            value={note}
-            onChangeText={setNote}
-            mode="outlined"
-            multiline
-            style={{ marginTop: 8 }}
-          />
-          <TextInput
-            label="Mã giảm giá (nếu có)"
-            value={couponCode}
-            onChangeText={setCouponCode}
-            mode="outlined"
-            style={{ marginTop: 8 }}
-            autoCapitalize="characters"
-          />
-          <TextInput
-            label={`Trừ điểm (Bạn có: ${availablePoints} điểm)`}
-            value={pointsToUse}
-            onChangeText={setPointsToUse}
-            mode="outlined"
-            keyboardType="number-pad"
-            style={{ marginTop: 8 }}
-            placeholder="1 điểm = 1000đ"
-          />
+          <View style={{ alignItems: 'flex-end', marginRight: 12 }}>
+            <Text style={{ fontSize: 12, color: '#6b7280' }}>Tổng thanh toán</Text>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#dc2626' }}>
+              {displayTotalAmount.toLocaleString()} ₫
+            </Text>
+          </View>
 
           <Button
             mode="contained"
-            onPress={handleCheckout}
-            style={{ marginTop: 12, backgroundColor: '#dc2626' }}
-            loading={placing}
-            disabled={placing || !items.length}
+            onPress={navigateToCheckout}
+            style={{ backgroundColor: '#dc2626', borderRadius: 8, justifyContent: 'center' }}
+            labelStyle={{ fontSize: 14, fontWeight: 'bold', marginHorizontal: 16 }}
+            disabled={selectedItems.length === 0}
           >
-            Đặt hàng (COD)
+            Mua ngay
           </Button>
 
-          <Button
-            mode="text"
-            onPress={() => navigation.navigate('Orders')}
-            style={{ marginTop: 4 }}
-            disabled={placing}
-          >
-            Xem lịch sử đơn hàng
-          </Button>
-        </ScrollView>
+        </View>
       </View>
     </View>
   );

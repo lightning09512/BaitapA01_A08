@@ -19,14 +19,13 @@ const STATUS_LABELS = {
     SHIPPING: 'Vận chuyển', DELIVERED: 'Đã giao', CANCELLED: 'Đã hủy',
 };
 
-function StatCard({ icon, label, value, color }) {
+function StatCard({ icon, value, color }) {
     return (
         <View style={[styles.statCard, { borderLeftColor: color }]}>
             <View style={[styles.statIcon, { backgroundColor: color + '22' }]}>
                 <Ionicons name={icon} size={22} color={color} />
             </View>
-            <View>
-                <Text style={styles.statLabel}>{label}</Text>
+            <View style={{ flex: 1, alignItems: 'center' }}>
                 <Text style={[styles.statValue, { color }]}>{value}</Text>
             </View>
         </View>
@@ -64,7 +63,7 @@ export default function AdminDashboardScreen({ navigation }) {
             {/* Header */}
             <View style={styles.header}>
                 <View>
-                    <Text style={styles.headerTitle}>⚡ Admin Dashboard</Text>
+                    <Text style={styles.headerTitle}>Admin Dashboard</Text>
                     <Text style={styles.headerSub}>SellphoneK Management</Text>
                 </View>
                 <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
@@ -81,9 +80,9 @@ export default function AdminDashboardScreen({ navigation }) {
                     {/* Stats tổng quan */}
                     <Text style={styles.sectionTitle}>Tổng quan</Text>
                     <View style={styles.statsRow}>
-                        <StatCard icon="cube-outline" label="Sản phẩm" value={stats?.totalProducts || 0} color="#dc2626" />
-                        <StatCard icon="people-outline" label="Khách hàng" value={stats?.totalUsers || 0} color="#3b82f6" />
-                        <StatCard icon="receipt-outline" label="Đơn hàng" value={stats?.totalOrders || 0} color="#8b5cf6" />
+                        <StatCard icon="cube-outline" value={stats?.totalProducts || 0} color="#dc2626" />
+                        <StatCard icon="people-outline" value={stats?.totalUsers || 0} color="#3b82f6" />
+                        <StatCard icon="receipt-outline" value={stats?.totalOrders || 0} color="#8b5cf6" />
                     </View>
 
                     {/* Doanh thu */}

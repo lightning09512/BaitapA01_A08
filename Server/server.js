@@ -48,8 +48,8 @@ io.on('connection', (socket) => {
 // alter: true giúp thêm cột mới (ví dụ: role) mà không xoá dữ liệu cũ
 sequelize.sync({ alter: true }).then(() => {
     server.listen(PORT, () => {
-        console.log(`🚀 Server đang chạy trên cổng ${PORT}`);
+        console.log(`[INFO] Server đang chạy trên cổng ${PORT}`);
     });
 }).catch(err => {
-    console.error("❌ Không thể đồng bộ Database:", err);
+    console.error("[ERROR] Không thể đồng bộ Database:", err);
 });

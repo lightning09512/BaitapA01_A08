@@ -63,7 +63,7 @@ export default function AdminOrdersScreen({ navigation }) {
                         setUpdating(true);
                         try {
                             await api.post('/admin/orders/status', { orderId, newStatus });
-                            Alert.alert('✅ Thành công', `Đã cập nhật: ${STATUS_LABELS[newStatus]}`);
+                            Alert.alert('Thành công', `Đã cập nhật: ${STATUS_LABELS[newStatus]}`);
                             setSelectedOrder(null);
                             loadOrders(1);
                         } catch (e) {
@@ -92,7 +92,7 @@ export default function AdminOrdersScreen({ navigation }) {
                     </View>
                 </View>
                 <View style={styles.orderBottom}>
-                    <Text style={styles.orderAddress} numberOfLines={1}>📍 {item.address}</Text>
+                    <Text style={styles.orderAddress} numberOfLines={1}>Địa chỉ: {item.address}</Text>
                     <Text style={styles.orderAmount}>{(item.totalAmount || 0).toLocaleString()} ₫</Text>
                 </View>
                 <Text style={styles.orderDate}>

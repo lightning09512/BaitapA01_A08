@@ -11,6 +11,7 @@ import IntroScreen from '../IntroScreen';
 import HomeScreen from '../Main/HomeScreen';
 import ProductDetailScreen from '../Main/ProductDetailScreen';
 import CartScreen from '../Main/CartScreen';
+import CheckoutScreen from '../Main/CheckoutScreen';
 import OrdersScreen from '../Main/OrdersScreen';
 import NotificationScreen from '../Main/NotificationScreen';
 import FavoritesScreen from '../Profile/FavoritesScreen';
@@ -59,6 +60,7 @@ export default function AppNavigator() {
                 <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Đăng Ký' }} />
                 <Stack.Screen name="MainApp" component={MainTabs} />
                 <Stack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ title: 'Chi Tiết' }} />
+                <Stack.Screen name="Checkout" component={CheckoutScreen} options={{ title: 'Thông Tin Thanh Toán' }} />
                 <Stack.Screen name="Orders" component={OrdersScreen} options={{ title: 'Đơn Hàng' }} />
                 <Stack.Screen name="Notifications" component={NotificationScreen} options={{ title: 'Thông Báo', headerShown: false }} />
                 <Stack.Screen name="Favorites" component={FavoritesScreen} options={{ title: 'Yêu Thích' }} />

@@ -79,7 +79,7 @@ function GlassInput({ label, icon, value, onChangeText, disabled, keyboardType, 
                     selectionColor="#60a5fa"
                 />
             </Animated.View>
-            {error && errorText ? <Text style={styles.errorText}>⚠ {errorText}</Text> : null}
+            {error && errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
         </View>
     );
 }
@@ -135,7 +135,7 @@ function OtpInput({ value, onChangeText, disabled, error, errorText }) {
                     caretHidden
                 />
             </TouchableOpacity>
-            {error && errorText ? <Text style={styles.errorText}>⚠ {errorText}</Text> : null}
+            {error && errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
         </View>
     );
 }
@@ -195,7 +195,7 @@ export default function VerifyAccountScreen({ navigation, route }) {
         try {
             const res = await api.post('/verify-account', { email, otp });
             Alert.alert(
-                'Xác minh thành công ✅',
+                'Xác minh thành công',
                 res.data.message,
                 [{ text: 'Đăng nhập ngay', onPress: () => navigation.replace('Login') }]
             );
@@ -254,7 +254,7 @@ export default function VerifyAccountScreen({ navigation, route }) {
                     {/* Shield icon */}
                     <View style={styles.shieldWrapper}>
                         <Animated.View style={[styles.shieldGlow, { transform: [{ scale: shieldPulse }] }]} />
-                        <Text style={styles.shieldIcon}>🛡️</Text>
+                        <Text style={styles.shieldIcon}></Text>
                     </View>
 
                     <Text style={styles.welcomeText}>Xác minh tài khoản</Text>
@@ -263,12 +263,12 @@ export default function VerifyAccountScreen({ navigation, route }) {
                     {/* Email pre-filled badge */}
                     {route?.params?.email ? (
                         <View style={styles.emailBadge}>
-                            <Text style={styles.emailBadgeText}>✉️  {email}</Text>
+                            <Text style={styles.emailBadgeText}>{email}</Text>
                         </View>
                     ) : (
                         <GlassInput
                             label="Email"
-                            icon="✉️"
+                            icon=""
                             value={email}
                             onChangeText={t => updateField('email', t)}
                             keyboardType="email-address"

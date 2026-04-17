@@ -112,7 +112,7 @@ function GlassInput({ label, icon, value, onChangeText, secureTextEntry, disable
 
                 {secureTextEntry && (
                     <TouchableOpacity onPress={() => setShowPassword(v => !v)} style={styles.eyeBtn}>
-                        <Text style={styles.eyeIcon}>{showPassword ? '🙈' : '👁️'}</Text>
+                        <Text style={styles.eyeIcon}>{showPassword ? 'Ẩn' : 'Hiện'}</Text>
                     </TouchableOpacity>
                 )}
             </Animated.View>
@@ -337,14 +337,7 @@ export default function LoginScreen({ navigation }) {
                         </Text>
                     </TouchableOpacity>
 
-                    {/* Guest */}
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate('Homepage')}
-                        style={styles.guestBtn}
-                        disabled={loading}
-                    >
-                        <Text style={styles.guestText}>Xem thông tin sinh viên →</Text>
-                    </TouchableOpacity>
+
                 </Animated.View>
             </ScrollView>
         </View>

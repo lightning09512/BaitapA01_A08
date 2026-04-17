@@ -75,10 +75,10 @@ export default function AdminProductsScreen({ navigation }) {
         try {
             if (editMode) {
                 await api.put(`/admin/products/${editId}`, form);
-                Alert.alert('✅ Thành công', 'Đã cập nhật sản phẩm!');
+                Alert.alert('Thành công', 'Đã cập nhật sản phẩm!');
             } else {
                 await api.post('/admin/products', form);
-                Alert.alert('✅ Thành công', 'Đã thêm sản phẩm mới!');
+                Alert.alert('Thành công', 'Đã thêm sản phẩm mới!');
             }
             setModalVisible(false);
             loadProducts(1);
@@ -178,7 +178,7 @@ export default function AdminProductsScreen({ navigation }) {
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalCard}>
                         <View style={styles.modalHeader}>
-                            <Text style={styles.modalTitle}>{editMode ? '✏️ Sửa sản phẩm' : '➕ Thêm sản phẩm mới'}</Text>
+                            <Text style={styles.modalTitle}>{editMode ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới'}</Text>
                             <TouchableOpacity onPress={() => setModalVisible(false)}>
                                 <Ionicons name="close" size={22} color="#111827" />
                             </TouchableOpacity>

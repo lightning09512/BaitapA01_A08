@@ -7,7 +7,7 @@ const { sequelize, User } = require('../models');
 async function createAdmin() {
     try {
         await sequelize.authenticate();
-        console.log('✅ Đã kết nối MySQL');
+        console.log('[INFO] Đã kết nối MySQL');
 
         const existing = await User.findOne({ where: { username: 'admin' } });
         if (existing) {
@@ -15,7 +15,7 @@ async function createAdmin() {
             existing.role = 'admin';
             existing.isVerified = true;
             await existing.save();
-            console.log('✅ Đã cập nhật tài khoản admin:');
+            console.log('[SUCCESS] Đã cập nhật tài khoản admin:');
         } else {
             await User.create({
                 username: 'admin',
@@ -27,7 +27,7 @@ async function createAdmin() {
                 role: 'admin',
                 points: 0,
             });
-            console.log('✅ Đã tạo tài khoản admin mới:');
+            console.log('[SUCCESS] Đã tạo tài khoản admin mới:');
         }
 
         console.log('   Username: admin');
@@ -35,7 +35,7 @@ async function createAdmin() {
         console.log('   Role:     admin');
         process.exit(0);
     } catch (error) {
-        console.error('❌ Lỗi:', error.message);
+        console.error('[ERROR] Lỗi:', error.message);
         process.exit(1);
     }
 }

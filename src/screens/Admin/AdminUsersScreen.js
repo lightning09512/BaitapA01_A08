@@ -46,7 +46,7 @@ export default function AdminUsersScreen({ navigation }) {
                         try {
                             await api.post('/admin/users/role', { userId: user.id, newRole });
                             setUsers(prev => prev.map(u => u.id === user.id ? { ...u, role: newRole } : u));
-                            Alert.alert('✅ Thành công', `Đã đổi quyền thành ${newRole}`);
+                            Alert.alert('Thành công', `Đã đổi quyền thành ${newRole}`);
                         } catch (e) {
                             Alert.alert('Lỗi', e.response?.data?.message || 'Không thể cập nhật quyền');
                         }
@@ -73,7 +73,7 @@ export default function AdminUsersScreen({ navigation }) {
                 <Text style={styles.userMeta}>@{item.username} • {item.email}</Text>
                 <Text style={styles.userMeta}>
                     {item.phone || 'Chưa có SĐT'} • {item.points || 0} điểm •
-                    {item.isVerified ? ' ✅ Verified' : ' ⚠️ Unverified'}
+                    {item.isVerified ? ' (Verified)' : ' (Unverified)'}
                 </Text>
             </View>
             <TouchableOpacity onPress={() => handleToggleRole(item)} style={styles.roleBtn}>

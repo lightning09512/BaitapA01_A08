@@ -82,12 +82,12 @@ function GlassInput({ label, icon, value, onChangeText, secureTextEntry, disable
                 />
                 {secureTextEntry && (
                     <TouchableOpacity onPress={() => setShowPassword(v => !v)} style={styles.eyeBtn}>
-                        <Text style={styles.eyeIcon}>{showPassword ? '🙈' : '👁️'}</Text>
+                        <Text style={styles.eyeIcon}>{showPassword ? 'Ẩn' : 'Hiện'}</Text>
                     </TouchableOpacity>
                 )}
             </Animated.View>
             {error && errorText ? (
-                <Text style={styles.errorText}>⚠ {errorText}</Text>
+                <Text style={styles.errorText}>{errorText}</Text>
             ) : null}
         </View>
     );
@@ -155,7 +155,7 @@ export default function RegisterScreen({ navigation }) {
             const res = await api.post('/register', form);
             setLoading(false);
             const message = res.data?.message || 'Đăng ký thành công! Vui lòng kiểm tra email để xác minh tài khoản.';
-            Alert.alert('Thành công 🎉', message, [
+            Alert.alert('Thành công', message, [
                 { text: 'OK', onPress: () => navigation.navigate('VerifyAccount', { email: form.email }) }
             ]);
         } catch (e) {

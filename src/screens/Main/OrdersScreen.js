@@ -189,7 +189,6 @@ const styles = StyleSheet.create({
   cancelButton: {
     borderColor: '#fecaca',
     backgroundColor: '#fff7ed',
-    height: 32,
   },
 });
 

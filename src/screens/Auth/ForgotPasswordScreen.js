@@ -83,11 +83,11 @@ function GlassInput({ label, icon, value, onChangeText, secureTextEntry, disable
                 />
                 {secureTextEntry && (
                     <TouchableOpacity onPress={() => setShowPassword(v => !v)} style={styles.eyeBtn}>
-                        <Text style={styles.eyeIcon}>{showPassword ? '🙈' : '👁️'}</Text>
+                        <Text style={styles.eyeIcon}>{showPassword ? 'Ẩn' : 'Hiện'}</Text>
                     </TouchableOpacity>
                 )}
             </Animated.View>
-            {error && errorText ? <Text style={styles.errorText}>⚠ {errorText}</Text> : null}
+            {error && errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
         </View>
     );
 }
@@ -126,7 +126,7 @@ function OtpInput({ value, onChangeText, disabled, error, errorText }) {
                     caretHidden
                 />
             </TouchableOpacity>
-            {error && errorText ? <Text style={styles.errorText}>⚠ {errorText}</Text> : null}
+            {error && errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
         </View>
     );
 }
@@ -221,7 +221,7 @@ export default function ForgotPasswordScreen({ navigation }) {
                 return;
             }
             Alert.alert(
-                'Thành công 🎉',
+                'Thành công',
                 'Đổi mật khẩu thành công! Vui lòng đăng nhập lại.',
                 [{ text: 'OK', onPress: () => navigation.goBack() }]
             );
@@ -291,7 +291,7 @@ export default function ForgotPasswordScreen({ navigation }) {
 
                                 <GlassInput
                                     label="Email"
-                                    icon="✉️"
+                                    icon=""
                                     value={email}
                                     onChangeText={t => updateField('email', t)}
                                     keyboardType="email-address"
@@ -319,7 +319,7 @@ export default function ForgotPasswordScreen({ navigation }) {
                             <>
                                 <Text style={styles.welcomeText}>Nhập mã xác nhận 📩</Text>
                                 <View style={styles.emailBadge}>
-                                    <Text style={styles.emailBadgeText}>✉️  {email}</Text>
+                                    <Text style={styles.emailBadgeText}>{email}</Text>
                                 </View>
 
                                 <OtpInput
