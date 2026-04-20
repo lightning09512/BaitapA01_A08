@@ -56,6 +56,32 @@ export default function AdminUsersScreen({ navigation }) {
         );
     };
 
+    const handleDeleteUser = (user) => {
+        if (user.role === 'admin') {
+            Alert.alert('Không thể xóa', 'Không thể xóa tài khoản Admin.');
+            return;
+        }
+        Alert.alert(
+            '⚠️ Xác nhận xóa',
+            `Bạn có chắc muốn xóa tài khoản "${user.username}"?\n\nThao tác này sẽ xóa toàn bộ dữ liệu liên quan (đơn hàng, giỏ hàng, đánh giá...) và KHÔNG THỂ HOÀN TÁC.`,
+            [
+                { text: 'Huỷ', style: 'cancel' },
+                {
+                    text: 'Xóa', style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            await api.delete(`/admin/users/${user.id}`);
+                            setUsers(prev => prev.filter(u => u.id !== user.id));
+                            Alert.alert('Thành công', `Đã xóa tài khoản "${user.username}".`);
+                        } catch (e) {
+                            Alert.alert('Lỗi', e.response?.data?.message || 'Không thể xóa tài khoản');
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
     const renderItem = ({ item }) => (
         <View style={styles.userCard}>
             <Image
@@ -73,15 +99,22 @@ export default function AdminUsersScreen({ navigation }) {
                 <Text style={styles.userMeta}>@{item.username} • {item.email}</Text>
                 <Text style={styles.userMeta}>
                     {item.phone || 'Chưa có SĐT'} • {item.points || 0} điểm •
-                    {item.isVerified ? ' (Verified)' : ' (Unverified)'}
+                    {item.isVerified ? ' ✅ Verified' : ' ❌ Unverified'}
                 </Text>
             </View>
-            <TouchableOpacity onPress={() => handleToggleRole(item)} style={styles.roleBtn}>
+
+            {/* Nút đổi quyền */}
+            <TouchableOpacity onPress={() => handleToggleRole(item)} style={styles.actionBtn}>
                 <Ionicons
                     name={item.role === 'admin' ? 'shield-checkmark' : 'shield-outline'}
                     size={20}
                     color={item.role === 'admin' ? '#dc2626' : '#9ca3af'}
                 />
+            </TouchableOpacity>
+
+            {/* Nút xóa tài khoản */}
+            <TouchableOpacity onPress={() => handleDeleteUser(item)} style={[styles.actionBtn, { marginLeft: 2 }]}>
+                <Ionicons name="trash-outline" size={20} color="#ef4444" />
             </TouchableOpacity>
         </View>
     );
@@ -159,5 +192,5 @@ const styles = StyleSheet.create({
     roleAdmin: { backgroundColor: '#fee2e2' },
     roleCustomer: { backgroundColor: '#f3f4f6' },
     roleText: { fontSize: 11, fontWeight: '600', color: '#374151' },
-    roleBtn: { padding: 8 },
+    actionBtn: { padding: 8 },
 });

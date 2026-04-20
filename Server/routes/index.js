@@ -102,5 +102,6 @@ router.post('/admin/orders/status', authenticateToken, requireAdmin, adminContro
 // Admin quản lý người dùng
 router.get('/admin/users', authenticateToken, requireAdmin, adminController.getAllUsers);
 router.post('/admin/users/role', authenticateToken, requireAdmin, adminController.updateUserRole);
+router.delete('/admin/users/:userId', authenticateToken, requireAdmin, adminController.deleteUser);
 
 module.exports = router;

@@ -63,7 +63,7 @@ export default function OrdersScreen() {
     const statusColor = STATUS_COLORS[item.status] || '#6b7280';
     const statusLabel = STATUS_LABELS[item.status] || item.status;
     const created = item.createdAt ? new Date(item.createdAt) : null;
-    const firstItem = item.items?.[0];
+    const firstItem = item.OrderItems?.[0];
 
     return (
       <View style={styles.card}>
@@ -81,7 +81,7 @@ export default function OrdersScreen() {
         {firstItem && (
           <Text style={styles.itemsText}>
             {firstItem.name}
-            {item.items.length > 1 ? ` và ${item.items.length - 1} sản phẩm khác` : ''}
+            {item.OrderItems.length > 1 ? ` và ${item.OrderItems.length - 1} sản phẩm khác` : ''}
           </Text>
         )}
         <View style={styles.footerRow}>

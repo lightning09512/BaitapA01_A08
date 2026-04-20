@@ -12,6 +12,7 @@ import api from '../../services/api';
 
 export default function CartScreen({ navigation }) {
   const [items, setItems] = useState([]);
+  const [totalAmount, setTotalAmount] = useState(0);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [loading, setLoading] = useState(true);
   const [availablePoints, setAvailablePoints] = useState(0);
@@ -69,6 +70,7 @@ export default function CartScreen({ navigation }) {
     }
     navigation.navigate('Checkout', {
       selectedItems,
+      checkoutItems: items.filter(item => selectedItems.includes(item.productId)),
       displayTotalQuantity,
       displayTotalAmount,
       availablePoints

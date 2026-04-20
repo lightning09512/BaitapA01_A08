@@ -213,6 +213,11 @@ export default function ProfileScreen({ navigation }) {
             )}
 
             <View style={{ width: '100%', marginBottom: 20, marginTop: 10 }}>
+                <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Orders')}>
+                    <Ionicons name="receipt-outline" size={24} color="#2563eb" style={{ marginRight: 15 }} />
+                    <Text style={styles.menuText}>Đơn hàng của tôi</Text>
+                    <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Favorites')}>
                     <Ionicons name="heart-outline" size={24} color="#ef4444" style={{ marginRight: 15 }} />
                     <Text style={styles.menuText}>Sản phẩm yêu thích</Text>

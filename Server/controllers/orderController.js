@@ -1,4 +1,5 @@
 const { Order, OrderItem, Product, User, Coupon, Notification } = require('../models');
+const { sendOrderConfirmationEmail } = require('../services/emailService');
 
 const ORDER_STATUS = {
     NEW: 'NEW',
@@ -106,6 +107,16 @@ const checkoutCod = async (req, res) => {
             message: `Đơn hàng mới với tổng tiền ${totalAmount.toLocaleString()}đ đã được đặt thành công.`,
             isRead: false
         });
+
+        // Gửi email hóa đơn xác nhận đơn hàng
+        console.log(`[Order] User email: "${user.email}", will send: ${!!user.email}`);
+        if (user.email) {
+            sendOrderConfirmationEmail(user.email, newOrder, orderItemsData)
+                .then(ok => console.log(`[Order] Email sent: ${ok}`))
+                .catch(err => console.error('[Order] Email error:', err));
+        } else {
+            console.warn('[Order] Email trống, bỏ qua gửi email.');
+        }
 
         res.json({ message: "Đặt hàng COD thành công", order: newOrder });
     } catch (error) {

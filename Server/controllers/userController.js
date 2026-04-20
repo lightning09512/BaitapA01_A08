@@ -1,4 +1,4 @@
-const { User, Product, Notification, Coupon, Review, Sequelize } = require('../models');
+const { User, Product, Notification, Coupon, Review, Order, OrderItem, Sequelize } = require('../models');
 
 const getProfile = async (req, res) => {
     try {
@@ -135,6 +135,22 @@ const reviewProduct = async (req, res) => {
         const { rating, comment } = req.body;
         const user = await User.findOne({ where: { username: req.user.username } });
         
+        // Kiểm tra xem đã mua hàng chưa
+        const hasBought = await Order.findOne({
+            where: { 
+                userId: user.id,
+                status: 'DELIVERED' // Hoặc có thể dùng { [Sequelize.Op.notIn]: ['CANCELLED'] }
+            },
+            include: [{
+                model: OrderItem,
+                where: { productId }
+            }]
+        });
+
+        if (!hasBought) {
+            return res.status(403).json({ message: "Bạn cần mua và nhận thành công sản phẩm này mới có thể đánh giá." });
+        }
+
         const newReview = await Review.create({
             userId: user.id,
             productId,

@@ -1,5 +1,6 @@
 const { User } = require('../models');
 const jwt = require('jsonwebtoken');
+const emailService = require('../services/emailService');
 
 const SECRET_KEY = "SECRET_KEY_A04";
 
@@ -24,9 +25,10 @@ const register = async (req, res) => {
             points: 0,
         });
 
-        console.log(`\n=== OTP XÁC MINH TÀI KHOẢN CHO ${email}: ${otp} ===\n`);
+        emailService.sendOTPEmail(email, otp, 'Xác minh tài khoản');
+
         res.json({
-            message: "Đăng ký thành công! Vui lòng kiểm tra terminal server để xem mã OTP.",
+            message: `Đăng ký thành công! Đã gửi mã OTP đến email ${email}. Vui lòng kiểm tra hộp thư của bạn.`,
             requiresVerification: true
         });
     } catch (e) {
@@ -84,8 +86,9 @@ const forgotPassword = async (req, res) => {
         user.resetOtp = otp;
         await user.save();
 
-        console.log(`\n=== OTP QUÊN MẬT KHẨU CHO ${email}: ${otp} ===\n`);
-        res.json({ message: `Đã gửi mã OTP đến ${email}. Vui lòng kiểm tra terminal server để xem mã OTP!` });
+        emailService.sendOTPEmail(email, otp, 'Khôi phục mật khẩu');
+
+        res.json({ message: `Đã gửi mã OTP đến ${email}. Vui lòng kiểm tra hộp thư của bạn!` });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

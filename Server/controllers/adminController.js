@@ -210,6 +210,39 @@ const updateUserRole = async (req, res) => {
     }
 };
 
+const deleteUser = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { CartItem, Notification, Coupon, Review, Order, OrderItem, UserFavorites, UserViewedHistory } = require('../models');
+
+        const user = await User.findByPk(userId);
+        if (!user) return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+        if (user.role === 'admin') return res.status(400).json({ message: 'Không thể xóa tài khoản Admin.' });
+
+        // Xóa dữ liệu liên quan
+        await CartItem.destroy({ where: { userId: user.id } });
+        await Notification.destroy({ where: { userId: user.username } });
+        await Coupon.destroy({ where: { userId: user.id } });
+        await Review.destroy({ where: { userId: user.id } });
+
+        // Xóa OrderItems trước khi xóa Orders
+        const orders = await Order.findAll({ where: { userId: user.id } });
+        for (const order of orders) {
+            await OrderItem.destroy({ where: { orderId: order.id } });
+        }
+        await Order.destroy({ where: { userId: user.id } });
+
+        // Xóa favorites & viewed
+        try { await UserFavorites.destroy({ where: { UserId: user.id } }); } catch {}
+        try { await UserViewedHistory.destroy({ where: { UserId: user.id } }); } catch {}
+
+        await user.destroy();
+        res.json({ message: `Đã xóa tài khoản "${user.username}" thành công.` });
+    } catch (e) {
+        res.status(500).json({ message: e.message });
+    }
+};
+
 // ========== THỐNG KÊ DOANH THU ==========
 
 const getDashboardStats = async (req, res) => {
@@ -267,6 +300,7 @@ module.exports = {
     // Users
     getAllUsers,
     updateUserRole,
+    deleteUser,
     // Stats
     getDashboardStats,
 };
