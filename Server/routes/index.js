@@ -83,6 +83,7 @@ router.post('/cart/clear', authenticateToken, cartController.clearCart);
 
 // --- CHAT ---
 router.get('/chat/history/:targetId', authenticateToken, chatController.getChatHistory);
+router.post('/chat/send', authenticateToken, chatController.sendMessage);
 router.get('/admin/chat/conversations', authenticateToken, requireAdmin, chatController.getAdminConversations);
 
 // --- ORDERS (customer) ---

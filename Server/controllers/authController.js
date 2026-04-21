@@ -1,4 +1,4 @@
-const { User } = require('../models');
+const { User, Op } = require('../models');
 const jwt = require('jsonwebtoken');
 const emailService = require('../services/emailService');
 
@@ -7,12 +7,32 @@ const SECRET_KEY = "SECRET_KEY_A04";
 const register = async (req, res) => {
     try {
         const { username, password, email } = req.body;
-        const existsName = await User.findOne({ where: { username } });
-        if (existsName) return res.status(400).json({ message: "Tài khoản đã tồn tại" });
 
-        const existsEmail = await User.findOne({ where: { email } });
-        if (existsEmail) return res.status(400).json({ message: "Email đã được sử dụng" });
+        // 1. Kiểm tra xem đã có tài khoản nào ĐÃ XÁC MINH sử dụng username hoặc email này chưa
+        const verifiedUser = await User.findOne({
+            where: {
+                isVerified: true,
+                [Op.or]: [{ username }, { email }]
+            }
+        });
 
+        if (verifiedUser) {
+            if (verifiedUser.username === username) {
+                return res.status(400).json({ message: "Tài khoản đã tồn tại" });
+            }
+            return res.status(400).json({ message: "Email đã được sử dụng" });
+        }
+
+        // 2. Xóa tất cả các bản ghi CHƯA XÁC MINH bị trùng username hoặc email
+        // Điều này giúp dọn dẹp các yêu cầu đăng ký bị bỏ dở (tắt app, không nhập OTP)
+        await User.destroy({
+            where: {
+                isVerified: false,
+                [Op.or]: [{ username }, { email }]
+            }
+        });
+
+        // 3. Tạo tài khoản mới (ở trạng thái chưa xác minh)
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
         await User.create({

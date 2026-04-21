@@ -106,7 +106,7 @@ export default function ProfileScreen({ navigation }) {
                     <View style={styles.headerTopActions}>
                         <View style={{ flex: 1 }} />
                         <View style={styles.headerIcons}>
-                            <TouchableOpacity style={styles.iconBtn}>
+                            <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.navigate('EditProfile')}>
                                 <Ionicons name="settings-outline" size={24} color="#fff" />
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.navigate('CartTab')}>

@@ -425,7 +425,22 @@ export default function HomeScreen({ navigation }) {
                         </View>
                     )}
                 </View>
+                <View style={{ height: 80 }} />
             </ScrollView>
+
+            <TouchableOpacity 
+                style={styles.floatingChatBtn} 
+                onPress={() => navigation.navigate('Chat')}
+                activeOpacity={0.9}
+            >
+                <LinearGradient
+                    colors={['#ef4444', '#b91c1c']}
+                    style={styles.floatingChatGradient}
+                >
+                    <Ionicons name="chatbubble-ellipses" size={28} color="#fff" />
+                    <View style={styles.floatingChatBadge} />
+                </LinearGradient>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -434,6 +449,37 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
+    },
+    floatingChatBtn: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        elevation: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+    },
+    floatingChatGradient: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 30,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    floatingChatBadge: {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+        backgroundColor: '#4ade80',
+        borderWidth: 2,
+        borderColor: '#fff',
     },
     header: {
         paddingTop: Platform.OS === 'ios' ? 50 : 40,

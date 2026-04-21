@@ -9,17 +9,33 @@ const SOCKET_URL = api.defaults.baseURL;
 let socket = null;
 
 export const initiateSocket = async (userId) => {
-    if (socket) return socket;
+    if (socket) {
+        if (socket.connected && userId) {
+            socket.emit('register', userId);
+        } else if (!socket.connected) {
+            socket.connect();
+        }
+        return socket;
+    }
 
     socket = io(SOCKET_URL, {
-        transports: ['websocket'],
+        transports: ['websocket', 'polling'],
+        reconnection: true,
     });
 
     socket.on('connect', () => {
-        console.log('[Socket] Connected');
+        console.log('[Socket] Connected with ID:', socket.id);
         if (userId) {
             socket.emit('register', userId);
         }
+    });
+
+    socket.on('connect_error', (error) => {
+        console.error('[Socket] Connection Error:', error.message);
+    });
+
+    socket.on('error', (error) => {
+        console.error('[Socket] General Error:', error);
     });
 
     return socket;

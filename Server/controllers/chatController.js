@@ -84,8 +84,25 @@ const sendMessageInternal = async (senderId, receiverId, content) => {
     });
 };
 
+const sendMessage = async (req, res) => {
+    try {
+        const senderId = req.user.id;
+        const { receiverId, content } = req.body;
+
+        if (!receiverId || !content || !content.trim()) {
+            return res.status(400).json({ message: 'Thiếu người nhận hoặc nội dung tin nhắn.' });
+        }
+
+        const message = await sendMessageInternal(senderId, Number(receiverId), content.trim());
+        res.status(201).json(message);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getChatHistory,
     getAdminConversations,
-    sendMessageInternal
+    sendMessageInternal,
+    sendMessage
 };
