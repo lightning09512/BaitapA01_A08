@@ -11,6 +11,7 @@ export default function ViewedProductsScreen({ navigation }) {
     useEffect(() => {
         const load = async () => {
             setLoading(true);
+            setViewed([]); // Clear current list to force a visible refresh
             try {
                 const res = await api.get('/users/viewed');
                 setViewed(res.data || []);

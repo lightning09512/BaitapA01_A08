@@ -5,9 +5,9 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Image,
   TouchableOpacity
 } from 'react-native';
+import { Image } from 'expo-image';
 import { Text, TextInput, Button, Divider } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../services/api';
@@ -135,7 +135,7 @@ export default function CheckoutScreen({ route, navigation }) {
             {checkoutItems.map((item, index) => (
                 <View key={item.productId || index}>
                     <View style={styles.productRow}>
-                        <Image source={{ uri: item.image }} style={styles.productImage} />
+                        <Image source={{ uri: item.image }} style={styles.productImage} contentFit="contain" />
                         <View style={styles.productInfo}>
                             <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
                             <Text style={styles.productPrice}>{item.price?.toLocaleString()} ₫</Text>

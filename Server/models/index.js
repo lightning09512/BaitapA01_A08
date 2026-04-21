@@ -1,4 +1,4 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Op, Sequelize } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const User = sequelize.define('User', {
@@ -8,7 +8,10 @@ const User = sequelize.define('User', {
     email: { type: DataTypes.STRING, unique: true, allowNull: false },
     name: { type: DataTypes.STRING },
     phone: { type: DataTypes.STRING },
-    avatar: { type: DataTypes.STRING },
+    avatar: { type: DataTypes.TEXT },
+    bio: { type: DataTypes.STRING },
+    gender: { type: DataTypes.STRING },
+    birthday: { type: DataTypes.STRING },
     isVerified: { type: DataTypes.BOOLEAN, defaultValue: false },
     verifyOtp: { type: DataTypes.STRING },
     resetOtp: { type: DataTypes.STRING },
@@ -27,6 +30,7 @@ const Product = sequelize.define('Product', {
     name: { type: DataTypes.STRING, allowNull: false },
     price: { type: DataTypes.DOUBLE, allowNull: false },
     category: { type: DataTypes.STRING },
+    brand: { type: DataTypes.STRING },
     soldQuantity: { type: DataTypes.INTEGER, defaultValue: 0 },
     discountPercent: { type: DataTypes.INTEGER, defaultValue: 0 },
     description: { type: DataTypes.TEXT },
@@ -38,7 +42,7 @@ const Review = sequelize.define('Review', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     username: { type: DataTypes.STRING },
     name: { type: DataTypes.STRING },
-    avatar: { type: DataTypes.STRING },
+    avatar: { type: DataTypes.TEXT },
     rating: { type: DataTypes.INTEGER, defaultValue: 5 },
     comment: { type: DataTypes.TEXT },
 });
@@ -116,7 +120,7 @@ const Notification = sequelize.define('Notification', {
     isRead: { type: DataTypes.BOOLEAN, defaultValue: false },
 });
 
-User.hasMany(Notification, { foreignKey: 'userId', sourceKey: 'username' }); 
+User.hasMany(Notification, { foreignKey: 'userId', sourceKey: 'username' });
 // Có thể liên kết bằng username vì cũ code dùng username
 
 // Bảng trung gian
@@ -128,14 +132,33 @@ User.belongsToMany(Product, { through: UserFavorites, as: 'Favorites' });
 Product.belongsToMany(User, { through: UserFavorites });
 
 const UserViewedHistory = sequelize.define('UserViewedHistory', {
-    // bảng này để lưu lịch sử viewed
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 });
 
 User.belongsToMany(Product, { through: UserViewedHistory, as: 'ViewedProducts' });
 Product.belongsToMany(User, { through: UserViewedHistory });
 
+// Individual associations for direct sorting
+UserViewedHistory.belongsTo(User, { foreignKey: 'UserId' });
+UserViewedHistory.belongsTo(Product, { foreignKey: 'ProductId' });
+
+const ChatMessage = sequelize.define('ChatMessage', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    senderId: { type: DataTypes.INTEGER, allowNull: false },
+    receiverId: { type: DataTypes.INTEGER, allowNull: false },
+    content: { type: DataTypes.TEXT, allowNull: false },
+    isRead: { type: DataTypes.BOOLEAN, defaultValue: false },
+});
+
+User.hasMany(ChatMessage, { foreignKey: 'senderId', as: 'SentMessages' });
+User.hasMany(ChatMessage, { foreignKey: 'receiverId', as: 'ReceivedMessages' });
+ChatMessage.belongsTo(User, { foreignKey: 'senderId', as: 'Sender' });
+ChatMessage.belongsTo(User, { foreignKey: 'receiverId', as: 'Receiver' });
+
 module.exports = {
     sequelize,
+    Sequelize,
+    Op,
     User,
     Product,
     Review,
@@ -145,5 +168,6 @@ module.exports = {
     Coupon,
     Notification,
     UserFavorites,
-    UserViewedHistory
+    UserViewedHistory,
+    ChatMessage
 };

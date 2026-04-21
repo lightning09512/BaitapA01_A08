@@ -50,7 +50,7 @@ const login = async (req, res) => {
             });
         }
 
-        const token = jwt.sign({ username: user.username, role: user.role || 'customer' }, SECRET_KEY);
+        const token = jwt.sign({ id: user.id, username: user.username, role: user.role || 'customer' }, SECRET_KEY);
         res.json({ token, user, role: user.role || 'customer' });
     } catch (e) {
         res.status(500).json({ message: e.message });

@@ -153,6 +153,10 @@ export default function AdminDashboardScreen({ navigation }) {
                             <Ionicons name="people-outline" size={28} color="#059669" />
                             <Text style={[styles.actionLabel, { color: '#059669' }]}>Người dùng</Text>
                         </TouchableOpacity>
+                        <TouchableOpacity style={[styles.actionCard, { backgroundColor: '#fdf2f8' }]} onPress={() => navigation.navigate('AdminChatList')}>
+                            <Ionicons name="chatbubbles-outline" size={28} color="#be185d" />
+                            <Text style={[styles.actionLabel, { color: '#be185d' }]}>Tin nhắn</Text>
+                        </TouchableOpacity>
                         <TouchableOpacity style={[styles.actionCard, { backgroundColor: '#fef3c7' }]} onPress={loadStats}>
                             <Ionicons name="refresh-outline" size={28} color="#d97706" />
                             <Text style={[styles.actionLabel, { color: '#d97706' }]}>Làm mới</Text>

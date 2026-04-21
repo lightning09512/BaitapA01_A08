@@ -1,28 +1,29 @@
 import { io } from 'socket.io-client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import api from './api';
 
-const SOCKET_URL = 'http://10.0.2.2:3000'; // Make sure this matches your backend URL
+// Base URL usually same as API base but with socket protocol
+const SOCKET_URL = api.defaults.baseURL;
+
 let socket = null;
 
-export const initSocket = (username) => {
+export const initiateSocket = async (userId) => {
     if (socket) return socket;
 
-    socket = io(SOCKET_URL);
-
-    socket.on('connect', () => {
-        console.log('[Socket] Connected to server, id:', socket.id);
-        // Register the username with the socket to receive targeted notifications
-        socket.emit('register', username);
+    socket = io(SOCKET_URL, {
+        transports: ['websocket'],
     });
 
-    socket.on('disconnect', () => {
-        console.log('[Socket] Disconnected from server');
+    socket.on('connect', () => {
+        console.log('[Socket] Connected');
+        if (userId) {
+            socket.emit('register', userId);
+        }
     });
 
     return socket;
 };
-
-export const getSocket = () => socket;
 
 export const disconnectSocket = () => {
     if (socket) {
@@ -30,3 +31,5 @@ export const disconnectSocket = () => {
         socket = null;
     }
 };
+
+export const getSocket = () => socket;

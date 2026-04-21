@@ -31,8 +31,26 @@ io.on('connection', (socket) => {
     console.log(`[Socket] Client connected: ${socket.id}`);
 
     socket.on('register', (userId) => {
-        userSockets.set(userId, socket.id);
+        userSockets.set(userId.toString(), socket.id);
         console.log(`[Socket] User ${userId} registered to socket ${socket.id}`);
+    });
+
+    socket.on('send_message', async ({ senderId, receiverId, content }) => {
+        try {
+            const { sendMessageInternal } = require('./controllers/chatController');
+            const savedMsg = await sendMessageInternal(senderId, receiverId, content);
+            
+            // Emit to recipient if online
+            const recipientSocketId = userSockets.get(receiverId.toString());
+            if (recipientSocketId) {
+                io.to(recipientSocketId).emit('receive_message', savedMsg);
+            }
+            
+            // Emit confirmation back to sender
+            socket.emit('message_sent', savedMsg);
+        } catch (error) {
+            console.error('[Socket] Messaging error:', error);
+        }
     });
 
     socket.on('disconnect', () => {

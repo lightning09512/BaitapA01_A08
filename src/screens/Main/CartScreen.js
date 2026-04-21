@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import {
   View,
-  Image,
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { ActivityIndicator, Button, Text } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../services/api';
@@ -49,18 +50,39 @@ export default function CartScreen({ navigation }) {
     setTotalQuantity(data.totalQuantity || 0);
   };
 
-  const changeQuantity = async (productId, newQty) => {
+const changeQuantity = async (productId, newQty) => {
+    if (newQty <= 0) {
+      handleRemoveItem(productId);
+      return;
+    }
     try {
-      let res;
-      if (newQty <= 0) {
-        res = await api.post('/cart/remove', { productId });
-      } else {
-        res = await api.put('/cart/update', { productId, quantity: newQty });
-      }
+      const res = await api.put('/cart/update', { productId, quantity: newQty });
       setCartFromResponse(res.data || {});
     } catch (e) {
       console.log('Update cart error:', e);
     }
+  };
+
+  const handleRemoveItem = (productId) => {
+    Alert.alert(
+      "Xóa sản phẩm",
+      "Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?",
+      [
+        { text: "Hủy", style: "cancel" },
+        { 
+          text: "Xóa", 
+          style: "destructive", 
+          onPress: async () => {
+            try {
+              const res = await api.post('/cart/remove', { productId });
+              setCartFromResponse(res.data || {});
+            } catch (e) {
+              console.log('Remove item error:', e);
+            }
+          } 
+        }
+      ]
+    );
   };
 
   const navigateToCheckout = () => {
@@ -111,7 +133,7 @@ export default function CartScreen({ navigation }) {
         >
            <Ionicons name={isSelected ? "checkbox" : "square-outline"} size={26} color={isSelected ? "#dc2626" : "#9ca3af"} />
         </TouchableOpacity>
-        <Image source={{ uri: item.image }} style={styles.itemImage} resizeMode="contain" />
+        <Image source={{ uri: item.image }} style={styles.itemImage} contentFit="contain" />
         <View style={styles.itemInfo}>
           <Text style={styles.itemName} numberOfLines={2}>
             {item.name}
@@ -134,6 +156,12 @@ export default function CartScreen({ navigation }) {
           </View>
         </View>
         <View style={styles.lineTotalBox}>
+          <TouchableOpacity 
+            style={styles.deleteBtn}
+            onPress={() => handleRemoveItem(item.productId)}
+          >
+            <Ionicons name="trash-outline" size={20} color="#6b7280" />
+          </TouchableOpacity>
           <Text style={styles.lineTotalText}>{item.lineTotal.toLocaleString()} ₫</Text>
         </View>
       </View>
@@ -265,12 +293,17 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   lineTotalBox: {
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    paddingVertical: 2,
   },
   lineTotalText: {
     fontSize: 13,
     fontWeight: '600',
     color: '#111827',
+  },
+  deleteBtn: {
+    padding: 4,
   },
   bottomSheet: {
     position: 'absolute',

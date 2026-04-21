@@ -10,15 +10,20 @@ import HomepageScreen from '../HomepageScreen';
 import IntroScreen from '../IntroScreen';
 import HomeScreen from '../Main/HomeScreen';
 import ProductDetailScreen from '../Main/ProductDetailScreen';
+import SearchProductsScreen from '../Main/SearchProductsScreen';
 import CartScreen from '../Main/CartScreen';
 import CheckoutScreen from '../Main/CheckoutScreen';
 import OrdersScreen from '../Main/OrdersScreen';
 import NotificationScreen from '../Main/NotificationScreen';
 import FavoritesScreen from '../Profile/FavoritesScreen';
 import ProfileScreen from '../Profile/ProfileScreen';
+import EditProfileScreen from '../Profile/EditProfileScreen';
 import ViewedProductsScreen from '../Profile/ViewedProductsScreen';
 import WalletScreen from '../Profile/WalletScreen';
 import OrderStatsScreen from '../Profile/OrderStatsScreen';
+import ChatScreen from '../Main/ChatScreen';
+import AdminChatListScreen from '../Admin/AdminChatListScreen';
+import AdminChatDetailScreen from '../Admin/AdminChatDetailScreen';
 // Admin Screens
 import AdminDashboardScreen from '../Admin/AdminDashboardScreen';
 import AdminProductsScreen from '../Admin/AdminProductsScreen';
@@ -60,18 +65,23 @@ export default function AppNavigator() {
                 <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Đăng Ký' }} />
                 <Stack.Screen name="MainApp" component={MainTabs} />
                 <Stack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ title: 'Chi Tiết' }} />
+                <Stack.Screen name="SearchProducts" component={SearchProductsScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="Checkout" component={CheckoutScreen} options={{ title: 'Thông Tin Thanh Toán' }} />
                 <Stack.Screen name="Orders" component={OrdersScreen} options={{ title: 'Đơn Hàng' }} />
+                <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Sửa Hồ Sơ' }} />
                 <Stack.Screen name="Notifications" component={NotificationScreen} options={{ title: 'Thông Báo', headerShown: false }} />
                 <Stack.Screen name="Favorites" component={FavoritesScreen} options={{ title: 'Yêu Thích' }} />
                 <Stack.Screen name="ViewedProducts" component={ViewedProductsScreen} options={{ title: 'Đã Xem' }} />
                 <Stack.Screen name="Wallet" component={WalletScreen} options={{ title: 'Kho Điểm & Ưu Đãi' }} />
                 <Stack.Screen name="OrderStats" component={OrderStatsScreen} options={{ title: 'Thống Kê Dòng Tiền', headerShown: false }} />
+                <Stack.Screen name="Chat" component={ChatScreen} options={{ title: 'Hỗ trợ' }} />
                 {/* Admin Screens */}
                 <Stack.Screen name="AdminDashboard" component={AdminDashboardScreen} options={{ title: 'Admin Dashboard' }} />
                 <Stack.Screen name="AdminProducts" component={AdminProductsScreen} options={{ title: 'Quản lý Sản phẩm' }} />
                 <Stack.Screen name="AdminOrders" component={AdminOrdersScreen} options={{ title: 'Quản lý Đơn hàng' }} />
                 <Stack.Screen name="AdminUsers" component={AdminUsersScreen} options={{ title: 'Quản lý Người dùng' }} />
+                <Stack.Screen name="AdminChatList" component={AdminChatListScreen} options={{ title: 'Danh sách hỗ trợ' }} />
+                <Stack.Screen name="AdminChatDetail" component={AdminChatDetailScreen} options={{ title: 'Nhắn tin khách hàng' }} />
             </Stack.Navigator>
         </NavigationContainer>
     );

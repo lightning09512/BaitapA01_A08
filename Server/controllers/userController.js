@@ -1,31 +1,46 @@
-const { User, Product, Notification, Coupon, Review, Order, OrderItem, Sequelize } = require('../models');
+const { User, Product, Notification, Coupon, Review, Order, OrderItem, UserViewedHistory, Sequelize } = require('../models');
 
 const getProfile = async (req, res) => {
     try {
+        const userId = req.user.id;
+        const username = req.user.username;
+        const findQuery = userId ? { id: userId } : { username: username };
+
         const user = await User.findOne({ 
-            where: { username: req.user.username },
+            where: findQuery,
             attributes: { exclude: ['password'] } 
         });
-        if (!user) return res.status(404).json({ message: "Lỗi user" });
+        if (!user) return res.status(404).json({ message: "Không tìm thấy người dùng" });
         res.json(user);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-const updateAvatar = async (req, res) => {
+const updateProfile = async (req, res) => {
     try {
-        const { avatar } = req.body;
-        const user = await User.findOne({ where: { username: req.user.username } });
-        if (user) {
-            if (avatar) user.avatar = avatar;
-            await user.save();
-            const { password, ...safeUser } = user.toJSON();
-            res.json({ message: "Cập nhật avatar thành công", user: safeUser });
-        } else {
-            res.status(404).json({ message: "Lỗi user" });
-        }
+        const { avatar, name, phone, bio, gender, birthday } = req.body;
+        const userId = req.user.id;
+        const username = req.user.username;
+        const findQuery = userId ? { id: userId } : { username: username };
+
+        const user = await User.findOne({ where: findQuery });
+        if (!user) return res.status(404).json({ message: "Không tìm thấy người dùng" });
+
+        // Update fields
+        if (avatar !== undefined) user.avatar = avatar;
+        if (name !== undefined) user.name = name;
+        if (phone !== undefined) user.phone = phone;
+        if (bio !== undefined) user.bio = bio;
+        if (gender !== undefined) user.gender = gender;
+        if (birthday !== undefined) user.birthday = birthday;
+        
+        await user.save();
+        
+        const { password, ...safeUser } = user.toJSON();
+        res.json({ message: "Cập nhật hồ sơ thành công", user: safeUser });
     } catch (error) {
+        console.error("Update profile error:", error);
         res.status(500).json({ message: error.message });
     }
 };
@@ -96,13 +111,25 @@ const checkFavorite = async (req, res) => {
 
 const getViewed = async (req, res) => {
     try {
-        const user = await User.findOne({ 
-            where: { username: req.user.username }, 
-            include: ['ViewedProducts'] 
-        });
+        const user = await User.findOne({ where: { username: req.user.username } });
         if (!user) return res.status(404).json({ message: "Lỗi user" });
-        // The results might not be sorted by viewed time without complex pivot tables but it works.
-        res.json(user.ViewedProducts || []);
+
+        // Fetch products with their view metadata, sorted by absolute sequence ID
+        const historySorted = await UserViewedHistory.findAll({
+            where: { UserId: user.id },
+            include: [{ model: Product, required: true }],
+            order: [['id', 'DESC']]
+        });
+
+        // Convert to product list, explicitly mapping the sorting just in case
+        const viewedProducts = historySorted.map(h => {
+            const prod = h.Product.get({ plain: true });
+            // Attach the view timestamp if useful for debugging
+            prod.viewedAt = h.updatedAt;
+            return prod;
+        });
+
+        res.json(viewedProducts);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -197,9 +224,23 @@ const getProductReviews = async (req, res) => {
     }
 };
 
+const getSupportInfo = async (req, res) => {
+    try {
+        const admin = await User.findOne({ 
+            where: { role: 'admin' },
+            attributes: ['id', 'username', 'name', 'avatar']
+        });
+        if (!admin) return res.status(404).json({ message: "Chưa có nhân viên hỗ trợ" });
+        res.json(admin);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getProfile,
-    updateAvatar,
+    updateProfile,
+    getSupportInfo,
     getWallet,
     getFavorites,
     toggleFavorite,
