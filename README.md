@@ -1,216 +1,93 @@
-# SellphoneK - Đồ án LTDD Nâng Cao
+# CellphoneK - Premium E-commerce Mobile Application
 
-## Giới thiệu dự án
+CellphoneK là một ứng dụng thương mại điện tử chuyên về thiết bị điện tử, được phát triển với mục tiêu mang lại trải nghiệm mua sắm hiện đại, mượt mà và an toàn tương tự như các nền tảng lớn (CellphoneS, Shopee).
 
-SellphoneK là một ứng dụng di động được phát triển bằng React Native, chuyên về thương mại điện tử trong lĩnh vực công nghệ. Dự án được xây dựng với mục tiêu mang lại trải nghiệm mua sắm công nghệ tiện lợi và hiện đại cho người dùng.
+---
 
-**Tên dự án:** SellphoneK  
-**Công nghệ:** React Native  
-**Ngôn ngữ:** Tiếng Việt
+## Tính Năng Chính
 
-## Tính năng chính
+### Cho Người Dùng (Customer)
+- Hệ thống Tài khoản: Đăng ký, Đăng nhập, Quên mật khẩu qua OTP (Email). Bảo mật mật khẩu bằng Bcrypt.
+- Trải nghiệm mua sắm:
+    - Duyệt sản phẩm theo Danh mục, Thương hiệu.
+    - Xem chi tiết sản phẩm với Thông số kỹ thuật đầy đủ.
+    - Lựa chọn Biến thể (Variants): Chọn RAM, ROM, Màu sắc với giá thay đổi tương ứng.
+- Giỏ hàng & Thanh toán: Quản lý giỏ hàng real-time, đặt hàng ship COD.
+- Tương tác: Đánh giá sản phẩm (Reviews), yêu thích sản phẩm (Favorites), quản lý lịch sử xem.
+- Hỗ trợ thực tế: Chat trực tuyến với người quản trị (Socket.io).
 
-### 1. Xác thực người dùng
-- **Đăng nhập:** Đăng nhập với tài khoản và mật khẩu
-- **Đăng ký:** Tạo tài khoản mới với xác thực email
-- **Quên mật khẩu:** Khôi phục mật khẩu qua OTP gửi qua email
-- **Xác minh tài khoản:** Xác thực email trước khi sử dụng dịch vụ
+### Cho Quản Trị Viên (Admin)
+- Bảng điều khiển (Dashboard): Thống kê doanh thu, đơn hàng, người dùng.
+- Quản lý sản phẩm: Thêm, sửa, xóa sản phẩm và các biến thể.
+- Quản lý đơn hàng: Theo dõi và cập nhật trạng thái đơn hàng (NEW -> CONFIRMED -> SHIPPING -> DELIVERED).
+- Hỗ trợ khách hàng: Hệ thống chat đa luồng xử lý nhiều hội thoại cùng lúc.
 
-### 2. Quản lý Hồ sơ (Profile)
-- **Đổi Avatar:** Cập nhật ảnh đại diện tức thời
-- **Cập nhật thông tin:** OTP bảo vệ 2 lớp khi đổi Tên, SĐT, Mật khẩu, Email
+---
 
-### 3. Tìm kiếm và Khám phá Sản phẩm
-- **Tìm kiếm Real-time:** Bộ lọc siêu nhạy theo từ khóa
-- **Lọc danh mục:** Trượt dọc thanh Category ngang để tìm mảng công nghệ.
-- **Top 10 Bán Chạy:** Dải Slider ngang hiển thị các sản phẩm Hot nhất (`soldQuantity`).
-- **Săn Deal Khủng (Grid 2 Cột):** Bày trí 20 sản phẩm giảm giá mạnh nhất (`discountPercent`) thông qua Layout 2 cột đẹp mắt.
-- **Chi tiết sản phẩm:** Trải nghiệm xem hình ảnh và cấu hình chi tiết
+## Công Nghệ Sử Dụng
 
-### 4. Giao diện người dùng
-- **Thiết kế hiện đại:** Giao diện tối với hiệu ứng glassmorphism
-- **Animation mượt mà:** Hiệu ứng chuyển động mượt mà và thu hút
-- **Responsive:** Tương thích tốt trên nhiều kích thước màn hình
-- **Dark theme:** Giao diện tối chuyên nghiệp, giảm mỏi mắt
+| Lớp (Layer) | Công nghệ |
+| :--- | :--- |
+| Frontend | React Native (Expo), React Navigation, React Native Paper |
+| Backend | Node.js, Express.js |
+| Database | MySQL (thông qua Sequelize ORM) |
+| Real-time | Socket.io |
+| Security | JWT (JSON Web Token), Bcrypt Hashing |
+| Email | Nodemailer |
 
-### 5. Bảo mật
-- **Mã OTP:** Hệ thống bảo mật 2 lớp với mã OTP
-- **Token xác thực:** Sử dụng JWT token để bảo vệ session
-- **Xác thực email:** Bắt buộc xác thực email để tăng cường bảo mật
+---
 
-## Cấu trúc dự án
+## Cấu trúc Thư mục
 
-```
+```text
 BaiTapA01_A08/
-├── src/
-│   ├── screens/
-│   │   ├── Auth/
-│   │   │   ├── LoginScreen.js          # Màn hình đăng nhập
-│   │   │   ├── RegisterScreen.js       # Màn hình đăng ký
-│   │   │   └── ForgotPasswordScreen.js # Màn hình quên mật khẩu
-│   │   └── Main/
-│   │       └── HomeScreen.js          # Màn hình chính
-│   ├── services/
-│   │   └── api.js                  # Cấu hình API
-│   └── contexts/
-│       └── providers/               # Context providers
-├── Server/
-│   ├── server.js                   # Backend server
-│   ├── package.json               # Dependencies server
-│   └── data.json                  # Dữ liệu mẫu
-├── components/
-│   └── ui/                       # UI components
-├── constants/
-│   └── theme.js                   # Theme configuration
-└── assets/
-    └── images/                    # Hình ảnh dự án
+├── Server/               # Node.js Backend
+│   ├── config/           # Cấu hình DB
+│   ├── controllers/      # Logic nghiệp vụ (Auth, Product, Order...)
+│   ├── models/           # Định nghĩa Schema (Sequelize)
+│   ├── routes/           # Định nghĩa các Endpoint API
+│   ├── services/         # Email, Chat services
+│   └── server.js         # file chạy chính
+├── src/                  # React Native Frontend
+│   ├── components/       # Các UI Component tái sử dụng
+│   ├── screens/          # Các màn hình (Main, Auth, Intro...)
+│   ├── services/         # Axios API configuration
+│   └── navigation/       # Cấu hình điều hướng App
+└── App.js                # Entry point của ứng dụng
 ```
 
-## Công nghệ sử dụng
+---
 
-### Frontend (React Native)
-- **React Native:** Framework phát triển ứng dụng đa nền tảng
-- **React Navigation:** Điều hướng giữa các màn hình
-- **React Native Paper:** Component UI Material Design
-- **AsyncStorage:** Lưu trữ dữ liệu local
-- **Animated API:** Hiệu ứng và animation
-
-### Backend (Node.js)
-- **Node.js:** Runtime JavaScript phía server
-- **Express.js:** Framework web cho API
-- **JWT:** Xác thực người dùng
-- **bcrypt:** Mã hóa mật khẩu
-
-## Cài đặt và chạy dự án
+## Hướng dẫn Cài đặt
 
 ### Yêu cầu hệ thống
-- **Node.js:** phiên bản 14 trở lên
-- **npm:** phiên bản 6 trở lên
-- **React Native CLI:** phiên bản mới nhất
-- **Android Studio** (cho Android) hoặc **Xcode** (cho iOS)
+- Node.js (>= 18.x)
+- MySQL Server
 
-### Các bước cài đặt
-
-1. **Clone dự án**
-```bash
-git clone <repository-url>
-cd BaiTapA01_A08
-```
-
-2. **Cài đặt dependencies**
-```bash
-# Dependencies cho ứng dụng
-npm install
-
-# Dependencies cho server
-cd Server
-npm install
-```
-
-3. **Khởi động server backend**
+### 2. Cài đặt Backend
 ```bash
 cd Server
+npm install
+# Cấu hình file .env trong thư mục Server với thông tin DB của bạn
 npm start
-# Server sẽ chạy trên port 3001
 ```
 
-4. **Cấu hình API**
-- Mở file `src/services/api.js`
-- Đảm bảo IP và port đúng với máy chạy server
-
-5. **Chạy ứng dụng**
+### 3. Cài đặt Frontend
 ```bash
-# Quay lại thư mục gốc
-cd ..
-
-# Chạy trên Android
-npx react-native run-android
-
-# Chạy trên iOS
-npx react-native run-ios
+npm install
+npx expo start
 ```
 
-## Tính năng đặc biệt
+---
 
-###  Hệ thống xác thực đa bước
-1. **Đăng ký:** Người dùng điền thông tin cơ bản
-2. **Xác thực email:** Gửi link xác thực đến email
-3. **Kích hoạt:** Người dùng xác thực để kích hoạt tài khoản
-
-###  Giao diện Glassmorphism
-- **Hiệu ứng kính:** Background mờ với hiệu ứng trong suốt
-- **Animation orbs:** Các quả cầu động tạo chiều sâu
-- **Border radius:** Bo tròn mềm mại, hiện đại
-- **Color scheme:** Palette màu xanh dương chuyên nghiệp
-
-###  Performance optimization
-- **Lazy loading:** Tải components khi cần thiết
-- **Memoization:** Tối ưu hiệu suất render
-- **Code splitting:** Chia nhỏ bundle để giảm kích thước
-
-## Hướng dẫn sử dụng
-
-### Đối với người dùng mới
-1. Mở ứng dụng SellphoneK
-2. Chọn "Đăng ký ngay"
-3. Điền đầy đủ thông tin:
-   - Tài khoản (tối thiểu 3 ký tự)
-   - Email (hợp lệ)
-   - Mật khẩu (tối thiểu 6 ký tự)
-4. Nhấn "Tạo Tài Khoản"
-5. Kiểm tra email để xác thực tài khoản
-6. Đăng nhập sau khi xác thực
-
-### Đối với người dùng đã có tài khoản
-1. Mở ứng dụng
-2. Nhập tài khoản và mật khẩu
-3. Nhấn "Đăng Nhập"
-4. Trải nghiệm dịch vụ
-
-### Quên mật khẩu
-1. Chọn "Quên mật khẩu?" trên màn hình đăng nhập
-2. Nhập email đã đăng ký
-3. Nhận mã OTP qua email
-4. Nhập mã OTP và mật khẩu mới
-5. Đăng nhập lại với mật khẩu mới
-
-## Đóng góp và phát triển
-
-### Môi trường phát triển
-- **VS Code:** IDE chính cho phát triển
-- **React Native Debugger:** Debug ứng dụng
-- **Postman:** Test API endpoints
-
-### Quy chuẩn code
-- **ESLint:** Kiểm tra chất lượng code
-- **Prettier:** Định dạng code tự động
-- **Git version control:** Quản lý phiên bản
-
-## Tương lai phát triển
-
-### Version 1.1 (Dự kiến)
-- [ ] Thêm thanh toán trực tuyến
-- [ ] Giỏ hàng và wishlist
-- [ ] Đánh giá sản phẩm
-- [ ] Chat hỗ trợ khách hàng
-
-### Version 2.0 (Dự kiến)
-- [ ] Admin dashboard
-- [ ] Push notifications
-- [ ] Multi-language support
-- [ ] Progressive Web App
-
-## Liên hệ và hỗ trợ
-
-**Thực hiện bởi:** Nguyễn Minh Quốc Khánh - MSSV: 23110113
-**Hướng dẫn:** Giảng viên phụ trách: Nguyễn Hữu Trung
+## Giao diện Ứng dụng
+*(Bạn hãy chụp ảnh màn hình và thay thế vào đây)*
+- [Màn hình Intro]
+- [Trang chủ - Light Mode]
+- [Chi tiết sản phẩm & Biến thể]
+- [Dashboard Admin]
 
 ---
 
-## License
-
-Dự án được phát triển cho mục đích học tập tại trường Đại học Sư phạm Kỹ thuật TP.HCM.
-
----
-
-**SellphoneK - Công nghệ trong tầm tay** 
+## Giấy phép
+Dự án được phát hành dưới giấy phép MIT.
