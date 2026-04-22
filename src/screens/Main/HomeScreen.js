@@ -22,6 +22,7 @@ const { width } = Dimensions.get('window');
 
 // Mapping categories to illustrative images (Cellphones style)
 const CATEGORY_IMAGES = {
+    'All': 'https://static.vecteezy.com/system/resources/previews/006/086/266/non_2x/select-all-icon-free-vector.jpg',
     'Phone': 'https://cdn-icons-png.freepik.com/512/13/13398.png',
     'Laptop': 'https://cdn-icons-png.flaticon.com/512/428/428001.png',
     'Tablet': 'https://cdn-icons-png.flaticon.com/512/1530/1530457.png',
@@ -48,7 +49,7 @@ export default function HomeScreen({ navigation }) {
     const [loadingMore, setLoadingMore] = useState(false);
     const [unreadNotifCount, setUnreadNotifCount] = useState(0);
     const PAGE_SIZE = 10;
-    const categoryOptions = categories.filter((c) => c && c !== 'All');
+    const categoryOptions = ['All', ...categories.filter((c) => c && c !== 'All')];
     const brandOptions = ['All', ...brands.filter((b) => b && b !== 'All')];
 
     const fetchInitial = async () => {
@@ -311,15 +312,16 @@ export default function HomeScreen({ navigation }) {
                 <View style={styles.categoryWrap}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryScroll}>
                         {categoryOptions.map(cat => {
-                            const isActive = cat === selectedCategory;
+                            const isActive = (cat === 'All' && !selectedCategory) || (cat === selectedCategory);
                             return (
                                 <TouchableOpacity
                                     key={cat}
                                     style={styles.categoryCard}
                                     onPress={() => {
-                                        setSelectedCategory(cat);
+                                        const newCat = cat === 'All' ? '' : cat;
+                                        setSelectedCategory(newCat);
                                         setPage(1);
-                                        openSearchWithFilters(cat, selectedBrand);
+                                        openSearchWithFilters(newCat, selectedBrand);
                                     }}
                                     activeOpacity={0.85}
                                 >

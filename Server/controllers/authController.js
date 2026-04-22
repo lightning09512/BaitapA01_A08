@@ -68,7 +68,7 @@ const login = async (req, res) => {
         if (user.isVerified === false) {
             return res.json({
                 requiresVerification: true,
-                message: "Tài khoản của bạn chưa được xác minh. Vui lòng kiểm tra email để nhập mã OTP."
+                message: "Vui lòng đăng ký lại và sử dụng đúng email đã đăng ký trước đó"
             });
         }
 

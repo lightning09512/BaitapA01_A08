@@ -184,7 +184,7 @@ export default function LoginScreen({ navigation }) {
                 setLoading(false);
                 Alert.alert(
                     'Cần xác minh',
-                    'Tài khoản chưa được xác minh. Vui lòng kiểm tra email.'
+                    'Vui lòng đăng ký lại và sử dụng đúng email đã đăng ký trước đó'
                 );
                 return;
             }
