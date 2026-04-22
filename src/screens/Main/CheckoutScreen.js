@@ -15,7 +15,7 @@ import api from '../../services/api';
 export default function CheckoutScreen({ route, navigation }) {
   // Catching data from previous screen
   const { 
-    selectedItems = [], 
+    selectedItems = [], // These are now CartItem keys or IDs depending on how we decide
     checkoutItems = [],
     displayTotalQuantity = 0, 
     displayTotalAmount = 0,
@@ -61,7 +61,7 @@ export default function CheckoutScreen({ route, navigation }) {
         note,
         couponCode: couponCode.trim() || undefined,
         pointsToUse: Number(pointsToUse) || undefined,
-        selectedProductIds: selectedItems
+        selectedCartItemIds: checkoutItems.map(item => item.id)
       });
       alert(res.data?.message || 'Đặt hàng thành công!');
       navigation.replace('Orders');
@@ -133,11 +133,14 @@ export default function CheckoutScreen({ route, navigation }) {
             </View>
             
             {checkoutItems.map((item, index) => (
-                <View key={item.productId || index}>
+                <View key={item.id || index}>
                     <View style={styles.productRow}>
                         <Image source={{ uri: item.image }} style={styles.productImage} contentFit="contain" />
                         <View style={styles.productInfo}>
                             <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
+                            {item.variantName ? (
+                                <Text style={styles.variantInfo}>Cấu hình: {item.variantName}</Text>
+                            ) : null}
                             <Text style={styles.productPrice}>{item.price?.toLocaleString()} ₫</Text>
                             <Text style={styles.productQty}>Số lượng: x{item.quantity}</Text>
                         </View>
@@ -316,6 +319,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6b7280',
     marginTop: 2,
+  },
+  variantInfo: {
+    fontSize: 12,
+    color: '#6b7280',
+    backgroundColor: '#f3f4f6',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginBottom: 4,
   },
   divider: {
     height: 1,

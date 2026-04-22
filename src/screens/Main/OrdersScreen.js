@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, StyleSheet, FlatList, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { Image } from 'expo-image';
 import { ActivityIndicator, Button, Text, Divider } from 'react-native-paper';
@@ -55,6 +56,12 @@ export default function OrdersScreen({ route, navigation }) {
     loadOrders();
   }, [route.params?.initialTab]);
 
+  useFocusEffect(
+    useCallback(() => {
+      loadOrders();
+    }, [])
+  );
+
   const onRefresh = async () => {
     setRefreshing(true);
     await loadOrders();
@@ -76,7 +83,7 @@ export default function OrdersScreen({ route, navigation }) {
     if (activeTab === 'WAIT_CONFIRM') return orders.filter(o => o.status === 'NEW');
     if (activeTab === 'WAIT_PICKUP') return orders.filter(o => o.status === 'CONFIRMED' || o.status === 'PREPARING');
     if (activeTab === 'SHIPPING') return orders.filter(o => o.status === 'SHIPPING');
-    if (activeTab === 'REVIEW') return orders.filter(o => o.status === 'DELIVERED');
+    if (activeTab === 'REVIEW') return orders.filter(o => o.status === 'DELIVERED' && o.OrderItems?.some(oi => !oi.isRated));
     return orders;
   };
 
@@ -101,7 +108,7 @@ export default function OrdersScreen({ route, navigation }) {
           <React.Fragment key={oi.id || index}>
             <TouchableOpacity 
               style={styles.productInfoRow}
-              onPress={() => {/* TODO: Navigate to OrderDetail if needed */}}
+              onPress={() => navigation.navigate('ProductDetail', { id: oi.productId })}
             >
               <Image 
                 source={{ uri: oi.image || 'https://via.placeholder.com/150' }} 
@@ -142,9 +149,25 @@ export default function OrdersScreen({ route, navigation }) {
                 {item.status === 'PREPARING' ? 'Yêu cầu hủy' : 'Hủy đơn hàng'}
               </Button>
             )}
+            {item.status === 'DELIVERED' && item.OrderItems?.some(oi => !oi.isRated) && (
+              <Button 
+                mode="outlined" 
+                onPress={() => navigation.navigate('WriteReview', { 
+                  orderId: item.id, 
+                  product: item.OrderItems.find(oi => !oi.isRated) || item.OrderItems[0] 
+                })}
+                style={[styles.actionBtn, { borderColor: '#dc2626' }]}
+                contentStyle={{ height: 36 }}
+                textColor="#dc2626"
+                labelStyle={{ fontSize: 12, marginVertical: 0 }}
+                compact
+              >
+                Đánh giá
+              </Button>
+            )}
             <Button 
                 mode="contained" 
-                onPress={() => {}} 
+                onPress={() => navigation.navigate('ProductDetail', { id: item.OrderItems[0]?.productId })} 
                 style={[styles.actionBtn, { backgroundColor: '#dc2626' }]}
                 contentStyle={{ height: 36 }}
                 labelStyle={{ fontSize: 12, marginVertical: 0 }}

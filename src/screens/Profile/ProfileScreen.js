@@ -45,7 +45,7 @@ export default function ProfileScreen({ navigation }) {
                 if (o.status === 'NEW') counts.WAIT_CONFIRM++;
                 else if (o.status === 'CONFIRMED' || o.status === 'PREPARING') counts.WAIT_PICKUP++;
                 else if (o.status === 'SHIPPING') counts.SHIPPING++;
-                else if (o.status === 'DELIVERED') counts.REVIEW++;
+                else if (o.status === 'DELIVERED' && o.OrderItems?.some(oi => !oi.isRated)) counts.REVIEW++;
             });
             
             setOrderCounts(counts);

@@ -428,8 +428,8 @@ export default function HomeScreen({ navigation }) {
                 <View style={{ height: 80 }} />
             </ScrollView>
 
-            <TouchableOpacity 
-                style={styles.floatingChatBtn} 
+            <TouchableOpacity
+                style={styles.floatingChatBtn}
                 onPress={() => navigation.navigate('Chat')}
                 activeOpacity={0.9}
             >

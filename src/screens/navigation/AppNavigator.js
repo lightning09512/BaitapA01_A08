@@ -15,6 +15,7 @@ import CartScreen from '../Main/CartScreen';
 import CheckoutScreen from '../Main/CheckoutScreen';
 import OrdersScreen from '../Main/OrdersScreen';
 import NotificationScreen from '../Main/NotificationScreen';
+import WriteReviewScreen from '../Main/WriteReviewScreen';
 import FavoritesScreen from '../Profile/FavoritesScreen';
 import ProfileScreen from '../Profile/ProfileScreen';
 import EditProfileScreen from '../Profile/EditProfileScreen';
@@ -69,6 +70,7 @@ export default function AppNavigator() {
                 <Stack.Screen name="Checkout" component={CheckoutScreen} options={{ title: 'Thông Tin Thanh Toán' }} />
                 <Stack.Screen name="Orders" component={OrdersScreen} options={{ title: 'Đơn Hàng' }} />
                 <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Sửa Hồ Sơ' }} />
+                <Stack.Screen name="WriteReview" component={WriteReviewScreen} options={{ title: 'Viết Đánh Giá' }} />
                 <Stack.Screen name="Notifications" component={NotificationScreen} options={{ title: 'Thông Báo', headerShown: false }} />
                 <Stack.Screen name="Favorites" component={FavoritesScreen} options={{ title: 'Yêu Thích' }} />
                 <Stack.Screen name="ViewedProducts" component={ViewedProductsScreen} options={{ title: 'Đã Xem' }} />

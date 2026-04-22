@@ -1,9 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { TextInput as RNTextInput } from 'react-native';
-import { ActivityIndicator, Surface, Text } from 'react-native-paper';
 import { Image } from 'expo-image';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { FlatList, TextInput as RNTextInput, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Surface, Text } from 'react-native-paper';
 import api from '../../services/api';
 
 const PAGE_SIZE = 12;

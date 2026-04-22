@@ -154,6 +154,48 @@ export const getProductSpecs = (productName) => {
       { label: "Thiết kế", value: "Treo từ tính độc đáo (Nổi trên không)" },
       { label: "Bàn phím", value: "Hành trình phím 1mm, có đèn nền" },
       { label: "Trackpad", value: "Tích hợp sẵn hỗ trợ Multi-Touch" }
+    ],
+    "Xiaomi 14": [
+      { label: "Màn hình", value: "6.36-inch LTPO OLED, 120Hz" },
+      { label: "Chipset", value: "Qualcomm Snapdragon 8 Gen 3" },
+      { label: "Camera", value: "Hệ thống ống kính Leica 75mm" },
+      { label: "Pin", value: "4610 mAh, Sạc nhanh 90W" },
+      { label: "Hệ điều hành", value: "HyperOS (Android 14)" }
+    ],
+    "TECNO Camon 30": [
+      { label: "Màn hình", value: "6.78-inch AMOLED, 120Hz" },
+      { label: "Chipset", value: "MediaTek Helio G99 Ultimate" },
+      { label: "RAM/ROM", value: "8GB/12GB + 256GB" },
+      { label: "Camera trước", value: "50 MP (Lấy nét tự động)" },
+      { label: "Pin", value: "5000 mAh, Sạc nhanh 45W" }
+    ],
+    "HONOR X8b": [
+      { label: "Màn hình", value: "6.7-inch AMOLED, 2000 nits" },
+      { label: "CPU", value: "Qualcomm Snapdragon 680" },
+      { label: "Camera sau", value: "108 MP (Chụp siêu nét)" },
+      { label: "Camera trước", value: "50 MP (Góc nhìn rộng)" },
+      { label: "Thiết kế", value: "Siêu mỏng 6.78mm" }
+    ],
+    "Nubia RedMagic 9 Pro": [
+      { label: "Màn hình", value: "6.8-inch AMOLED, 120Hz Full Display" },
+      { label: "Chipset", value: "Snapdragon 8 Gen 3" },
+      { label: "Tản nhiệt", value: "Quạt tản nhiệt chủ động 22,000 RPM" },
+      { label: "Pin/Sạc", value: "6500 mAh, Sạc nhanh 80W" },
+      { label: "Gaming", value: "Trigger vai 520Hz, Hệ thống đèn RGB" }
+    ],
+    "Nokia G42": [
+      { label: "Màn hình", value: "6.56-inch IPS LCD, 90Hz" },
+      { label: "Hiệu năng", value: "Snapdragon 480+ 5G" },
+      { label: "Độ bền", value: "Thiết kế QuickFix (Dễ dàng tự sửa chữa)" },
+      { label: "Pin", value: "Thời lượng pin lên đến 3 ngày" },
+      { label: "Camera", value: "50 MP với công nghệ AI" }
+    ],
+    "Infinix Note 40 Pro": [
+      { label: "Màn hình", value: "6.78-inch 3D Curved AMOLED, 120Hz" },
+      { label: "Chipset", value: "MediaTek Dimensity 7020" },
+      { label: "Camera sau", value: "108 MP (OIS) Phóng đại 3x" },
+      { label: "Sạc", value: "45W All-Round FastCharge + 20W Sạc từ tính" },
+      { label: "Âm thanh", value: "Loa kép được tinh chỉnh bởi JBL" }
     ]
   };
 

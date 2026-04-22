@@ -67,7 +67,7 @@ export default function IntroScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" backgroundColor="#1e40af" />
+      <StatusBar style="dark" backgroundColor="#ffffff" />
       
       {/* Background gradient effect */}
       <View style={styles.backgroundGradient}>
@@ -156,7 +156,7 @@ export default function IntroScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#ffffff',
   },
   backgroundGradient: {
     position: 'absolute',
@@ -167,15 +167,12 @@ const styles = StyleSheet.create({
   },
   gradientTop: {
     flex: 1,
-    backgroundColor: 'transparent',
-    borderBottomLeftRadius: 150,
-    borderBottomRightRadius: 150,
-    backgroundColor: '#1e40af',
+    backgroundColor: '#fef2f2',
     opacity: 0.8,
   },
   gradientBottom: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#ffffff',
   },
   content: {
     flex: 1,
@@ -203,7 +200,7 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 100,
     borderWidth: 3,
-    borderColor: '#60a5fa',
+    borderColor: '#ef4444',
     opacity: 0.5,
   },
   textContainer: {
@@ -213,30 +210,27 @@ const styles = StyleSheet.create({
   universityName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: '#111827',
     textAlign: 'center',
     marginBottom: 8,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
   },
   universitySubName: {
     fontSize: 18,
-    color: '#94a3b8',
+    color: '#4b5563',
     textAlign: 'center',
     marginBottom: 30,
   },
   divider: {
     width: 60,
     height: 3,
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#dc2626',
     marginVertical: 20,
     borderRadius: 2,
   },
   groupName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#60a5fa',
+    color: '#ef4444',
     textAlign: 'center',
     marginBottom: 12,
     textTransform: 'uppercase',
@@ -245,12 +239,9 @@ const styles = StyleSheet.create({
   studentName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#f8fafc',
+    color: '#111827',
     textAlign: 'center',
     marginBottom: 6,
-    textShadowColor: 'rgba(0, 0, 0, 0.4)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
   },
   studentId: {
     fontSize: 16,
@@ -261,7 +252,7 @@ const styles = StyleSheet.create({
   },
   major: {
     fontSize: 16,
-    color: '#94a3b8',
+    color: '#6b7280',
     textAlign: 'center',
     fontStyle: 'italic',
   },
@@ -274,13 +265,13 @@ const styles = StyleSheet.create({
   progressBackground: {
     width: width * 0.8,
     height: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#f3f4f6',
     borderRadius: 2,
     overflow: 'hidden',
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#dc2626',
     borderRadius: 2,
   },
   progressText: {
@@ -308,26 +299,26 @@ const styles = StyleSheet.create({
   circle: {
     position: 'absolute',
     borderRadius: 1000,
-    opacity: 0.1,
+    opacity: 0.05,
   },
   circle1: {
     width: 100,
     height: 100,
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#dc2626',
     top: height * 0.2,
     left: -30,
   },
   circle2: {
     width: 150,
     height: 150,
-    backgroundColor: '#60a5fa',
+    backgroundColor: '#ef4444',
     top: height * 0.6,
     right: -50,
   },
   circle3: {
     width: 80,
     height: 80,
-    backgroundColor: '#93c5fd',
+    backgroundColor: '#f87171',
     bottom: height * 0.3,
     left: 50,
   },

@@ -1,4 +1,4 @@
-const { Product, Review, Sequelize, sequelize } = require('../models');
+const { Product, Review, Sequelize, sequelize, ProductVariant } = require('../models');
 
 const getProducts = async (req, res) => {
     try {
@@ -101,7 +101,9 @@ const getByDiscount = async (req, res) => {
 
 const getProductById = async (req, res) => {
     try {
-        const product = await Product.findByPk(req.params.id);
+        const product = await Product.findByPk(req.params.id, {
+            include: [{ model: ProductVariant, as: 'Variants' }]
+        });
         if (!product) return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
 
         const reviewCount = await Review.count({ where: { productId: product.id } });

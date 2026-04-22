@@ -59,9 +59,11 @@ const register = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { username, password } = req.body;
-        const user = await User.findOne({ where: { username, password } });
+        const user = await User.findOne({ where: { username } });
         
-        if (!user) return res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu" });
+        if (!user || !(await user.validPassword(password))) {
+            return res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu" });
+        }
 
         if (user.isVerified === false) {
             return res.json({

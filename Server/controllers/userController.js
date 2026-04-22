@@ -159,23 +159,45 @@ const readAllNotifications = async (req, res) => {
 const reviewProduct = async (req, res) => {
     try {
         const productId = Number(req.params.id);
-        const { rating, comment } = req.body;
+        const { rating, comment, orderId } = req.body;
         const user = await User.findOne({ where: { username: req.user.username } });
         
         // Kiểm tra xem đã mua hàng chưa
         const hasBought = await Order.findOne({
             where: { 
                 userId: user.id,
-                status: 'DELIVERED' // Hoặc có thể dùng { [Sequelize.Op.notIn]: ['CANCELLED'] }
+                status: 'DELIVERED',
+                ...(orderId && { id: orderId })
             },
             include: [{
                 model: OrderItem,
-                where: { productId }
+                where: { productId, isRated: false }
             }]
         });
 
         if (!hasBought) {
-            return res.status(403).json({ message: "Bạn cần mua và nhận thành công sản phẩm này mới có thể đánh giá." });
+            return res.status(403).json({ message: "Bạn đã đánh giá sản phẩm này rồi hoặc đơn hàng chưa hoàn tất." });
+        }
+
+        // Đánh dấu đã đánh giá trong OrderItem
+        if (orderId) {
+            await OrderItem.update(
+                { isRated: true },
+                { where: { orderId, productId } }
+            );
+        } else {
+            // Nếu không có orderId, tìm đơn hàng DELIVERED gần nhất của item này và đánh dấu
+            const itemToMark = await OrderItem.findOne({
+                where: { productId, isRated: false },
+                include: [{
+                    model: Order,
+                    where: { userId: user.id, status: 'DELIVERED' }
+                }]
+            });
+            if (itemToMark) {
+                itemToMark.isRated = true;
+                await itemToMark.save();
+            }
         }
 
         const newReview = await Review.create({

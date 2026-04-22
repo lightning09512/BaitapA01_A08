@@ -13,11 +13,12 @@ export default function ProductDetailScreen({ route, navigation }) {
     const [reviews, setReviews] = useState([]);
     const [similarProducts, setSimilarProducts] = useState([]);
     const [isFavorite, setIsFavorite] = useState(false);
+    const [selectedVariant, setSelectedVariant] = useState(null);
 
     // For review submission
-    const [rating, setRating] = useState(5);
-    const [comment, setComment] = useState('');
-    const [submitting, setSubmitting] = useState(false);
+    // const [rating, setRating] = useState(5);
+    // const [comment, setComment] = useState('');
+    // const [submitting, setSubmitting] = useState(false);
 
     // Toast notification
     const [toastVisible, setToastVisible] = useState(false);
@@ -44,7 +45,13 @@ export default function ProductDetailScreen({ route, navigation }) {
 
                 // Fetch product data
                 const res = await api.get(`/products/${productId}`);
-                setProduct(res.data);
+                const productData = res.data;
+                setProduct(productData);
+
+                // Default to first variant if exists
+                if (productData.Variants && productData.Variants.length > 0) {
+                    setSelectedVariant(productData.Variants[0]);
+                }
 
                 // Fetch extra data in parallel
                 const [favRes, revRes, simRes] = await Promise.all([
@@ -72,37 +79,32 @@ export default function ProductDetailScreen({ route, navigation }) {
         }
     };
 
+/*
     const submitReview = async () => {
-        if (!comment.trim()) {
-            alert('Vui lòng nhập nội dung đánh giá');
-            return;
-        }
-        setSubmitting(true);
-        try {
-            const res = await api.post(`/products/${product.id}/reviews`, { rating, comment });
-            alert(res.data.message || 'Đánh giá thành công');
-            setReviews([res.data.review, ...reviews]);
-            setComment('');
-            setRating(5);
-        } catch (error) {
-            console.log("Lỗi đánh giá:", error);
-            alert('Không thể gửi đánh giá. Vui lòng thử lại.');
-        } finally {
-            setSubmitting(false);
-        }
+        ...
     };
+*/
 
     if (!product) {
         return <View style={{ flex: 1, backgroundColor: '#fff' }} />;
     }
 
+    const specs = getProductSpecs(product.name);
+    
+    // Derived data
     const discount = product.discountPercent || 0;
     const sold = product.soldQuantity || 0;
     const views = product.viewCount || 0;
     const reviewCount = product.reviewCount || reviews.length;
-    const oldPrice = product.price / (1 - discount / 100);
 
-    const specs = getProductSpecs(product.name);
+    // Derived states for variations
+    const variants = product.Variants || [];
+    const ramOptions = [...new Set(variants.map(v => v.ram))].filter(Boolean);
+    const romOptions = [...new Set(variants.map(v => v.rom))].filter(Boolean);
+    const colorOptions = [...new Set(variants.map(v => v.color))].filter(Boolean);
+
+    const activePrice = selectedVariant ? selectedVariant.price : product.price;
+    const oldPrice = activePrice / (1 - discount / 100);
 
     const renderSimilarItem = ({ item }) => (
         <TouchableOpacity
@@ -111,7 +113,7 @@ export default function ProductDetailScreen({ route, navigation }) {
         >
             <Image source={{ uri: item.image }} style={styles.similarImage} contentFit="contain" />
             <Text style={styles.similarName} numberOfLines={2}>{item.name}</Text>
-            <Text style={styles.similarPrice}>{item.price.toLocaleString()} ₫</Text>
+            <Text style={styles.similarPrice}>{(item.price || 0).toLocaleString()} ₫</Text>
         </TouchableOpacity>
     );
 
@@ -152,13 +154,78 @@ export default function ProductDetailScreen({ route, navigation }) {
                     </View>
 
                     <View style={styles.priceContainer}>
-                        <Text style={styles.priceText}>{product.price.toLocaleString()} ₫</Text>
+                        <Text style={styles.priceText}>{(activePrice || 0).toLocaleString()} ₫</Text>
                         {discount > 0 && (
-                            <Text style={styles.oldPriceText}>{oldPrice.toLocaleString()} ₫</Text>
+                            <Text style={styles.oldPriceText}>{(oldPrice || 0).toLocaleString()} ₫</Text>
                         )}
                         {discount > 0 && <Badge style={styles.discountBadge}>-{discount}%</Badge>}
                     </View>
                 </View>
+
+                {/* Chọn cấu hình (Biến thể) */}
+                {variants.length > 0 && (
+                    <View style={styles.variationSection}>
+                        {ramOptions.length > 0 && (
+                            <View style={styles.optContainer}>
+                                <Text style={styles.optTitle}>Chọn RAM:</Text>
+                                <View style={styles.chipRow}>
+                                    {ramOptions.map(ram => (
+                                        <TouchableOpacity 
+                                            key={ram} 
+                                            style={[styles.chip, selectedVariant?.ram === ram && styles.chipActive]}
+                                            onPress={() => {
+                                                const found = variants.find(v => v.ram === ram && (v.rom === selectedVariant?.rom || true));
+                                                if (found) setSelectedVariant(found);
+                                            }}
+                                        >
+                                            <Text style={[styles.chipText, selectedVariant?.ram === ram && styles.chipTextActive]}>{ram}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </View>
+                        )}
+
+                        {romOptions.length > 0 && (
+                            <View style={styles.optContainer}>
+                                <Text style={styles.optTitle}>Chọn bộ nhớ (ROM):</Text>
+                                <View style={styles.chipRow}>
+                                    {romOptions.map(rom => (
+                                        <TouchableOpacity 
+                                            key={rom} 
+                                            style={[styles.chip, selectedVariant?.rom === rom && styles.chipActive]}
+                                            onPress={() => {
+                                                const found = variants.find(v => v.rom === rom && (v.ram === selectedVariant?.ram || true));
+                                                if (found) setSelectedVariant(found);
+                                            }}
+                                        >
+                                            <Text style={[styles.chipText, selectedVariant?.rom === rom && styles.chipTextActive]}>{rom}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </View>
+                        )}
+
+                        {colorOptions.length > 1 && (
+                             <View style={styles.optContainer}>
+                                <Text style={styles.optTitle}>Chọn màu sắc:</Text>
+                                <View style={styles.chipRow}>
+                                    {colorOptions.map(color => (
+                                        <TouchableOpacity 
+                                            key={color} 
+                                            style={[styles.chip, selectedVariant?.color === color && styles.chipActive]}
+                                            onPress={() => {
+                                                const found = variants.find(v => v.color === color && v.ram === selectedVariant?.ram && v.rom === selectedVariant?.rom);
+                                                if (found) setSelectedVariant(found);
+                                            }}
+                                        >
+                                            <Text style={[styles.chipText, selectedVariant?.color === color && styles.chipTextActive]}>{color}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </View>
+                        )}
+                    </View>
+                )}
 
                 {/* Khuyến mãi hấp dẫn */}
                 <View style={styles.promoSection}>
@@ -281,36 +348,11 @@ export default function ProductDetailScreen({ route, navigation }) {
                         <Text style={{ color: '#6b7280', alignSelf: 'center', marginVertical: 10 }}>Chưa có đánh giá nào.</Text>
                     )}
 
-                    {/* Khung viết review */}
-                    <View style={styles.writeReviewBox}>
-                        <Text style={{ fontSize: 14, fontWeight: '600', marginBottom: 8 }}>Viết đánh giá của bạn</Text>
-                        <View style={{ flexDirection: 'row', marginBottom: 12, alignItems: 'center' }}>
-                            <Text style={{ marginRight: 8, color: '#374151' }}>Chọn sao:</Text>
-                            {[1, 2, 3, 4, 5].map(star => (
-                                <TouchableOpacity key={star} onPress={() => setRating(star)}>
-                                    <Ionicons name={star <= rating ? "star" : "star-outline"} size={26} color="#facc15" />
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-                        <TextInput
-                            mode="outlined"
-                            placeholder="Xin mời chia sẻ một số cảm nhận..."
-                            multiline
-                            numberOfLines={3}
-                            value={comment}
-                            onChangeText={setComment}
-                            style={{ backgroundColor: '#fff', marginBottom: 12 }}
-                            outlineColor="#d1d5db"
-                        />
-                        <Button
-                            mode="contained"
-                            onPress={submitReview}
-                            loading={submitting}
-                            disabled={submitting}
-                            style={{ backgroundColor: '#dc2626', borderRadius: 8 }}
-                        >
-                            Gửi Đánh Giá
-                        </Button>
+                    {/* Khung viết review đã được chuyển sang trang Đơn hàng */}
+                    <View style={{ padding: 16, alignItems: 'center' }}>
+                         <Text style={{ color: '#6b7280', textAlign: 'center' }}>
+                             Vui lòng vào phần Đơn mua để đánh giá sản phẩm sau khi đã nhận hàng.
+                         </Text>
                     </View>
                 </View>
 
@@ -328,24 +370,32 @@ export default function ProductDetailScreen({ route, navigation }) {
                     style={styles.buyNowBtn}
                     onPress={async () => {
                         try {
-                            await api.post('/cart/add', { productId: product.id, quantity: 1 });
+                            await api.post('/cart/add', { 
+                                productId: product.id, 
+                                quantity: 1, 
+                                variantId: selectedVariant?.id 
+                            });
                         } catch (e) {
                             console.log('Add to cart error:', e);
                         }
+                        
+                        const variantName = selectedVariant ? `${selectedVariant.ram || ''} / ${selectedVariant.rom || ''}` : '';
                         const itemToBuy = {
                             productId: product.id,
+                            variantId: selectedVariant?.id,
                             name: product.name,
+                            variantName: variantName,
                             image: product.image,
-                            price: product.price,
+                            price: activePrice,
                             quantity: 1,
-                            lineTotal: product.price
+                            lineTotal: activePrice
                         };
                         navigation.navigate('Checkout', {
                             selectedItems: [product.id],
                             checkoutItems: [itemToBuy],
                             displayTotalQuantity: 1,
-                            displayTotalAmount: product.price,
-                            availablePoints: 0 // Will be updated by CheckoutScreen if needed
+                            displayTotalAmount: activePrice,
+                            availablePoints: 0
                         });
                     }}
                 >
@@ -355,7 +405,11 @@ export default function ProductDetailScreen({ route, navigation }) {
                     style={[styles.iconActionBtn, { marginRight: 0 }]}
                     onPress={async () => {
                         try {
-                            await api.post('/cart/add', { productId: product.id, quantity: 1 });
+                            await api.post('/cart/add', { 
+                                productId: product.id, 
+                                quantity: 1, 
+                                variantId: selectedVariant?.id 
+                            });
                             showToast('✓  Đã thêm vào giỏ hàng');
                         } catch (e) {
                             console.log('Add to cart error:', e);
@@ -396,6 +450,15 @@ const styles = StyleSheet.create({
     priceText: { fontSize: 24, fontWeight: 'bold', color: '#dc2626' },
     oldPriceText: { fontSize: 14, color: '#9ca3af', textDecorationLine: 'line-through', marginBottom: 4 },
     discountBadge: { backgroundColor: '#fee2e2', color: '#dc2626', marginBottom: 4, fontWeight: 'bold' },
+
+    variationSection: { backgroundColor: '#ffffff', paddingHorizontal: 16, paddingBottom: 16, marginBottom: 8 },
+    optContainer: { marginTop: 12 },
+    optTitle: { fontSize: 14, fontWeight: 'bold', color: '#111827', marginBottom: 8 },
+    chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    chip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, borderWidth: 1, borderColor: '#e5e7eb', backgroundColor: '#f9fafb' },
+    chipActive: { borderColor: '#dc2626', backgroundColor: '#fef2f2' },
+    chipText: { fontSize: 13, color: '#4b5563' },
+    chipTextActive: { color: '#dc2626', fontWeight: 'bold' },
 
     promoSection: { backgroundColor: '#ffffff', padding: 16, marginBottom: 8 },
     promoHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },

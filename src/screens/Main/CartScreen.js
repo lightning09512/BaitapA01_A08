@@ -50,20 +50,20 @@ export default function CartScreen({ navigation }) {
     setTotalQuantity(data.totalQuantity || 0);
   };
 
-const changeQuantity = async (productId, newQty) => {
+const changeQuantity = async (productId, variantId, newQty) => {
     if (newQty <= 0) {
-      handleRemoveItem(productId);
+      handleRemoveItem(productId, variantId);
       return;
     }
     try {
-      const res = await api.put('/cart/update', { productId, quantity: newQty });
+      const res = await api.put('/cart/update', { productId, variantId, quantity: newQty });
       setCartFromResponse(res.data || {});
     } catch (e) {
       console.log('Update cart error:', e);
     }
   };
 
-  const handleRemoveItem = (productId) => {
+  const handleRemoveItem = (productId, variantId) => {
     Alert.alert(
       "Xóa sản phẩm",
       "Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?",
@@ -74,7 +74,7 @@ const changeQuantity = async (productId, newQty) => {
           style: "destructive", 
           onPress: async () => {
             try {
-              const res = await api.post('/cart/remove', { productId });
+              const res = await api.post('/cart/remove', { productId, variantId });
               setCartFromResponse(res.data || {});
             } catch (e) {
               console.log('Remove item error:', e);
@@ -92,18 +92,21 @@ const changeQuantity = async (productId, newQty) => {
     }
     navigation.navigate('Checkout', {
       selectedItems,
-      checkoutItems: items.filter(item => selectedItems.includes(item.productId)),
+      checkoutItems: items.filter(item => {
+          const key = `${item.productId}-${item.variantId || ''}`;
+          return selectedItems.includes(key);
+      }),
       displayTotalQuantity,
       displayTotalAmount,
       availablePoints
     });
   };
 
-  const toggleSelect = (productId) => {
+  const toggleSelect = (key) => {
     setSelectedItems(prev => 
-      prev.includes(productId) 
-        ? prev.filter(id => id !== productId)
-        : [...prev, productId]
+      prev.includes(key) 
+        ? prev.filter(id => id !== key)
+        : [...prev, key]
     );
   };
 
@@ -111,24 +114,25 @@ const changeQuantity = async (productId, newQty) => {
     if (selectedItems.length === items.length && items.length > 0) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(items.map(item => item.productId));
+      setSelectedItems(items.map(item => `${item.productId}-${item.variantId || ''}`));
     }
   };
 
   const displayTotalAmount = items
-    .filter(item => selectedItems.includes(item.productId))
+    .filter(item => selectedItems.includes(`${item.productId}-${item.variantId || ''}`))
     .reduce((sum, item) => sum + item.lineTotal, 0);
 
   const displayTotalQuantity = items
-    .filter(item => selectedItems.includes(item.productId))
+    .filter(item => selectedItems.includes(`${item.productId}-${item.variantId || ''}`))
     .reduce((sum, item) => sum + item.quantity, 0);
 
   const renderItem = ({ item }) => {
-    const isSelected = selectedItems.includes(item.productId);
+    const itemKey = `${item.productId}-${item.variantId || ''}`;
+    const isSelected = selectedItems.includes(itemKey);
     return (
       <View style={styles.itemCard}>
         <TouchableOpacity 
-           onPress={() => toggleSelect(item.productId)}
+           onPress={() => toggleSelect(itemKey)}
            style={{ justifyContent: 'center', marginRight: 10 }}
         >
            <Ionicons name={isSelected ? "checkbox" : "square-outline"} size={26} color={isSelected ? "#dc2626" : "#9ca3af"} />
@@ -138,18 +142,23 @@ const changeQuantity = async (productId, newQty) => {
           <Text style={styles.itemName} numberOfLines={2}>
             {item.name}
           </Text>
+          {item.variantName ? (
+              <Text style={styles.variantLabel} numberOfLines={1}>
+                  Phân loại: {item.variantName}
+              </Text>
+          ) : null}
           <Text style={styles.itemPrice}>{item.price.toLocaleString()} ₫</Text>
           <View style={styles.qtyRow}>
             <TouchableOpacity
               style={styles.qtyButton}
-              onPress={() => changeQuantity(item.productId, item.quantity - 1)}
+              onPress={() => changeQuantity(item.productId, item.variantId, item.quantity - 1)}
             >
               <Text style={styles.qtyButtonText}>-</Text>
             </TouchableOpacity>
             <Text style={styles.qtyValue}>{item.quantity}</Text>
             <TouchableOpacity
               style={styles.qtyButton}
-              onPress={() => changeQuantity(item.productId, item.quantity + 1)}
+              onPress={() => changeQuantity(item.productId, item.variantId, item.quantity + 1)}
             >
               <Text style={styles.qtyButtonText}>+</Text>
             </TouchableOpacity>
@@ -158,7 +167,7 @@ const changeQuantity = async (productId, newQty) => {
         <View style={styles.lineTotalBox}>
           <TouchableOpacity 
             style={styles.deleteBtn}
-            onPress={() => handleRemoveItem(item.productId)}
+            onPress={() => handleRemoveItem(item.productId, item.variantId)}
           >
             <Ionicons name="trash-outline" size={20} color="#6b7280" />
           </TouchableOpacity>
@@ -182,7 +191,7 @@ const changeQuantity = async (productId, newQty) => {
       ) : (
         <FlatList
           data={items}
-          keyExtractor={(item) => item.productId.toString()}
+          keyExtractor={(item) => `${item.productId}-${item.variantId || ''}`}
           renderItem={renderItem}
           contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 140 }}
           showsVerticalScrollIndicator={false}
@@ -262,7 +271,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#111827',
+    marginBottom: 2,
+  },
+  variantLabel: {
+    fontSize: 12,
+    color: '#6b7280',
     marginBottom: 4,
+    backgroundColor: '#f3f4f6',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
   },
   itemPrice: {
     fontSize: 13,

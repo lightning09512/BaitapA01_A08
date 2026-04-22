@@ -1,4 +1,4 @@
-const { Order, OrderItem, Product, User, Coupon, Notification } = require('../models');
+const { Order, OrderItem, Product, User, Coupon, Notification, ProductVariant } = require('../models');
 const { sendOrderConfirmationEmail } = require('../services/emailService');
 
 const ORDER_STATUS = {
@@ -32,14 +32,32 @@ const checkoutCod = async (req, res) => {
         // Calculate totals
         for (const item of cartItems) {
             const product = await Product.findByPk(item.productId);
+            let variant = null;
+            if (item.variantId) {
+                variant = await ProductVariant.findByPk(item.variantId);
+            }
+
             if (product) {
-                const lineTotal = product.price * item.quantity;
+                const price = variant ? variant.price : product.price;
+                const lineTotal = price * item.quantity;
                 totalAmount += lineTotal;
+                
+                let variantInfo = '';
+                if (variant) {
+                    const parts = [];
+                    if (variant.ram) parts.push(variant.ram);
+                    if (variant.rom) parts.push(variant.rom);
+                    if (variant.color) parts.push(variant.color);
+                    variantInfo = parts.join(' / ');
+                }
+
                 orderItemsData.push({
                     productId: product.id,
+                    variantId: item.variantId,
+                    variantInfo: variantInfo,
                     name: product.name,
                     image: product.image,
-                    unitPrice: product.price,
+                    unitPrice: price,
                     quantity: item.quantity,
                     lineTotal: lineTotal
                 });

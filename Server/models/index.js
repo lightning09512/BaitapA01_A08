@@ -1,5 +1,6 @@
 const { DataTypes, Op, Sequelize } = require('sequelize');
 const { sequelize } = require('../config/database');
+const bcrypt = require('bcryptjs');
 
 const User = sequelize.define('User', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -8,7 +9,7 @@ const User = sequelize.define('User', {
     email: { type: DataTypes.STRING, unique: true, allowNull: false },
     name: { type: DataTypes.STRING },
     phone: { type: DataTypes.STRING },
-    avatar: { type: DataTypes.TEXT },
+    avatar: { type: DataTypes.TEXT('long') },
     bio: { type: DataTypes.STRING },
     gender: { type: DataTypes.STRING },
     birthday: { type: DataTypes.STRING },
@@ -23,7 +24,24 @@ const User = sequelize.define('User', {
     tempPhone: { type: DataTypes.STRING },
     tempName: { type: DataTypes.STRING },
     otpPhone: { type: DataTypes.STRING },
+}, {
+    hooks: {
+        beforeCreate: async (user) => {
+            if (user.password) {
+                user.password = await bcrypt.hash(user.password, 10);
+            }
+        },
+        beforeUpdate: async (user) => {
+            if (user.changed('password')) {
+                user.password = await bcrypt.hash(user.password, 10);
+            }
+        }
+    }
 });
+
+User.prototype.validPassword = async function (password) {
+    return await bcrypt.compare(password, this.password);
+};
 
 const Product = sequelize.define('Product', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -34,15 +52,24 @@ const Product = sequelize.define('Product', {
     soldQuantity: { type: DataTypes.INTEGER, defaultValue: 0 },
     discountPercent: { type: DataTypes.INTEGER, defaultValue: 0 },
     description: { type: DataTypes.TEXT },
-    image: { type: DataTypes.TEXT },
+    image: { type: DataTypes.TEXT('long') },
     viewCount: { type: DataTypes.INTEGER, defaultValue: 0 },
+});
+
+const ProductVariant = sequelize.define('ProductVariant', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    ram: { type: DataTypes.STRING },      // e.g. "8GB", "12GB"
+    rom: { type: DataTypes.STRING },      // e.g. "256GB", "512GB"
+    color: { type: DataTypes.STRING },    // e.g. "Titan Natural"
+    price: { type: DataTypes.DOUBLE },    // Specific price for this variant
+    stock: { type: DataTypes.INTEGER, defaultValue: 20 },
 });
 
 const Review = sequelize.define('Review', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     username: { type: DataTypes.STRING },
     name: { type: DataTypes.STRING },
-    avatar: { type: DataTypes.TEXT },
+    avatar: { type: DataTypes.TEXT('long') },
     rating: { type: DataTypes.INTEGER, defaultValue: 5 },
     comment: { type: DataTypes.TEXT },
 });
@@ -54,6 +81,10 @@ Review.belongsTo(User, { foreignKey: 'userId' });
 // Quan hệ Product - Review
 Product.hasMany(Review, { foreignKey: 'productId' });
 Review.belongsTo(Product, { foreignKey: 'productId' });
+
+// Quan hệ Product - ProductVariant
+Product.hasMany(ProductVariant, { foreignKey: 'productId', as: 'Variants' });
+ProductVariant.belongsTo(Product, { foreignKey: 'productId' });
 
 const Order = sequelize.define('Order', {
     id: { type: DataTypes.STRING, primaryKey: true }, // Dùng chuỗi Timestamp làm mã như cũ
@@ -79,10 +110,13 @@ Order.belongsTo(User, { foreignKey: 'userId' });
 const OrderItem = sequelize.define('OrderItem', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING },
-    image: { type: DataTypes.TEXT },
+    image: { type: DataTypes.TEXT('long') },
     unitPrice: { type: DataTypes.DOUBLE },
     quantity: { type: DataTypes.INTEGER },
     lineTotal: { type: DataTypes.DOUBLE },
+    isRated: { type: DataTypes.BOOLEAN, defaultValue: false },
+    variantId: { type: DataTypes.INTEGER },           // Link optionally to variant
+    variantInfo: { type: DataTypes.STRING },         // Store string info for history
 });
 
 Order.hasMany(OrderItem, { foreignKey: 'orderId' });
@@ -91,9 +125,13 @@ OrderItem.belongsTo(Order, { foreignKey: 'orderId' });
 Product.hasMany(OrderItem, { foreignKey: 'productId' });
 OrderItem.belongsTo(Product, { foreignKey: 'productId' });
 
+ProductVariant.hasMany(OrderItem, { foreignKey: 'variantId' });
+OrderItem.belongsTo(ProductVariant, { foreignKey: 'variantId' });
+
 const CartItem = sequelize.define('CartItem', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     quantity: { type: DataTypes.INTEGER, defaultValue: 1 },
+    variantId: { type: DataTypes.INTEGER }, // Optional link to specific variant
 });
 
 User.hasMany(CartItem, { foreignKey: 'userId' });
@@ -101,6 +139,9 @@ CartItem.belongsTo(User, { foreignKey: 'userId' });
 
 Product.hasMany(CartItem, { foreignKey: 'productId' });
 CartItem.belongsTo(Product, { foreignKey: 'productId' });
+
+ProductVariant.hasMany(CartItem, { foreignKey: 'variantId' });
+CartItem.belongsTo(ProductVariant, { foreignKey: 'variantId' });
 
 const Coupon = sequelize.define('Coupon', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -165,6 +206,7 @@ module.exports = {
     Order,
     OrderItem,
     CartItem,
+    ProductVariant,
     Coupon,
     Notification,
     UserFavorites,
