@@ -129,7 +129,7 @@ const checkoutCod = async (req, res) => {
         // Gửi email hóa đơn xác nhận đơn hàng
         console.log(`[Order] User email: "${user.email}", will send: ${!!user.email}`);
         if (user.email) {
-            sendOrderConfirmationEmail(user.email, newOrder, orderItemsData)
+            sendOrderConfirmationEmail(user.email, newOrder, orderItemsData, user.name)
                 .then(ok => console.log(`[Order] Email sent: ${ok}`))
                 .catch(err => console.error('[Order] Email error:', err));
         } else {

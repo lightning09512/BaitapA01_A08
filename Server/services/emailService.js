@@ -42,68 +42,140 @@ const sendOTPEmail = async (toEmail, otp, title = 'Mã OTP của bạn là') => 
 };
 
 // ===== GỬI XÁC NHẬN ĐƠN HÀNG =====
-const sendOrderConfirmationEmail = async (toEmail, order, orderItems) => {
+const sendOrderConfirmationEmail = async (toEmail, order, orderItems, userName = 'Quý khách') => {
     try {
         const itemsHtml = orderItems.map(item => `
             <tr>
-                <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; color: #374151;">${item.name}</td>
-                <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: center; color: #374151;">${item.quantity}</td>
-                <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: right; color: #374151;">${Number(item.unitPrice).toLocaleString('vi-VN')}đ</td>
-                <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: right; color: #374151; font-weight: bold;">${Number(item.lineTotal).toLocaleString('vi-VN')}đ</td>
+                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img src="${item.image || 'https://via.placeholder.com/50'}" alt="${item.name}" style="width: 40px; height: 40px; border-radius: 4px; object-fit: contain; border: 1px solid #f1f5f9;" />
+                        <div>
+                            <div style="font-weight: 600; color: #1e293b; font-size: 13px;">${item.name}</div>
+                            ${item.variantInfo ? `<div style="font-size: 11px; color: #64748b;">${item.variantInfo}</div>` : ''}
+                        </div>
+                    </div>
+                </td>
+                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: center; color: #475569;">${item.quantity}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: right; color: #475569;">${Number(item.unitPrice).toLocaleString('vi-VN')}đ</td>
+                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: right; color: #dc2626; font-weight: 700;">${Number(item.lineTotal).toLocaleString('vi-VN')}đ</td>
             </tr>
         `).join('');
+
+        const orderDate = new Date(order.createdAt || Date.now()).toLocaleDateString('vi-VN');
 
         const mailOptions = {
             from: `"SellphoneK Support" <${process.env.EMAIL_USER}>`,
             to: toEmail,
             subject: `[SellphoneK] Xác nhận đơn hàng #${order.id}`,
             html: `
-            <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 10px;">
+            <div style="background-color: #f8fafc; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                <div style="max-width: 650px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+                    
+                    <!-- Header with Logo -->
+                    <div style="padding: 30px 40px; border-bottom: 2px solid #f1f5f9; text-align: center;">
+                        <div style="display: inline-block; padding: 10px 20px; background-color: #dc2626; border-radius: 8px;">
+                            <span style="color: #ffffff; font-size: 24px; font-weight: 900; letter-spacing: 1px;">SellphoneK</span>
+                        </div>
+                        <h2 style="color: #1e293b; margin-top: 20px; margin-bottom: 5px; font-size: 20px; text-transform: uppercase; letter-spacing: 1px;">Thông báo xác nhận đơn hàng</h2>
+                        <div style="width: 50px; height: 3px; background-color: #dc2626; margin: 10px auto;"></div>
+                    </div>
 
-                <!-- Header -->
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <h2 style="color: #2563eb; margin-bottom: 4px;">🎉 ĐẶT HÀNG THÀNH CÔNG</h2>
-                    <p style="color: #6b7280; font-size: 14px; margin: 0;">Cảm ơn bạn đã tin tưởng mua sắm tại <strong>SellphoneK</strong>!</p>
+                    <div style="padding: 30px 40px;">
+                        <p style="font-size: 15px; color: #475569; margin-bottom: 25px;">Thân gửi quý khách: <strong style="color: #1e293b; font-size: 16px;">${userName.toUpperCase()}</strong></p>
+                        <p style="font-size: 14px; color: #64748b; line-height: 1.6;">SellphoneK xin thông báo đơn đặt hàng của quý khách đã được tiếp nhận thành công. Dưới đây là chi tiết thông tin hóa đơn điện tử của bạn:</p>
+
+                        <!-- Thông tin khách hàng table -->
+                        <h3 style="font-size: 14px; color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-top: 30px;">THÔNG TIN KHÁCH HÀNG:</h3>
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+                            <tr>
+                                <td style="width: 35%; padding: 10px; background-color: #f8fafc; border: 1px solid #e2e8f0; font-weight: 600; color: #475569; font-size: 13px;">Họ và tên</td>
+                                <td style="padding: 10px; border: 1px solid #e2e8f0; color: #1e293b; font-size: 13px;">${userName}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; background-color: #f8fafc; border: 1px solid #e2e8f0; font-weight: 600; color: #475569; font-size: 13px;">Số điện thoại</td>
+                                <td style="padding: 10px; border: 1px solid #e2e8f0; color: #1e293b; font-size: 13px;">${order.phone}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; background-color: #f8fafc; border: 1px solid #e2e8f0; font-weight: 600; color: #475569; font-size: 13px;">Địa chỉ nhận hàng</td>
+                                <td style="padding: 10px; border: 1px solid #e2e8f0; color: #1e293b; font-size: 13px;">${order.address}</td>
+                            </tr>
+                        </table>
+
+                        <!-- Thông tin đơn hàng table -->
+                        <h3 style="font-size: 14px; color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">THÔNG TIN ĐƠN HÀNG:</h3>
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+                            <tr>
+                                <td style="width: 35%; padding: 10px; background-color: #f8fafc; border: 1px solid #e2e8f0; font-weight: 600; color: #475569; font-size: 13px;">Mã đơn hàng</td>
+                                <td style="padding: 10px; border: 1px solid #e2e8f0; color: #dc2626; font-weight: 700; font-size: 13px;">#${order.id}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; background-color: #f8fafc; border: 1px solid #e2e8f0; font-weight: 600; color: #475569; font-size: 13px;">Ngày đặt hàng</td>
+                                <td style="padding: 10px; border: 1px solid #e2e8f0; color: #1e293b; font-size: 13px;">${orderDate}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; background-color: #f8fafc; border: 1px solid #e2e8f0; font-weight: 600; color: #475569; font-size: 13px;">Phương thức</td>
+                                <td style="padding: 10px; border: 1px solid #e2e8f0; color: #1e293b; font-size: 13px;">Thanh toán khi nhận hàng (COD)</td>
+                            </tr>
+                        </table>
+
+                        <!-- Chi tiết sản phẩm -->
+                        <h3 style="font-size: 14px; color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">CHI TIẾT GIỎ HÀNG:</h3>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                            <thead>
+                                <tr style="background-color: #1e293b;">
+                                    <th style="padding: 12px; text-align: left; color: #ffffff; font-size: 12px; text-transform: uppercase;">Sản phẩm</th>
+                                    <th style="padding: 12px; text-align: center; color: #ffffff; font-size: 12px; text-transform: uppercase;">SL</th>
+                                    <th style="padding: 12px; text-align: right; color: #ffffff; font-size: 12px; text-transform: uppercase;">Đơn giá</th>
+                                    <th style="padding: 12px; text-align: right; color: #ffffff; font-size: 12px; text-transform: uppercase;">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${itemsHtml}
+                            </tbody>
+                        </table>
+
+                        <!-- Tổng cộng -->
+                        <div style="margin-top: 20px; background-color: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="padding: 5px 0; color: #64748b; font-size: 13px;">Tạm tính:</td>
+                                    <td style="padding: 5px 0; text-align: right; color: #1e293b; font-size: 13px;">${Number(order.subTotal).toLocaleString('vi-VN')}đ</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px 0; color: #64748b; font-size: 13px;">Giảm giá:</td>
+                                    <td style="padding: 5px 0; text-align: right; color: #dc2626; font-size: 13px;">-${Number(order.discountAmount).toLocaleString('vi-VN')}đ</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 15px 0 0 0; color: #1e293b; font-weight: 700; font-size: 16px;">TỔNG CỘNG:</td>
+                                    <td style="padding: 15px 0 0 0; text-align: right; color: #dc2626; font-weight: 800; font-size: 22px;">${Number(order.totalAmount).toLocaleString('vi-VN')}đ</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- QR Section similar to screenshot -->
+                        <div style="margin-top: 40px; padding: 25px; border: 1px dashed #cbd5e1; border-radius: 12px; text-align: center;">
+                            <div style="margin-bottom: 15px; color: #1e293b; font-weight: 600; font-size: 14px;">MÃ TRA CỨU ĐƠN HÀNG</div>
+                            <img src="https://chart.googleapis.com/chart?cht=qr&chl=https://sellphonek.com/orders/${order.id}&chs=120x120&chld=L|0" alt="Order QR" style="width: 100px; height: 100px; margin-bottom: 10px;" />
+                            <div style="color: #94a3b8; font-size: 12px;">Quét mã để xem trạng thái vận chuyển chi tiết</div>
+                        </div>
+
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="background-color: #f1f5f9; padding: 30px; text-align: center;">
+                        <p style="margin: 0; color: #475569; font-size: 13px; font-weight: 600;">HỆ THỐNG CỬA HÀNG CÔNG NGHỆ SELLPHONEK</p>
+                        <p style="margin: 10px 0; color: #64748b; font-size: 12px; line-height: 1.6;">
+                            Địa chỉ: Tòa nhà CMC, 11 Duy Tân, Cầu Giấy, Hà Nội<br>
+                            Hotline: 1900 6789 - Email: support@sellphonek.com
+                        </p>
+                        <div style="margin-top: 20px;">
+                            <a href="#" style="text-decoration: none; color: #dc2626; font-size: 12px; font-weight: 700; margin: 0 10px;">Facebook</a>
+                            <a href="#" style="text-decoration: none; color: #dc2626; font-size: 12px; font-weight: 700; margin: 0 10px;">Website</a>
+                            <a href="#" style="text-decoration: none; color: #dc2626; font-size: 12px; font-weight: 700; margin: 0 10px;">Instagram</a>
+                        </div>
+                        <p style="margin-top: 25px; color: #94a3b8; font-size: 11px;">© 2024 SellphoneK. All rights reserved.</p>
+                    </div>
                 </div>
-
-                <p style="font-size: 15px; color: #374151;">Đơn hàng <strong>#${order.id}</strong> của bạn đã được xác nhận và đang được xử lý.</p>
-
-                <!-- Thông tin giao hàng -->
-                <div style="background-color: #f8fafc; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2563eb;">
-                    <h3 style="color: #1f2937; margin: 0 0 10px 0; font-size: 15px;">📦 Thông tin giao hàng</h3>
-                    <p style="color: #4b5563; line-height: 1.8; margin: 0; font-size: 14px;">
-                        <strong>Địa chỉ:</strong> ${order.address}<br>
-                        <strong>Số điện thoại:</strong> ${order.phone}<br>
-                        <strong>Phương thức:</strong> Thanh toán khi nhận hàng (COD)
-                    </p>
-                </div>
-
-                <!-- Bảng sản phẩm -->
-                <h3 style="color: #1f2937; margin-top: 25px; font-size: 15px;">🧾 Chi tiết hóa đơn</h3>
-                <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
-                    <thead>
-                        <tr style="background-color: #2563eb; color: #ffffff;">
-                            <th style="padding: 12px 10px; text-align: left; border-radius: 6px 0 0 0;">Sản phẩm</th>
-                            <th style="padding: 12px 10px; text-align: center;">SL</th>
-                            <th style="padding: 12px 10px; text-align: right;">Đơn giá</th>
-                            <th style="padding: 12px 10px; text-align: right; border-radius: 0 6px 0 0;">Thành tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${itemsHtml}
-                    </tbody>
-                </table>
-
-                <!-- Tổng tiền -->
-                <div style="margin-top: 16px; text-align: right; padding-top: 12px; border-top: 2px solid #e5e7eb;">
-                    <p style="color: #6b7280; margin: 4px 0; font-size: 14px;">Tạm tính: <strong>${Number(order.subTotal).toLocaleString('vi-VN')}đ</strong></p>
-                    <p style="color: #ef4444; margin: 4px 0; font-size: 14px;">Giảm giá: <strong>-${Number(order.discountAmount).toLocaleString('vi-VN')}đ</strong></p>
-                    <p style="font-size: 20px; color: #2563eb; margin: 12px 0 0 0;"><strong>TỔNG CỘNG: ${Number(order.totalAmount).toLocaleString('vi-VN')}đ</strong></p>
-                </div>
-
-                <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 28px 0 16px 0;" />
-                <p style="font-size: 12px; color: #9ca3af; text-align: center;">Nếu bạn cần hỗ trợ, vui lòng liên hệ CSKH của SellphoneK.</p>
-                <p style="font-size: 12px; color: #9ca3af; text-align: center;">© SellphoneK</p>
             </div>
             `
         };
