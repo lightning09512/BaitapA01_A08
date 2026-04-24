@@ -2,7 +2,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import React, { useEffect, useState } from 'react';
 import { Animated, Dimensions, FlatList, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Badge, Button, Text, TextInput } from 'react-native-paper';
+import { ActivityIndicator, Badge, Button, Text, TextInput } from 'react-native-paper';
 import { getProductSpecs } from '../../data/productSpecs';
 import api from '../../services/api';
 
@@ -10,6 +10,8 @@ const { width } = Dimensions.get('window');
 
 export default function ProductDetailScreen({ route, navigation }) {
     const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
     const [reviews, setReviews] = useState([]);
     const [similarProducts, setSimilarProducts] = useState([]);
     const [isFavorite, setIsFavorite] = useState(false);
@@ -38,6 +40,8 @@ export default function ProductDetailScreen({ route, navigation }) {
     useEffect(() => {
         const load = async () => {
             try {
+                setLoading(true);
+                setError(false);
                 const productId = route.params.id;
 
                 // Increase view count
@@ -65,6 +69,9 @@ export default function ProductDetailScreen({ route, navigation }) {
                 setSimilarProducts(simRes.data || []);
             } catch (e) {
                 console.log('Product detail error:', e);
+                setError(true);
+            } finally {
+                setLoading(false);
             }
         };
         load();
@@ -85,8 +92,38 @@ export default function ProductDetailScreen({ route, navigation }) {
     };
 */
 
-    if (!product) {
-        return <View style={{ flex: 1, backgroundColor: '#fff' }} />;
+    if (loading) {
+        return (
+            <View style={{ flex: 1, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color="#dc2626" />
+                <Text style={{ marginTop: 16, color: '#64748b', fontSize: 14, fontWeight: '500' }}>Đang tìm kiếm thông tin...</Text>
+            </View>
+        );
+    }
+
+    if (error || !product) {
+        return (
+            <View style={{ flex: 1, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', padding: 32 }}>
+                <View style={{ width: 120, height: 120, borderRadius: 60, backgroundColor: '#fef2f2', justifyContent: 'center', alignItems: 'center', marginBottom: 24 }}>
+                    <MaterialCommunityIcons name="package-variant-remove" size={64} color="#ef4444" />
+                </View>
+                <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#111827', textAlign: 'center' }}>
+                    Sản phẩm không còn tồn tại
+                </Text>
+                <Text style={{ fontSize: 15, color: '#64748b', marginTop: 12, textAlign: 'center', lineHeight: 24 }}>
+                    Rất tiếc, sản phẩm này đã được gỡ bỏ khỏi hệ thống hoặc đã ngừng kinh doanh. Quý khách vui lòng tham khảo các dòng sản phẩm mới nhất của CellPhoneK.
+                </Text>
+                <Button 
+                    mode="contained" 
+                    onPress={() => navigation.goBack()}
+                    style={{ marginTop: 40, backgroundColor: '#dc2626', borderRadius: 12, width: '100%', elevation: 0 }}
+                    contentStyle={{ paddingVertical: 8 }}
+                    labelStyle={{ fontSize: 16, fontWeight: 'bold', letterSpacing: 0.5 }}
+                >
+                    Quay lại cửa hàng
+                </Button>
+            </View>
+        );
     }
 
     const specs = getProductSpecs(product.name);

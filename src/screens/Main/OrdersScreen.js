@@ -98,7 +98,7 @@ export default function OrdersScreen({ route, navigation }) {
       <View style={styles.orderCard}>
         <View style={styles.shopRow}>
           <Ionicons name="storefront-outline" size={16} color="#333" />
-          <Text style={styles.shopName}>SellphoneK Store</Text>
+          <Text style={styles.shopName}>CellPhoneK Store</Text>
           <Text style={[styles.orderStatusText, { color: statusColor }]}>{statusLabel}</Text>
         </View>
 

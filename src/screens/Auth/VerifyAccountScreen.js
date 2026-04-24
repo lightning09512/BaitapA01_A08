@@ -254,7 +254,7 @@ export default function VerifyAccountScreen({ navigation, route }) {
                     {/* Shield icon */}
                     <View style={styles.shieldWrapper}>
                         <Animated.View style={[styles.shieldGlow, { transform: [{ scale: shieldPulse }] }]} />
-                        <Text style={styles.shieldIcon}></Text>
+                        <Text style={styles.shieldIcon}>🛡️</Text>
                     </View>
 
                     <Text style={styles.welcomeText}>Xác minh tài khoản</Text>
@@ -287,8 +287,8 @@ export default function VerifyAccountScreen({ navigation, route }) {
                     />
 
                     {/* Progress bar */}
-                    <View style={styles.progressTrack}>
-                        <Animated.View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+                    <View style={{ height: 6, backgroundColor: '#f1f5f9', borderRadius: 3, marginVertical: 16, overflow: 'hidden' }}>
+                        <Animated.View style={{ height: 6, backgroundColor: '#dc2626', width: `${progress * 100}%` }} />
                     </View>
                     <Text style={styles.progressLabel}>{otp.length}/6 ký tự</Text>
 
@@ -409,14 +409,18 @@ const styles = StyleSheet.create({
     otpHiddenInput: { position: 'absolute', opacity: 0, width: 1, height: 1 },
 
     // Progress bar
-    progressContainer: {
-        height: 4, width: '100%',
-        backgroundColor: '#f3f4f6',
-        borderRadius: 2, marginBottom: 24, overflow: 'hidden',
+    progressTrack: {
+        height: 6,
+        width: '100%',
+        backgroundColor: '#f1f5f9',
+        borderRadius: 3,
+        marginVertical: 16,
+        overflow: 'hidden',
     },
     progressFill: {
-        height: '100%', borderRadius: 2,
+        height: 6,
         backgroundColor: '#dc2626',
+        borderRadius: 3,
     },
     progressLabel: {
         fontSize: 11, color: 'rgba(148,163,184,0.5)',

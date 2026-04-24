@@ -196,7 +196,7 @@ export default function ProfileScreen({ navigation }) {
                     <Divider />
                     <TouchableOpacity style={styles.serviceItem}>
                         <MaterialCommunityIcons name="food" size={20} color="#ef4444" />
-                        <Text style={styles.serviceText}>Đơn SellphoneKFood</Text>
+                        <Text style={styles.serviceText}>Đơn CellPhoneKFood</Text>
                         <Text style={styles.serviceAction}>Đang có ưu đãi</Text>
                         <Ionicons name="chevron-forward" size={16} color="#9ca3af" />
                     </TouchableOpacity>
@@ -208,20 +208,20 @@ export default function ProfileScreen({ navigation }) {
                     <View style={styles.utilityRow}>
                         <UtilityItem
                             icon="wallet-outline"
-                            label="Ví SellphoneK"
+                            label="Ví CellPhoneK"
                             subtext="Gói voucher 1.000.000₫"
                             color="#dc2626"
                             onPress={() => navigation.navigate('Wallet')}
                         />
                         <UtilityItem
                             icon="time-outline"
-                            label="SellphoneK Later"
+                            label="CellPhoneK Later"
                             subtext="₫ 14.926.887"
                             color="#3b82f6"
                         />
                         <UtilityItem
                             icon="logo-usd"
-                            label="Xu SellphoneK"
+                            label="Xu CellPhoneK"
                             subtext="0 xu"
                             color="#f59e0b"
                         />

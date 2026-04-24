@@ -13,9 +13,9 @@ const transporter = nodemailer.createTransport({
 const sendOTPEmail = async (toEmail, otp, title = 'Mã OTP của bạn là') => {
     try {
         const mailOptions = {
-            from: `"SellphoneK Support" <${process.env.EMAIL_USER}>`,
+            from: `"CellPhoneK Support" <${process.env.EMAIL_USER}>`,
             to: toEmail,
-            subject: `[SellphoneK] ${title}`,
+            subject: `[CellPhoneK] ${title}`,
             html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
                 <h2 style="color: #2563eb; text-align: center;">MÃ OTP CỦA BẠN</h2>
@@ -27,7 +27,7 @@ const sendOTPEmail = async (toEmail, otp, title = 'Mã OTP của bạn là') => 
                 <p style="font-size: 14px; color: #6b7280; text-align: center;">Vui lòng không chia sẻ mã này cho bất kỳ ai. Mã này sẽ hết hạn trong thời gian ngắn.</p>
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
                 <p style="font-size: 12px; color: #9ca3af; text-align: center;">Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.</p>
-                <p style="font-size: 12px; color: #9ca3af; text-align: center;">© SellphoneK</p>
+                <p style="font-size: 12px; color: #9ca3af; text-align: center;">© CellPhoneK</p>
             </div>
             `
         };
@@ -64,9 +64,9 @@ const sendOrderConfirmationEmail = async (toEmail, order, orderItems, userName =
         const orderDate = new Date(order.createdAt || Date.now()).toLocaleDateString('vi-VN');
 
         const mailOptions = {
-            from: `"SellphoneK Support" <${process.env.EMAIL_USER}>`,
+            from: `"CellPhoneK Support" <${process.env.EMAIL_USER}>`,
             to: toEmail,
-            subject: `[SellphoneK] Xác nhận đơn hàng #${order.id}`,
+            subject: `[CellPhoneK] Xác nhận đơn hàng #${order.id}`,
             html: `
             <div style="background-color: #f8fafc; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
                 <div style="max-width: 650px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
@@ -74,7 +74,7 @@ const sendOrderConfirmationEmail = async (toEmail, order, orderItems, userName =
                     <!-- Header with Logo -->
                     <div style="padding: 30px 40px; border-bottom: 2px solid #f1f5f9; text-align: center;">
                         <div style="display: inline-block; padding: 10px 20px; background-color: #dc2626; border-radius: 8px;">
-                            <span style="color: #ffffff; font-size: 24px; font-weight: 900; letter-spacing: 1px;">SellphoneK</span>
+                            <span style="color: #ffffff; font-size: 24px; font-weight: 900; letter-spacing: 1px;">CellPhoneK</span>
                         </div>
                         <h2 style="color: #1e293b; margin-top: 20px; margin-bottom: 5px; font-size: 20px; text-transform: uppercase; letter-spacing: 1px;">Thông báo xác nhận đơn hàng</h2>
                         <div style="width: 50px; height: 3px; background-color: #dc2626; margin: 10px auto;"></div>
@@ -82,7 +82,7 @@ const sendOrderConfirmationEmail = async (toEmail, order, orderItems, userName =
 
                     <div style="padding: 30px 40px;">
                         <p style="font-size: 15px; color: #475569; margin-bottom: 25px;">Thân gửi quý khách: <strong style="color: #1e293b; font-size: 16px;">${userName.toUpperCase()}</strong></p>
-                        <p style="font-size: 14px; color: #64748b; line-height: 1.6;">SellphoneK xin thông báo đơn đặt hàng của quý khách đã được tiếp nhận thành công. Dưới đây là chi tiết thông tin hóa đơn điện tử của bạn:</p>
+                        <p style="font-size: 14px; color: #64748b; line-height: 1.6;">CellPhoneK xin thông báo đơn đặt hàng của quý khách đã được tiếp nhận thành công. Dưới đây là chi tiết thông tin hóa đơn điện tử của bạn:</p>
 
                         <!-- Thông tin khách hàng table -->
                         <h3 style="font-size: 14px; color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-top: 30px;">THÔNG TIN KHÁCH HÀNG:</h3>
@@ -155,7 +155,7 @@ const sendOrderConfirmationEmail = async (toEmail, order, orderItems, userName =
                         <!-- QR Section similar to screenshot -->
                         <div style="margin-top: 40px; padding: 25px; border: 1px dashed #cbd5e1; border-radius: 12px; text-align: center;">
                             <div style="margin-bottom: 15px; color: #1e293b; font-weight: 600; font-size: 14px;">MÃ TRA CỨU ĐƠN HÀNG</div>
-                            <img src="https://chart.googleapis.com/chart?cht=qr&chl=https://sellphonek.com/orders/${order.id}&chs=120x120&chld=L|0" alt="Order QR" style="width: 100px; height: 100px; margin-bottom: 10px;" />
+                            <img src="https://chart.googleapis.com/chart?cht=qr&chl=https://cellphonek.com/orders/${order.id}&chs=120x120&chld=L|0" alt="Order QR" style="width: 100px; height: 100px; margin-bottom: 10px;" />
                             <div style="color: #94a3b8; font-size: 12px;">Quét mã để xem trạng thái vận chuyển chi tiết</div>
                         </div>
 
@@ -163,17 +163,17 @@ const sendOrderConfirmationEmail = async (toEmail, order, orderItems, userName =
 
                     <!-- Footer -->
                     <div style="background-color: #f1f5f9; padding: 30px; text-align: center;">
-                        <p style="margin: 0; color: #475569; font-size: 13px; font-weight: 600;">HỆ THỐNG CỬA HÀNG CÔNG NGHỆ SELLPHONEK</p>
+                        <p style="margin: 0; color: #475569; font-size: 13px; font-weight: 600;">HỆ THỐNG CỬA HÀNG CÔNG NGHỆ CELLPHONEK</p>
                         <p style="margin: 10px 0; color: #64748b; font-size: 12px; line-height: 1.6;">
                             Địa chỉ: Tòa nhà CMC, 11 Duy Tân, Cầu Giấy, Hà Nội<br>
-                            Hotline: 1900 6789 - Email: support@sellphonek.com
+                            Hotline: 1900 6789 - Email: support@cellphonek.com
                         </p>
                         <div style="margin-top: 20px;">
                             <a href="#" style="text-decoration: none; color: #dc2626; font-size: 12px; font-weight: 700; margin: 0 10px;">Facebook</a>
                             <a href="#" style="text-decoration: none; color: #dc2626; font-size: 12px; font-weight: 700; margin: 0 10px;">Website</a>
                             <a href="#" style="text-decoration: none; color: #dc2626; font-size: 12px; font-weight: 700; margin: 0 10px;">Instagram</a>
                         </div>
-                        <p style="margin-top: 25px; color: #94a3b8; font-size: 11px;">© 2024 SellphoneK. All rights reserved.</p>
+                        <p style="margin-top: 25px; color: #94a3b8; font-size: 11px;">© 2024 CellPhoneK. All rights reserved.</p>
                     </div>
                 </div>
             </div>

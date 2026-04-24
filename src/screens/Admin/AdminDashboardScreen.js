@@ -64,7 +64,7 @@ export default function AdminDashboardScreen({ navigation }) {
             <View style={styles.header}>
                 <View>
                     <Text style={styles.headerTitle}>Admin Dashboard</Text>
-                    <Text style={styles.headerSub}>SellphoneK Management</Text>
+                    <Text style={styles.headerSub}>CellPhoneK Management</Text>
                 </View>
                 <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
                     <Ionicons name="log-out-outline" size={22} color="#fff" />

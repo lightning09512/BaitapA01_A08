@@ -4,7 +4,7 @@ const fs = require('fs');
 
 async function exportDatabase() {
     try {
-        const dest = path.join(__dirname, '../../sellphonek_database.sql');
+        const dest = path.join(__dirname, '../../cellphonek_database.sql');
         
         console.log('Đang export dữ liệu sang file:', dest);
         

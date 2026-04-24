@@ -235,7 +235,7 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.container}>
             <LinearGradient colors={['#dc2626', '#ef4444']} style={styles.header}>
                 <View style={styles.logoRow}>
-                    <Text style={styles.logoText}>SellPhoneK</Text>
+                    <Text style={styles.logoText}>CellPhoneK</Text>
                     <View style={styles.locationBadge}>
                         <Ionicons name="location-outline" size={14} color="#fff" />
                         <Text style={styles.locationText}>TP. HCM</Text>

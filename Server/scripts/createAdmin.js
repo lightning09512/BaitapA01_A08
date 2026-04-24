@@ -20,7 +20,7 @@ async function createAdmin() {
             await User.create({
                 username: 'admin',
                 password: 'admin123',
-                email: 'admin@sellphonek.com',
+                email: 'admin@cellphonek.com',
                 name: 'Quản trị viên',
                 avatar: 'https://i.pravatar.cc/150?img=3',
                 isVerified: true,

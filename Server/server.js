@@ -65,7 +65,7 @@ io.on('connection', (socket) => {
 });
 
 // alter: true giúp thêm cột mới (ví dụ: role) mà không xoá dữ liệu cũ
-sequelize.sync({ alter: true }).then(() => {
+sequelize.sync().then(() => {
     server.listen(PORT, () => {
         console.log(`[INFO] Server đang chạy trên cổng ${PORT}`);
     });

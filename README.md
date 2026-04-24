@@ -1,93 +1,76 @@
-# CellphoneK - Premium E-commerce Mobile Application
+# CellPhoneK - Giai phap Nen tang Thuong mai Dien tu Di dong Chuyen nghiep
 
-CellphoneK là một ứng dụng thương mại điện tử chuyên về thiết bị điện tử, được phát triển với mục tiêu mang lại trải nghiệm mua sắm hiện đại, mượt mà và an toàn tương tự như các nền tảng lớn (CellphoneS, Shopee).
+## 1. Gioi thieu du an
+CellPhoneK la mot he sinh thai thuong mai dien tu toan dien duoc thiet ke chuyen biet cho linh vuc kinh doanh thiet bi cong nghe. Du an duoc xay dung dua tren tieu chuan cua cac ung dung hang dau hien nay, ket hop giua hieu nang manh me cua backend Node.js va su linh hoat cua frontend React Native. Day khong chi la mot bai tap lon ma con la mot nghien cuu ve cach toi uu hoa trai nghiem mua sam tren thiet bi di dong, tu khau duyet san pham cho den quan ly don hang thoi gian thuc.
 
----
+## 2. Kien truc he thong
+He thong duoc trien khai theo mo hinh Client-Server doc lap, dam bao kha nang bao tri va nang cap de dang:
+- Frontend: Ung dung di dong da nen tang, su dung co che quan ly trang thai hieu qua va dieu huong phuc tap.
+- Backend: API Server xay dung theo kien truc MVC (Model-View-Controller), cung cap cac dich vu RESTful API tieu chuan.
+- Real-time Layer: Su dung Socket.io de duy tri ket noi lien tuc giua khach hang va quan tri vien, phuc vu cho he thong chat va thong bao tuc thoi.
 
-## Tính Năng Chính
+## 3. Danh sach tinh nang chi tiet
 
-### Cho Người Dùng (Customer)
-- Hệ thống Tài khoản: Đăng ký, Đăng nhập, Quên mật khẩu qua OTP (Email). Bảo mật mật khẩu bằng Bcrypt.
-- Trải nghiệm mua sắm:
-    - Duyệt sản phẩm theo Danh mục, Thương hiệu.
-    - Xem chi tiết sản phẩm với Thông số kỹ thuật đầy đủ.
-    - Lựa chọn Biến thể (Variants): Chọn RAM, ROM, Màu sắc với giá thay đổi tương ứng.
-- Giỏ hàng & Thanh toán: Quản lý giỏ hàng real-time, đặt hàng ship COD.
-- Tương tác: Đánh giá sản phẩm (Reviews), yêu thích sản phẩm (Favorites), quản lý lịch sử xem.
-- Hỗ trợ thực tế: Chat trực tuyến với người quản trị (Socket.io).
+### 3.1. Phan he Khach hang (Customer App)
+- He thong xac thuc: Quy trinh dang ky khep kin vao co che xac minh OTP qua email, ngan chan tai khoan rac va bao mat thong tin bang ma hoa Bcrypt.
+- Trai nghiem mua sam thong minh: Bo loc san pham da chieu theo Danh muc, Thuong hieu, Muc gia. He thong goi y san pham tuong tu dua tren danh muc.
+- Quan ly bien the san pham (Product Variants): Ho tro nguoi dung lua chon linh hoat cac cau hinh RAM, ROM va Mau sac voi gia tri don hang duoc cap nhat tu dong.
+- Quy trinh thanh toan (Checkout): Gio hang thoi gian thuc, ap dung diem thuong va quy trinh xac nhan don hang COD nghiem ngat.
+- Trung tam ca nhan: Theo doi trang thai don hang chi tiet (tu khi dat den khi nhan), quan ly danh sach yeu thich va lich su san pham da xem.
 
-### Cho Quản Trị Viên (Admin)
-- Bảng điều khiển (Dashboard): Thống kê doanh thu, đơn hàng, người dùng.
-- Quản lý sản phẩm: Thêm, sửa, xóa sản phẩm và các biến thể.
-- Quản lý đơn hàng: Theo dõi và cập nhật trạng thái đơn hàng (NEW -> CONFIRMED -> SHIPPING -> DELIVERED).
-- Hỗ trợ khách hàng: Hệ thống chat đa luồng xử lý nhiều hội thoại cùng lúc.
+### 3.2. Phan he Quan tri (Admin Dashboard)
+- Quan tri du lieu tap trung: Giao dien dashboard truc quan voi cac bieu do thong ke doanh thu, san pham ban chay va tang truong nguoi dung.
+- Dieu phoi don hang: He thong quan ly trang thai don hang logic, cho phep admin duyet, chuan bi hang va theo doi qua trinh van chuyen.
+- Quan ly noi dung: Cong cu CMS manh me de quan ly danh muc san pham, bien the va hinh anh.
+- Cham soc khach hang: He thong chat tap trung cho phep admin phan hoi khach hang tuc thi, cai thien ty le chuyen doi.
 
----
+## 4. Dac ta ky thuat va Cong nghe
 
-## Công Nghệ Sử Dụng
+### 4.1. Stack Cong nghe
+- Frontend Framework: React Native (Expo SDK) - Toi uu hieu nang render va ho tro da nen tang.
+- Navigation: React Navigation (Stack & Tab Navigation) - Dieu huong phuc tap va muot ma.
+- UI Library: React Native Paper & Vanilla CSS - Giao dien tinh te, hien dai theo phong cach Glassmorphism.
+- Backend Runtime: Node.js & Express.js - Xu ly bat dong bo hieu qua, phu hop cho he thong nhieu truy van.
+- Database Engine: MySQL 8.0 - Dam bao tinh toan ven du lieu (ACID).
+- ORM Layer: Sequelize - Quan ly moi quan hien giua cac bang thong qua code JavaScript.
 
-| Lớp (Layer) | Công nghệ |
-| :--- | :--- |
-| Frontend | React Native (Expo), React Navigation, React Native Paper |
-| Backend | Node.js, Express.js |
-| Database | MySQL (thông qua Sequelize ORM) |
-| Real-time | Socket.io |
-| Security | JWT (JSON Web Token), Bcrypt Hashing |
-| Email | Nodemailer |
+### 4.2. Co so du lieu (Database Schema)
+He thong bao gom cac thuc the chinh:
+- Users: Luu tru thong tin dinh danh, phan quyen (Admin/Customer) va trang thai xac minh.
+- Products: Thong tin cot loi cua san pham bao gom ten, mo ta, danh muc, thuong hieu.
+- ProductVariants: Cac lua chon cau hinh (RAM, ROM, Mau sac) va gia rieng biet.
+- Orders & OrderItems: Luu tru chi tiet giao dich, thong tin van chuyen va gia tri tai thoi diem mua.
+- Reviews: Phan hoi cua khach hang ve chat luong san pham.
+- Messages: Lich su chat thoi gian thuc giua nguoi dung va he thong.
 
----
+## 5. Huong dan cai dat va Trien khai
 
-## Cấu trúc Thư mục
+### Buoc 1: Chuan bi tai nguyen
+- Tai va cai dat Node.js (Version 18+).
+- Cai dat MySQL Server va dam bao service dang chay tren cong 3306.
+- Cai dat Expo Go tren dien thoai di dong de kiem thu thuc te.
 
-```text
-BaiTapA01_A08/
-├── Server/               # Node.js Backend
-│   ├── config/           # Cấu hình DB
-│   ├── controllers/      # Logic nghiệp vụ (Auth, Product, Order...)
-│   ├── models/           # Định nghĩa Schema (Sequelize)
-│   ├── routes/           # Định nghĩa các Endpoint API
-│   ├── services/         # Email, Chat services
-│   └── server.js         # file chạy chính
-├── src/                  # React Native Frontend
-│   ├── components/       # Các UI Component tái sử dụng
-│   ├── screens/          # Các màn hình (Main, Auth, Intro...)
-│   ├── services/         # Axios API configuration
-│   └── navigation/       # Cấu hình điều hướng App
-└── App.js                # Entry point của ứng dụng
-```
+### Buoc 2: Thiet lap Co so du lieu
+- Su dung cong cu query SQL de tao database: `CREATE DATABASE app_ban_hang_db;`.
+- Import tep `cellphonek_database.sql` de thiet lap cau truc bang va du lieu mau. Tep nay chua cac rang buoc khoa ngoai (Foreign Keys) quan trong, vui long khong thay doi cau truc luc import.
 
----
+### Buoc 3: Cau hinh API Server
+- Di chuyen vao thu muc Server: `cd Server`.
+- Thuc thi lenh: `npm install`.
+- Chinh sua tep `Server/config/database.js`: Cap nhat `username` va `password` cua tai khoan MySQL tren may ban.
+- Thiet lap tep `.env`: Dien email va mat khau ung dung (App Password) de he thong co the gui mail OTP.
+- Khoi dong backend: `npm start`.
 
-## Hướng dẫn Cài đặt
+### Buoc 4: Khoi chay ung dung di dong
+- Quay lai thu muc goc: `npm install`.
+- Cau hinh dia chi ket noi: Mo tep `src/services/api.js`, thay `localhost` thanh IP mang noi bo cua may tinh (Vi du: `192.168.x.x`).
+- Khoi dong Expo: `npx expo start`.
+- Su dung camera dien thoai de quet ma QR hien thi tren terminal.
 
-### Yêu cầu hệ thống
-- Node.js (>= 18.x)
-- MySQL Server
+## 6. Xu ly su co thuong gap
+- Khong ket noi duoc API: Kiem tra xem dien thoai va may tinh co dang dung chung mot mang Wi-Fi hay khong. Kiem tra Firewall cua Windows co dang chan cong 3000 hay khong.
+- Loi gui Mail: Dam bao ban da bat "Xac minh 2 lop" cho Gmail va tao "Mat khau ung dung" (App Password).
+- Loi DB: Kiem tra lai thong tin dang nhap MySQL trong file config.
 
-### 2. Cài đặt Backend
-```bash
-cd Server
-npm install
-# Cấu hình file .env trong thư mục Server với thông tin DB của bạn
-npm start
-```
-
-### 3. Cài đặt Frontend
-```bash
-npm install
-npx expo start
-```
-
----
-
-## Giao diện Ứng dụng
-*(Bạn hãy chụp ảnh màn hình và thay thế vào đây)*
-- [Màn hình Intro]
-- [Trang chủ - Light Mode]
-- [Chi tiết sản phẩm & Biến thể]
-- [Dashboard Admin]
-
----
-
-## Giấy phép
-Dự án được phát hành dưới giấy phép MIT.
+## 7. Giay phep va Ban quyen
+Du an CellPhoneK duoc phat trien cho muc dich hoc tap va nghien cuu. Moi hanh vi sao chep hoac su dung cho muc dich thuong mai can co su dong y cua tac gia. Du an phat hanh duoi giay phep MIT.
