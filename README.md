@@ -1,76 +1,91 @@
-# CellPhoneK - Giai phap Nen tang Thuong mai Dien tu Di dong Chuyen nghiep
+# CellPhoneK - Giải pháp Nền tảng Thương mại Điện tử Di động Chuyên nghiệp
 
-## 1. Gioi thieu du an
-CellPhoneK la mot he sinh thai thuong mai dien tu toan dien duoc thiet ke chuyen biet cho linh vuc kinh doanh thiet bi cong nghe. Du an duoc xay dung dua tren tieu chuan cua cac ung dung hang dau hien nay, ket hop giua hieu nang manh me cua backend Node.js va su linh hoat cua frontend React Native. Day khong chi la mot bai tap lon ma con la mot nghien cuu ve cach toi uu hoa trai nghiem mua sam tren thiet bi di dong, tu khau duyet san pham cho den quan ly don hang thoi gian thuc.
+## 1. Giới thiệu dự án
+CellPhoneK là một hệ sinh thái thương mại điện tử toàn diện được thiết kế chuyên biệt cho lĩnh vực kinh doanh thiết bị công nghệ. Dự án được xây dựng dựa trên tiêu chuẩn của các ứng dụng hàng đầu hiện nay, kết hợp giữa hiệu năng mạnh mẽ của backend Node.js và sự linh hoạt của frontend React Native. Đây không chỉ là một bài tập lớn mà còn là một nghiên cứu về cách tối ưu hóa trải nghiệm mua sắm trên thiết bị di động, từ khâu duyệt sản phẩm cho đến quản lý đơn hàng thời gian thực.
 
-## 2. Kien truc he thong
-He thong duoc trien khai theo mo hinh Client-Server doc lap, dam bao kha nang bao tri va nang cap de dang:
-- Frontend: Ung dung di dong da nen tang, su dung co che quan ly trang thai hieu qua va dieu huong phuc tap.
-- Backend: API Server xay dung theo kien truc MVC (Model-View-Controller), cung cap cac dich vu RESTful API tieu chuan.
-- Real-time Layer: Su dung Socket.io de duy tri ket noi lien tuc giua khach hang va quan tri vien, phuc vu cho he thong chat va thong bao tuc thoi.
+## 2. Kiến trúc hệ thống
+Hệ thống được triển khai theo mô hình Client-Server độc lập, đảm bảo khả năng bảo trì và nâng cấp dễ dàng:
+- Frontend: Ứng dụng di động đa nền tảng, sử dụng cơ chế quản lý trạng thái hiệu quả và điều hướng phức tạp.
+- Backend: API Server xây dựng theo kiến trúc MVC (Model-View-Controller), cung cấp các dịch vụ RESTful API tiêu chuẩn.
+- Real-time Layer: Sử dụng Socket.io để duy trì kết nối liên tục giữa khách hàng và quản trị viên, phục vụ cho hệ thống chat và thông báo tức thời.
 
-## 3. Danh sach tinh nang chi tiet
+## 3. Danh sách tính năng chi tiết
 
-### 3.1. Phan he Khach hang (Customer App)
-- He thong xac thuc: Quy trinh dang ky khep kin vao co che xac minh OTP qua email, ngan chan tai khoan rac va bao mat thong tin bang ma hoa Bcrypt.
-- Trai nghiem mua sam thong minh: Bo loc san pham da chieu theo Danh muc, Thuong hieu, Muc gia. He thong goi y san pham tuong tu dua tren danh muc.
-- Quan ly bien the san pham (Product Variants): Ho tro nguoi dung lua chon linh hoat cac cau hinh RAM, ROM va Mau sac voi gia tri don hang duoc cap nhat tu dong.
-- Quy trinh thanh toan (Checkout): Gio hang thoi gian thuc, ap dung diem thuong va quy trinh xac nhan don hang COD nghiem ngat.
-- Trung tam ca nhan: Theo doi trang thai don hang chi tiet (tu khi dat den khi nhan), quan ly danh sach yeu thich va lich su san pham da xem.
+### 3.1. Phân hệ Khách hàng (Customer App)
+- Hệ thống xác thực: Quy trình đăng ký khép kín với cơ chế xác minh OTP qua email, ngăn chặn tài khoản rác và bảo mật thông tin bằng mã hóa Bcrypt.
+- Trải nghiệm mua sắm thông minh: Bộ lọc sản phẩm đa chiều theo Danh mục, Thương hiệu, Mức giá. Hệ thống gợi ý sản phẩm tương tự dựa trên danh mục.
+- Quản lý biến thể sản phẩm (Product Variants): Hỗ trợ người dùng lựa chọn linh hoạt các cấu hình RAM, ROM và Màu sắc với giá trị đơn hàng được cập nhật tự động.
+- Quy trình thanh toán (Checkout): Giỏ hàng thời gian thực, áp dụng điểm thưởng và quy trình xác nhận đơn hàng COD nghiêm ngặt.
+- Trung tâm cá nhân: Theo dõi trạng thái đơn hàng chi tiết (từ khi đặt đến khi nhận), quản lý danh sách yêu thích và lịch sử sản phẩm đã xem.
 
-### 3.2. Phan he Quan tri (Admin Dashboard)
-- Quan tri du lieu tap trung: Giao dien dashboard truc quan voi cac bieu do thong ke doanh thu, san pham ban chay va tang truong nguoi dung.
-- Dieu phoi don hang: He thong quan ly trang thai don hang logic, cho phep admin duyet, chuan bi hang va theo doi qua trinh van chuyen.
-- Quan ly noi dung: Cong cu CMS manh me de quan ly danh muc san pham, bien the va hinh anh.
-- Cham soc khach hang: He thong chat tap trung cho phep admin phan hoi khach hang tuc thi, cai thien ty le chuyen doi.
+### 3.2. Phân hệ Quản trị (Admin Dashboard)
+- Quản trị dữ liệu tập trung: Giao diện dashboard trực quan với các biểu đồ thống kê doanh thu, sản phẩm bán chạy và tăng trưởng người dùng.
+- Điều phối đơn hàng: Hệ thống quản lý trạng thái đơn hàng logic, cho phép admin duyệt, chuẩn bị hàng và theo dõi quá trình vận chuyển.
+- Quản lý nội dung: Công cụ CMS mạnh mẽ để quản lý danh mục sản phẩm, biến thể và hình ảnh.
+- Chăm sóc khách hàng: Hệ thống chat tập trung cho phép admin phản hồi khách hàng tức thì, cải thiện tỷ lệ chuyển đổi.
 
-## 4. Dac ta ky thuat va Cong nghe
+## 4. Đặc tả kỹ thuật và Công nghệ
 
-### 4.1. Stack Cong nghe
-- Frontend Framework: React Native (Expo SDK) - Toi uu hieu nang render va ho tro da nen tang.
-- Navigation: React Navigation (Stack & Tab Navigation) - Dieu huong phuc tap va muot ma.
-- UI Library: React Native Paper & Vanilla CSS - Giao dien tinh te, hien dai theo phong cach Glassmorphism.
-- Backend Runtime: Node.js & Express.js - Xu ly bat dong bo hieu qua, phu hop cho he thong nhieu truy van.
-- Database Engine: MySQL 8.0 - Dam bao tinh toan ven du lieu (ACID).
-- ORM Layer: Sequelize - Quan ly moi quan hien giua cac bang thong qua code JavaScript.
+### 4.1. Stack Công nghệ
+- Frontend Framework: React Native (Expo SDK).
+- Navigation: React Navigation (Stack & Tab Navigation).
+- UI Library: React Native Paper & Vanilla CSS.
+- Backend Runtime: Node.js & Express.js.
+- Database Engine: MySQL 8.0.
+- ORM Layer: Sequelize.
+- Real-time: Socket.io.
 
-### 4.2. Co so du lieu (Database Schema)
-He thong bao gom cac thuc the chinh:
-- Users: Luu tru thong tin dinh danh, phan quyen (Admin/Customer) va trang thai xac minh.
-- Products: Thong tin cot loi cua san pham bao gom ten, mo ta, danh muc, thuong hieu.
-- ProductVariants: Cac lua chon cau hinh (RAM, ROM, Mau sac) va gia rieng biet.
-- Orders & OrderItems: Luu tru chi tiet giao dich, thong tin van chuyen va gia tri tai thoi diem mua.
-- Reviews: Phan hoi cua khach hang ve chat luong san pham.
-- Messages: Lich su chat thoi gian thuc giua nguoi dung va he thong.
+### 4.2. Cơ sở dữ liệu (Database Schema)
+Hệ thống bao gồm các thực thể chính:
+- Users: Lưu trữ thông tin định danh, phân quyền (Admin/Customer) và trạng thái xác minh.
+- Products: Thông tin cốt lõi của sản phẩm bao gồm tên, mô tả, danh mục, thương hiệu.
+- ProductVariants: Các lựa chọn cấu hình (RAM, ROM, Màu sắc) và giá riêng biệt.
+- Orders & OrderItems: Lưu trữ chi tiết giao dịch và thông tin vận chuyển.
+- Reviews: Phản hồi của khách hàng về chất lượng sản phẩm.
+- Messages: Lịch sử chat thời gian thực giữa người dùng và hệ thống.
 
-## 5. Huong dan cai dat va Trien khai
+## 5. Hướng dẫn cài đặt và Triển khai (Setup)
 
-### Buoc 1: Chuan bi tai nguyen
-- Tai va cai dat Node.js (Version 18+).
-- Cai dat MySQL Server va dam bao service dang chay tren cong 3306.
-- Cai dat Expo Go tren dien thoai di dong de kiem thu thuc te.
+### Bước 1: Chuẩn bị môi trường
+Yêu cầu máy tính đã cài đặt sẵn các công cụ sau:
+- Node.js (Phiên bản 18.x trở lên).
+- MySQL Server (Phiên bản 8.0 trở lên).
+- Expo Go trên thiết bị di động hoặc Trình giả lập.
 
-### Buoc 2: Thiet lap Co so du lieu
-- Su dung cong cu query SQL de tao database: `CREATE DATABASE app_ban_hang_db;`.
-- Import tep `cellphonek_database.sql` de thiet lap cau truc bang va du lieu mau. Tep nay chua cac rang buoc khoa ngoai (Foreign Keys) quan trong, vui long khong thay doi cau truc luc import.
+### Bước 2: Thiết lập Cơ sở dữ liệu
+1. Mở phần mềm quản lý MySQL (như MySQL Workbench hoặc Navicat).
+2. Tạo một Database mới với tên: `app_ban_hang_db`.
+3. Import tệp dữ liệu `cellphonek_database.sql` (nằm tại thư mục gốc của dự án) vào Database vừa tạo. Lưu ý kiểm tra kỹ các ràng buộc khóa ngoại trong quá trình import.
 
-### Buoc 3: Cau hinh API Server
-- Di chuyen vao thu muc Server: `cd Server`.
-- Thuc thi lenh: `npm install`.
-- Chinh sua tep `Server/config/database.js`: Cap nhat `username` va `password` cua tai khoan MySQL tren may ban.
-- Thiet lap tep `.env`: Dien email va mat khau ung dung (App Password) de he thong co the gui mail OTP.
-- Khoi dong backend: `npm start`.
+### Bước 3: Cấu hình API Server (Backend)
+1. Truy cập vào thư mục Server: `cd Server`.
+2. Cài đặt các thư viện phụ thuộc: `npm install`.
+3. Cấu hình tệp `.env`:
+   - Mở tệp `.env` trong thư mục Server.
+   - Điền thông tin `EMAIL_USER` (Email gửi) và `EMAIL_PASS` (App Password của Gmail) để hệ thống có thể gửi mã OTP.
+4. Cấu hình kết nối Database:
+   - Mở tệp `Server/config/database.js`.
+   - Thay đổi `username` và `password` của MySQL cho phù hợp với tài khoản trên máy tính của bạn.
+5. Khởi chạy Server: `npm start`.
 
-### Buoc 4: Khoi chay ung dung di dong
-- Quay lai thu muc goc: `npm install`.
-- Cau hinh dia chi ket noi: Mo tep `src/services/api.js`, thay `localhost` thanh IP mang noi bo cua may tinh (Vi du: `192.168.x.x`).
-- Khoi dong Expo: `npx expo start`.
-- Su dung camera dien thoai de quet ma QR hien thi tren terminal.
+### Bước 4: Cấu hình Ứng dụng di động (Frontend)
+1. Quay lại thư mục gốc của dự án.
+2. Cài đặt thư viện cho Frontend: `npm install`.
+3. Cấu hình địa chỉ API:
+   - Mở tệp `src/services/api.js`.
+   - Tìm dòng `baseURL` và thay đổi `localhost` thành địa chỉ IP LAN của máy tính bạn (Ví dụ: `http://192.168.1.5:3000`). Điều này là bắt buộc để điện thoại có thể kết nối được với Server.
 
-## 6. Xu ly su co thuong gap
-- Khong ket noi duoc API: Kiem tra xem dien thoai va may tinh co dang dung chung mot mang Wi-Fi hay khong. Kiem tra Firewall cua Windows co dang chan cong 3000 hay khong.
-- Loi gui Mail: Dam bao ban da bat "Xac minh 2 lop" cho Gmail va tao "Mat khau ung dung" (App Password).
-- Loi DB: Kiem tra lai thong tin dang nhap MySQL trong file config.
+### Bước 5: Khởi chạy dự án
+1. Tại thư mục gốc, chạy lệnh: `npx expo start`.
+2. Sử dụng ứng dụng Expo Go trên điện thoại để quét mã QR hiển thị trên màn hình terminal.
+3. Đảm bảo điện thoại và máy tính chạy Server kết nối chung một mạng Wi-Fi.
 
-## 7. Giay phep va Ban quyen
-Du an CellPhoneK duoc phat trien cho muc dich hoc tap va nghien cuu. Moi hanh vi sao chep hoac su dung cho muc dich thuong mai can co su dong y cua tac gia. Du an phat hanh duoi giay phep MIT.
+## 6. Xử lý sự cố thường gặp
+- Lỗi kết nối API: Kiểm tra Firewall của Windows xem có đang chặn cổng 3000 hay không. Đảm bảo địa chỉ IP trong `api.js` là chính xác.
+- Lỗi gửi OTP: Kiểm tra lại quyền truy cập của ứng dụng trong cài đặt tài khoản Google và đảm bảo sử dụng "Mật khẩu ứng dụng" thay vì mật khẩu chính.
+- Lỗi đồng bộ DB: Nếu bảng không tự tạo, hãy kiểm tra lại cấu hình trong `Server/config/database.js`.
+
+## 7. Bản quyền và Liên hệ
+Dự án được phát triển cho mục đích học tập và nghiên cứu. Mọi hành vi sao chép hoặc sử dụng cho mục đích thương mại cần có sự đồng ý của tác giả.
+
+Giấy phép phát hành: MIT License.
