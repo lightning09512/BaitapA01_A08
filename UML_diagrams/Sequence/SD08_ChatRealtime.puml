@@ -1,0 +1,93 @@
+@startuml SD08_ChatRealtime
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+skinparam participant {
+    BackgroundColor #EBF5FB
+    BorderColor #2980B9
+    FontColor #1A252F
+    FontSize 12
+}
+skinparam actor {
+    BackgroundColor #D5E8D4
+    BorderColor #27AE60
+    FontColor #1A252F
+}
+skinparam sequence {
+    ArrowColor #2C3E50
+    LifeLineBorderColor #AEB6BF
+    LifeLineBackgroundColor #F2F3F4
+    GroupBorderColor #2980B9
+    GroupBackgroundColor #EBF5FB
+    GroupFontColor #1A5276
+    DividerBackgroundColor #EAECEE
+    DividerBorderColor #AEB6BF
+}
+
+title <size:16><b>SD08 - Chat Real-time (Socket.io)</b></size>\n<color:#5D6D7E><size:12>UC08 + UC13 | CellphoneK</size></color>
+
+actor "Khách Hàng" as Customer
+participant "ChatScreen\n(Customer)" as ChatScreen
+participant "Socket.io\nClient" as SocketClient
+participant "Server.js\n(Socket.io Server)" as SocketServer
+participant "ChatController" as ChatCtrl
+participant "AdminChatDetail\nScreen" as AdminChatScreen
+participant "Socket.io\nClient (Admin)" as SocketAdmin
+actor "Quản Trị Viên\n(Admin)" as Admin
+participant "Database\n(MySQL)" as DB
+
+== Bước 1: Khởi Tạo Kết Nối ==
+
+Customer -> ChatScreen : Mở màn hình Chat
+ChatScreen -> ChatCtrl : GET /support-info\n(Bearer token)
+ChatCtrl -> DB : User.findOne({role: 'admin'})
+DB --> ChatCtrl : adminInfo
+ChatCtrl --> ChatScreen : {id, username, name, avatar}
+
+ChatScreen -> ChatCtrl : GET /chat/history/:adminId\n(Bearer token)
+ChatCtrl -> DB : ChatMessage.findAll(\nsenderId=user OR receiverId=user)
+DB --> ChatCtrl : messages
+ChatCtrl --> ChatScreen : Lịch sử tin nhắn
+
+ChatScreen -> SocketClient : socket.connect(serverURL)
+SocketClient -> SocketServer : io.connect + emit('join', userId)
+SocketServer --> SocketClient : Xác nhận kết nối
+
+== Bước 2: Khách Hàng Gửi Tin Nhắn ==
+
+Customer -> ChatScreen : Nhập và gửi tin nhắn
+ChatScreen -> SocketClient : socket.emit('send_message',\n{senderId, receiverId: adminId, content})
+SocketClient -> SocketServer : Event 'send_message'
+
+SocketServer -> DB : ChatMessage.create(\n{senderId, receiverId,\ncontent, isRead: false})
+DB --> SocketServer : savedMessage
+
+SocketServer -> SocketAdmin : socket.to(adminRoom).emit(\n'receive_message', message)
+SocketAdmin -> AdminChatScreen : Nhận tin nhắn mới real-time
+AdminChatScreen --> Admin : Hiển thị tin nhắn mới\n+ badge thông báo
+
+== Bước 3: Admin Trả Lời ==
+
+Admin -> AdminChatScreen : Nhập và gửi phản hồi
+AdminChatScreen -> SocketAdmin : socket.emit('send_message',\n{senderId: adminId,\nreceiverId: customerId, content})
+SocketAdmin -> SocketServer : Event 'send_message'
+
+SocketServer -> DB : ChatMessage.create(\n{senderId: adminId,\nreceiverId: customerId,\ncontent, isRead: false})
+DB --> SocketServer : savedMessage
+
+SocketServer -> SocketClient : socket.to(customerRoom).emit(\n'receive_message', message)
+SocketClient -> ChatScreen : Nhận phản hồi real-time
+ChatScreen --> Customer : Hiển thị tin nhắn\ncủa Admin
+
+== Bước 4: Đánh Dấu Đã Đọc ==
+
+note over ChatScreen, DB
+    Khi người dùng mở lịch sử chat,
+    GET /chat/history/:targetId sẽ tự động
+    đánh dấu isRead = true cho các tin nhắn
+    mà người dùng là receiverId
+end note
+
+@enduml

@@ -1,0 +1,61 @@
+@startuml UC08_ChatHoTro
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam actor {
+    BorderColor #1A5276
+    BackgroundColor #D6EAF8
+    FontColor #1A252F
+    FontSize 13
+    FontStyle bold
+}
+
+skinparam usecase {
+    BorderColor #2980B9
+    BackgroundColor #EBF5FB
+    FontColor #1A252F
+    FontSize 12
+    ArrowColor #5D6D7E
+}
+
+skinparam rectangle {
+    BorderColor #2980B9
+    BorderThickness 2
+    BackgroundColor #FDFEFE
+    FontColor #1A5276
+    FontSize 14
+    FontStyle bold
+}
+
+title <size:17><b>UC08 - Chat Hỗ Trợ (Live Chat)</b></size>\n<color:#5D6D7E><size:12>CellphoneK E-Commerce App</size></color>
+
+' ===================== ACTORS =====================
+actor "Khách Hàng\n(Customer)" as Customer
+actor "Quản Trị Viên\n(Admin)" as Admin
+
+' ===================== SYSTEM BOUNDARY =====================
+rectangle "Hệ Thống Chat Hỗ Trợ (Socket.io)" {
+    usecase "UC08.1\nGửi tin nhắn\ntới Admin / CSKH" as UC08_1
+    usecase "UC08.2\nXem lịch sử chat" as UC08_2
+    usecase "UC08.3\nNhận tin nhắn\nreal-time" as UC08_3
+}
+
+' ===================== ASSOCIATIONS =====================
+Customer --> UC08_1 : Nhập và gửi\ntin nhắn
+Customer --> UC08_2 : Xem lại lịch sử\nhội thoại
+Admin --> UC08_3 : Nhận thông báo\ntin nhắn mới
+Admin --> UC08_2 : Xem lịch sử hội thoại\nvới từng khách hàng
+
+' ===================== RELATIONSHIPS =====================
+UC08_1 .> UC08_3 : <<include>>
+UC08_2 .> UC08_1 : <<include>>
+
+' ===================== NOTES =====================
+note bottom of UC08_3
+  Sử dụng Socket.io để
+  truyền tin nhắn real-time
+  giữa Customer và Admin
+end note
+
+@enduml

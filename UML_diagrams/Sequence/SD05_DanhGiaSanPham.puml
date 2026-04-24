@@ -1,0 +1,85 @@
+@startuml SD05_DanhGiaSanPham
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+skinparam participant {
+    BackgroundColor #E8F8F5
+    BorderColor #17A589
+    FontColor #1A252F
+    FontSize 12
+}
+skinparam actor {
+    BackgroundColor #D5E8D4
+    BorderColor #27AE60
+    FontColor #1A252F
+}
+skinparam sequence {
+    ArrowColor #2C3E50
+    LifeLineBorderColor #AEB6BF
+    LifeLineBackgroundColor #F2F3F4
+    GroupBorderColor #17A589
+    GroupBackgroundColor #E8F8F5
+    GroupFontColor #0E6655
+    DividerBackgroundColor #EAECEE
+    DividerBorderColor #AEB6BF
+}
+
+title <size:16><b>SD05 - Viết Đánh Giá Sản Phẩm & Nhận Thưởng</b></size>\n<color:#5D6D7E><size:12>UC07.1 + UC07.3 | CellphoneK</size></color>
+
+actor "Khách Hàng" as User
+participant "OrdersScreen" as OrdersScreen
+participant "WriteReviewScreen" as ReviewScreen
+participant "API Server\n(Express)" as Server
+participant "UserController" as UserCtrl
+participant "Database\n(MySQL)" as DB
+
+== Bước 1: Truy Cập Từ Đơn Hàng ==
+
+User -> OrdersScreen : Xem đơn hàng đã giao\n(status = DELIVERED)
+User -> OrdersScreen : Nhấn "Viết đánh giá"\ntrên sản phẩm trong đơn
+OrdersScreen -> ReviewScreen : navigation.navigate('WriteReview',\n{productId, orderId, productName})
+
+== Bước 2: Gửi Đánh Giá ==
+
+User -> ReviewScreen : Chọn số sao (1-5)\nvà nhập nội dung nhận xét
+User -> ReviewScreen : Nhấn "Gửi đánh giá"
+
+ReviewScreen -> Server : POST /products/:id/reviews\n{rating, comment, orderId}\n(Bearer token)
+Server -> UserCtrl : reviewProduct(req, res)
+
+UserCtrl -> DB : User.findOne({username})
+DB --> UserCtrl : user
+
+== Bước 3: Kiểm Tra Điều Kiện ==
+
+UserCtrl -> DB : Order.findOne(\n{userId, status: DELIVERED,\norderId})\ninclude OrderItem where\n{productId, isRated: false}
+DB --> UserCtrl : hasBought (order hoặc null)
+
+alt Chưa mua hoặc đã đánh giá rồi
+    UserCtrl --> Server : 403 "Bạn đã đánh giá\nsản phẩm này rồi\nhoặc đơn hàng chưa hoàn tất"
+    Server --> ReviewScreen : Error response
+    ReviewScreen --> User : Hiển thị thông báo lỗi
+else Hợp lệ - chưa đánh giá
+    UserCtrl -> DB : OrderItem.update(\n{isRated: true},\n{orderId, productId})
+
+    UserCtrl -> DB : Review.create(\n{userId, productId,\nusername, name, avatar,\nrating, comment})
+    DB --> UserCtrl : newReview
+
+    == Bước 4: Trao Thưởng ==
+
+    UserCtrl -> DB : user.points += 100\nuser.save()
+
+    UserCtrl -> DB : Coupon.create(\n{userId,\ncode: 'REVIEW' + timestamp,\ndiscountPercent: 10,\ndescription: 'Mã giảm giá 10%\ntừ Đánh giá sản phẩm'})
+    DB --> UserCtrl : newCoupon
+
+    UserCtrl -> DB : Notification.create(\n{userId: username,\ntitle: 'Đánh giá thành công!',\nmessage: '+100 điểm + coupon 10% (REVIEW...)'})
+    DB --> UserCtrl : Done
+
+    UserCtrl --> Server : 200 {message: "Đánh giá thành công!\nBạn được tặng 100 điểm\nvà mã giảm giá 10%", review}
+    Server --> ReviewScreen : Success response
+    ReviewScreen --> User : Thông báo thành công\nvà điều hướng về trang trước
+end
+
+@enduml

@@ -1,0 +1,151 @@
+@startuml ERD_Part1_Products
+
+title Sơ đồ ERD - Phần 1: Sản phẩm & Đơn hàng
+
+skinparam entity {
+  BackgroundColor #FFF9E6
+  BorderColor #D4860A
+  FontColor #333333
+}
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 80
+
+' ===================== ENTITIES =====================
+
+entity "products" as products {
+  + **id** : INT <<PK>>
+  --
+  name : VARCHAR(255)
+  price : DOUBLE
+  category : VARCHAR(255)
+  brand : VARCHAR(255)
+  description : TEXT
+  image : TEXT
+  soldQuantity : INT
+  discountPercent : INT
+  viewCount : INT
+  createdAt : DATETIME
+  updatedAt : DATETIME
+}
+
+entity "productvariants" as productvariants {
+  + **id** : INT <<PK>>
+  --
+  # productId : INT <<FK>>
+  ram : VARCHAR(255)
+  rom : VARCHAR(255)
+  color : VARCHAR(255)
+  price : DOUBLE
+  stock : INT
+  createdAt : DATETIME
+  updatedAt : DATETIME
+}
+
+entity "orders" as orders {
+  + **id** : VARCHAR(255) <<PK>>
+  --
+  # userId : INT <<FK>>
+  status : VARCHAR(255)
+  paymentMethod : VARCHAR(255)
+  address : VARCHAR(255)
+  phone : VARCHAR(255)
+  note : TEXT
+  subTotal : DOUBLE
+  discountAmount : DOUBLE
+  totalAmount : DOUBLE
+  usedCoupon : VARCHAR(255)
+  usedPoints : INT
+  cancelRequested : TINYINT
+  confirmedAt : DATETIME
+  cancelledAt : DATETIME
+  createdAt : DATETIME
+  updatedAt : DATETIME
+}
+
+entity "orderitems" as orderitems {
+  + **id** : INT <<PK>>
+  --
+  # orderId : VARCHAR(255) <<FK>>
+  # productId : INT <<FK>>
+  # variantId : INT <<FK>>
+  name : VARCHAR(255)
+  image : TEXT
+  unitPrice : DOUBLE
+  quantity : INT
+  lineTotal : DOUBLE
+  variantInfo : VARCHAR(255)
+  createdAt : DATETIME
+  updatedAt : DATETIME
+}
+
+entity "cartitems" as cartitems {
+  + **id** : INT <<PK>>
+  --
+  # userId : INT <<FK>>
+  # productId : INT <<FK>>
+  # variantId : INT <<FK>>
+  quantity : INT
+  createdAt : DATETIME
+  updatedAt : DATETIME
+}
+
+entity "reviews" as reviews {
+  + **id** : INT <<PK>>
+  --
+  # userId : INT <<FK>>
+  # productId : INT <<FK>>
+  username : VARCHAR(255)
+  name : VARCHAR(255)
+  avatar : TEXT
+  rating : INT
+  comment : TEXT
+  createdAt : DATETIME
+  updatedAt : DATETIME
+}
+
+entity "userfavorites" as userfavorites {
+  + **UserId** : INT <<PK, FK>>
+  + **ProductId** : INT <<PK, FK>>
+  --
+  createdAt : DATETIME
+  updatedAt : DATETIME
+}
+
+entity "userviewedhistories" as userviewedhistories {
+  + **id** : INT <<PK>>
+  --
+  # UserId : INT <<FK>>
+  # ProductId : INT <<FK>>
+  createdAt : DATETIME
+  updatedAt : DATETIME
+}
+
+' ===================== NOTE: users (external) =====================
+entity "users" as users #EEF4FF {
+  + **id** : INT <<PK>>
+  --
+  (tham chiếu từ Phần 2)
+}
+
+' ===================== RELATIONSHIPS =====================
+
+products ||--o{ productvariants : "có biến thể"
+products ||--o{ orderitems : "thuộc đơn hàng"
+products ||--o{ cartitems : "trong giỏ hàng"
+products ||--o{ reviews : "được đánh giá"
+products ||--o{ userfavorites : "được yêu thích"
+products ||--o{ userviewedhistories : "được xem"
+
+productvariants ||--o{ orderitems : "biến thể đặt mua"
+productvariants ||--o{ cartitems : "biến thể trong giỏ"
+
+orders ||--o{ orderitems : "chứa sản phẩm"
+
+users ||--o{ orders : "đặt hàng"
+users ||--o{ cartitems : "có giỏ hàng"
+users ||--o{ reviews : "viết đánh giá"
+users ||--o{ userfavorites : "yêu thích"
+users ||--o{ userviewedhistories : "đã xem"
+
+@enduml

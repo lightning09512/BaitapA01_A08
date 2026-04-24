@@ -1,0 +1,127 @@
+@startuml SD04_ThemGioHangDatHang
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+skinparam participant {
+    BackgroundColor #FEF5E7
+    BorderColor #E67E22
+    FontColor #1A252F
+    FontSize 12
+}
+skinparam actor {
+    BackgroundColor #D5E8D4
+    BorderColor #27AE60
+    FontColor #1A252F
+}
+skinparam sequence {
+    ArrowColor #2C3E50
+    LifeLineBorderColor #AEB6BF
+    LifeLineBackgroundColor #F2F3F4
+    GroupBorderColor #E67E22
+    GroupBackgroundColor #FEF5E7
+    GroupFontColor #784212
+    DividerBackgroundColor #EAECEE
+    DividerBorderColor #AEB6BF
+}
+
+title <size:16><b>SD04 - Thêm Vào Giỏ Hàng & Đặt Hàng COD</b></size>\n<color:#5D6D7E><size:12>UC05.1 + UC06.1 + UC06.2 + UC06.3 | CellphoneK</size></color>
+
+actor "Khách Hàng" as User
+participant "ProductDetail\nScreen" as DetailScreen
+participant "CartScreen" as CartScreen
+participant "CheckoutScreen" as CheckScreen
+participant "API Server\n(Express)" as Server
+participant "CartController" as CartCtrl
+participant "OrderController" as OrderCtrl
+participant "Database\n(MySQL)" as DB
+participant "Email Service" as Email
+
+== Bước 1: Thêm Sản Phẩm Vào Giỏ ==
+
+User -> DetailScreen : Chọn biến thể + Nhấn "Thêm vào giỏ"
+DetailScreen -> Server : POST /cart/add\n{productId, quantity, variantId}\n(Bearer token)
+Server -> CartCtrl : addToCart(req, res)
+
+CartCtrl -> DB : CartItem.findOne(\n{userId, productId, variantId})
+DB --> CartCtrl : cartItem (hoặc null)
+
+alt SP + biến thể đã có trong giỏ
+    CartCtrl -> DB : cartItem.quantity += qty\ncartItem.save()
+else Chưa có trong giỏ
+    CartCtrl -> DB : CartItem.create(\n{userId, productId, variantId, qty})
+end
+
+CartCtrl -> DB : Lấy toàn bộ giỏ hàng mới
+DB --> CartCtrl : cart data
+CartCtrl --> Server : 200 {items, totalAmount, totalQuantity}
+Server --> DetailScreen : Giỏ hàng đã cập nhật
+DetailScreen --> User : Thông báo "Đã thêm vào giỏ"
+
+== Bước 2: Xem Giỏ Hàng & Chọn SP Thanh Toán ==
+
+User -> CartScreen : Mở màn hình giỏ hàng
+CartScreen -> Server : GET /cart (Bearer token)
+Server -> CartCtrl : getCart(req, res)
+CartCtrl -> DB : Lấy CartItems + Product + Variant
+DB --> CartCtrl : Danh sách với giá theo variant
+CartCtrl --> Server : 200 cart
+Server --> CartScreen : Hiển thị giỏ hàng
+User -> CartScreen : Chọn các SP cần thanh toán
+User -> CartScreen : Nhấn "Thanh toán"
+CartScreen -> CheckScreen : navigation.navigate('Checkout',\n{selectedItems, checkoutItems,\ntotalAmount, availablePoints})
+
+== Bước 3: Đặt Hàng COD ==
+
+User -> CheckScreen : Nhập địa chỉ, SĐT, ghi chú
+opt Áp dụng mã giảm giá
+    User -> CheckScreen : Nhập couponCode
+end
+opt Dùng điểm thưởng
+    User -> CheckScreen : Nhập số điểm muốn dùng
+end
+User -> CheckScreen : Nhấn "Đặt Hàng"
+
+CheckScreen -> Server : POST /orders/checkout-cod\n{address, phone, note,\ncouponCode, pointsToUse,\nselectedCartItemIds}
+Server -> OrderCtrl : checkoutCod(req, res)
+
+OrderCtrl -> DB : Validate user + CartItems
+OrderCtrl -> DB : Lấy Product + ProductVariant\ncho từng item
+
+loop Tính tổng tiền
+    OrderCtrl -> OrderCtrl : price = variant?.price ?? product.price\nlineTotal = price × quantity
+end
+
+alt Có couponCode
+    OrderCtrl -> DB : Coupon.findOne(\n{userId, code, isUsed: false})
+    DB --> OrderCtrl : coupon
+    alt Coupon hợp lệ
+        OrderCtrl -> OrderCtrl : discount += subTotal × discountPercent/100
+        OrderCtrl -> DB : coupon.isUsed = true\ncoupon.save()
+    else Coupon không hợp lệ
+        OrderCtrl --> Server : 400 "Mã giảm giá không hợp lệ"
+        Server --> CheckScreen : Error
+        CheckScreen --> User : Alert thông báo lỗi
+    end
+end
+
+alt Có pointsToUse
+    OrderCtrl -> OrderCtrl : Kiểm tra user.points >= pointsToUse
+    OrderCtrl -> OrderCtrl : discount += pointsToUse × 1000đ
+    OrderCtrl -> DB : user.points -= pointsToUse
+end
+
+OrderCtrl -> DB : Order.create(\n{status: NEW, paymentMethod: COD,\naddress, phone, totalAmount...})
+OrderCtrl -> DB : OrderItem.create() cho mỗi SP
+OrderCtrl -> DB : Xóa CartItems đã thanh toán
+OrderCtrl -> DB : Notification.create(\n"Đặt hàng thành công!")
+OrderCtrl -> Email : sendOrderConfirmationEmail(\nuser.email, order, items)
+Email --> OrderCtrl : (async)
+
+OrderCtrl --> Server : 200 {message, order}
+Server --> CheckScreen : Success
+CheckScreen --> User : Alert "Đặt hàng thành công!"
+CheckScreen -> CartScreen : navigation.replace('Orders')
+
+@enduml

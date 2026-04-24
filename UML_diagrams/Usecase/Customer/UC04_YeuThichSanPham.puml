@@ -1,0 +1,53 @@
+@startuml UC04_YeuThichSanPham
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam actor {
+    BorderColor #922B21
+    BackgroundColor #FADBD8
+    FontColor #1A252F
+    FontSize 13
+    FontStyle bold
+}
+
+skinparam usecase {
+    BorderColor #E74C3C
+    BackgroundColor #FDEDEC
+    FontColor #1A252F
+    FontSize 12
+    ArrowColor #5D6D7E
+}
+
+skinparam rectangle {
+    BorderColor #E74C3C
+    BorderThickness 2
+    BackgroundColor #FDFEFE
+    FontColor #922B21
+    FontSize 14
+    FontStyle bold
+}
+
+title <size:17><b>UC04 - Yêu Thích Sản Phẩm</b></size>\n<color:#5D6D7E><size:12>CellphoneK E-Commerce App</size></color>
+
+' ===================== ACTORS =====================
+actor "Khách Hàng\n(Customer)" as Customer
+
+' ===================== SYSTEM BOUNDARY =====================
+rectangle "Hệ Thống Yêu Thích Sản Phẩm" {
+    usecase "UC04.1\nThêm / Bỏ yêu thích\nsản phẩm (Toggle)" as UC04_1
+    usecase "UC04.2\nXem danh sách\nSP yêu thích" as UC04_2
+}
+
+' ===================== ASSOCIATIONS =====================
+Customer --> UC04_1 : Nhấn icon ❤️\ntrên chi tiết SP
+Customer --> UC04_2 : Vào màn hình\nFavorites
+
+' ===================== NOTES =====================
+note right of UC04_1
+  Nếu chưa yêu thích → thêm vào
+  Nếu đã yêu thích → bỏ ra
+  (cơ chế Toggle)
+end note
+
+@enduml

@@ -1,0 +1,106 @@
+@startuml AD02_QuyTrinhDatHang
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam activity {
+    BackgroundColor #FEF5E7
+    BorderColor #E67E22
+    FontColor #1A252F
+    FontSize 12
+    DiamondBackgroundColor #FEF9E7
+    DiamondBorderColor #D4AC0D
+    DiamondFontColor #1A252F
+    StartColor #784212
+    EndColor #784212
+    BarColor #E67E22
+}
+skinparam arrow {
+    Color #2C3E50
+    FontColor #5D6D7E
+    FontSize 11
+}
+skinparam swimlane {
+    BorderColor #AEB6BF
+    TitleFontSize 13
+    TitleFontStyle bold
+}
+
+title <size:16><b>AD02 - Quy Trình Đặt Hàng COD</b></size>\n<color:#5D6D7E><size:12>UC05.1 + UC06.1 + UC06.2 + UC06.3 | CellphoneK</size></color>
+
+|Khách Hàng|
+start
+:Xem chi tiết sản phẩm;
+:Chọn biến thể (RAM/ROM/Màu);
+:Nhấn "Thêm vào giỏ hàng";
+
+|Hệ thống (Server)|
+if (Biến thể + SP đã\ncó trong giỏ?) then (Có)
+    :Tăng số lượng\ncartItem.quantity += qty;
+else (Không)
+    :Tạo CartItem mới\ntrong Database;
+endif
+
+|Khách Hàng|
+:Mở màn hình Giỏ hàng;
+:Chọn các sản phẩm cần thanh toán;
+:Nhấn "Thanh toán";
+:Nhập địa chỉ giao hàng;
+:Nhập số điện thoại;
+
+if (Có mã giảm giá?) then (Có)
+    :Nhập mã Coupon;
+    |Hệ thống (Server)|
+    :Tìm Coupon theo\n(userId, code, isUsed=false);
+    if (Coupon hợp lệ?) then (Không)
+        |Khách Hàng|
+        :Hiển thị lỗi\n"Mã giảm giá không hợp lệ";
+        stop
+    else (Có)
+        :Tính giảm giá:\ndiscount += total × discountPercent%;
+        :Đánh dấu coupon.isUsed = true;
+    endif
+else (Không)
+endif
+
+|Khách Hàng|
+if (Muốn dùng điểm thưởng?) then (Có)
+    :Nhập số điểm muốn dùng;
+    |Hệ thống (Server)|
+    if (Đủ điểm?) then (Không)
+        |Khách Hàng|
+        :Hiển thị lỗi\n"Điểm không hợp lệ\nhoặc không đủ";
+        stop
+    else (Có)
+        :discount += points × 1.000đ;
+        :user.points -= pointsToUse;
+    endif
+else (Không)
+endif
+
+|Khách Hàng|
+:Nhấn "Đặt Hàng";
+
+|Hệ thống (Server)|
+:Tính tổng tiền cuối:\ntotalAmount = subTotal - discount;
+:Tạo Order mới\n(status = NEW, paymentMethod = COD);
+
+fork
+    :Tạo OrderItems\ncho từng sản phẩm;
+fork again
+    :Xóa CartItems\nđã thanh toán;
+fork again
+    :Lưu điểm mới\ncủa user;
+end fork
+
+:Tạo thông báo\n"Đặt hàng thành công";
+
+|Email Service|
+:Gửi email xác nhận\nđơn hàng (async);
+
+|Khách Hàng|
+:Hiển thị "Đặt hàng thành công!";
+:Chuyển sang màn hình\nDanh sách đơn hàng;
+stop
+
+@enduml

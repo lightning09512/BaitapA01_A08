@@ -1,0 +1,97 @@
+@startuml AD06_QuenMatKhau
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam activity {
+    BackgroundColor #EBF5FB
+    BorderColor #2980B9
+    FontColor #1A252F
+    FontSize 12
+    DiamondBackgroundColor #FEF9E7
+    DiamondBorderColor #D4AC0D
+    DiamondFontColor #1A252F
+    StartColor #1A5276
+    EndColor #1A5276
+    BarColor #2980B9
+}
+skinparam arrow {
+    Color #2C3E50
+    FontColor #5D6D7E
+    FontSize 11
+}
+skinparam swimlane {
+    BorderColor #AEB6BF
+    TitleFontSize 13
+    TitleFontStyle bold
+}
+
+title <size:16><b>AD06 - Quên Mật Khẩu & Đặt Lại Mật Khẩu</b></size>\n<color:#5D6D7E><size:12>UC01.4 + UC01.5 | CellphoneK</size></color>
+
+
+|Khách Hàng|
+start
+:Nhấn "Quên mật khẩu?"\ntrên màn hình Đăng nhập;
+:Mở màn hình\nForgotPasswordScreen;
+:Nhập địa chỉ email đã đăng ký;
+:Nhấn "Gửi mã OTP";
+
+|Hệ thống (Server)|
+:Tìm user theo email\ntrong Database;
+
+if (Email tồn tại?) then (Không)
+    |Khách Hàng|
+    :Hiển thị lỗi\n"Không tìm thấy\ntài khoản với email này";
+    stop
+else (Có)
+endif
+
+if (Tài khoản đã xác minh\n(isVerified = true)?) then (Không)
+    |Khách Hàng|
+    :Hiển thị lỗi\n"Tài khoản chưa xác minh,\nvui lòng xác minh trước";
+    stop
+else (Có)
+endif
+
+|Hệ thống (Server)|
+:Tạo mã OTP 6 số ngẫu nhiên;
+:Lưu user.resetOtp = otp;
+
+|Email Service|
+:Gửi email "Khôi phục mật khẩu"\nchứa mã OTP đến email;
+
+|Khách Hàng|
+:Nhận thông báo\n"Đã gửi OTP đến email";
+:Mở email & đọc mã OTP;
+:Nhập OTP 6 số;
+:Nhập mật khẩu mới;
+:Nhập lại mật khẩu mới\n(xác nhận);
+
+if (Mật khẩu mới và\nxác nhận khớp nhau?) then (Không)
+    :Hiển thị lỗi\n"Mật khẩu không khớp";
+    stop
+else (Có)
+endif
+
+:Nhấn "Đặt lại mật khẩu";
+
+|Hệ thống (Server)|
+:Tìm user theo email;
+:Kiểm tra resetOtp;
+
+if (OTP đúng?) then (Không)
+    |Khách Hàng|
+    :Hiển thị lỗi\n"Mã OTP không đúng\nhoặc đã hết hạn";
+    stop
+else (Có)
+endif
+
+|Hệ thống (Server)|
+:Cập nhật:\nuser.password = newPassword\nuser.resetOtp = null;
+
+|Khách Hàng|
+:Hiển thị "Đổi mật khẩu thành công!";
+:Chuyển về màn hình Đăng nhập;
+stop
+
+@enduml

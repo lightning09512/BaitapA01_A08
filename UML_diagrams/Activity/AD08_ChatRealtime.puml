@@ -1,0 +1,95 @@
+@startuml AD08_ChatRealtime
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam activity {
+    BackgroundColor #EBF5FB
+    BorderColor #2980B9
+    FontColor #1A252F
+    FontSize 12
+    DiamondBackgroundColor #FEF9E7
+    DiamondBorderColor #D4AC0D
+    DiamondFontColor #1A252F
+    StartColor #1A5276
+    EndColor #1A5276
+    BarColor #2980B9
+}
+skinparam arrow {
+    Color #2C3E50
+    FontColor #5D6D7E
+    FontSize 11
+}
+skinparam swimlane {
+    BorderColor #AEB6BF
+    TitleFontSize 13
+    TitleFontStyle bold
+}
+
+title <size:16><b>AD08 - Chat Hỗ Trợ Real-time (Socket.io)</b></size>\n<color:#5D6D7E><size:12>UC08 + UC13 | CellphoneK</size></color>
+
+|Khách Hàng|
+start
+:Mở màn hình Chat;
+
+|Socket.io Server|
+fork
+    |Khách Hàng|
+    :Gọi REST API GET /support-info\nlấy thông tin Admin;
+    :Gọi REST API GET /chat/history/:adminId\nlấy lịch sử chat;
+fork again
+    |Khách Hàng|
+    :Kết nối Socket.io\nsocket.connect(serverURL);
+    |Socket.io Server|
+    :Chấp nhận kết nối\nsocket.join(userId);
+end fork
+
+|Khách Hàng|
+:Hiển thị lịch sử chat;
+
+repeat
+
+    |Khách Hàng|
+    :Nhập nội dung tin nhắn;
+    :Nhấn nút Gửi;
+
+    |Socket.io Server|
+    :Nhận event 'send_message'\n{senderId, receiverId, content};
+    :Lưu ChatMessage vào DB\n(isRead = false);
+
+    fork
+        :Phát event 'receive_message'\nđến room của Admin;
+        |Quản Trị Viên (Admin)|
+        :Nhận tin nhắn real-time;
+        :Hiển thị tin nhắn\nvà badge thông báo;
+    fork again
+        |Khách Hàng|
+        :Hiển thị tin nhắn\nvừa gửi trên màn hình;
+    end fork
+
+    |Quản Trị Viên (Admin)|
+    if (Admin có trả lời không?) then (Có)
+        :Nhập nội dung\nphản hồi;
+        :Nhấn Gửi;
+
+        |Socket.io Server|
+        :Nhận event 'send_message'\n{senderId: adminId,\nreceiverId: customerId, content};
+        :Lưu ChatMessage vào DB;
+        :Phát event 'receive_message'\nđến room của Khách hàng;
+
+        |Khách Hàng|
+        :Nhận phản hồi real-time\ntừ Admin;
+        :Hiển thị tin nhắn Admin\ntrên màn hình;
+    else (Không)
+    endif
+
+repeat while (Người dùng tiếp tục chat?) is (Có)
+
+|Khách Hàng|
+:Rời khỏi màn hình Chat;
+
+|Socket.io Server|
+:Đánh dấu isRead = true\ncho tất cả tin nhắn\nmà user là receiverId;
+stop
+
+@enduml

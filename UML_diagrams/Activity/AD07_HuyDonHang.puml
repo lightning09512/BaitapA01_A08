@@ -1,0 +1,93 @@
+@startuml AD07_HuyDonHang
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam activity {
+    BackgroundColor #FEF9E7
+    BorderColor #D4AC0D
+    FontColor #1A252F
+    FontSize 12
+    DiamondBackgroundColor #FEF9E7
+    DiamondBorderColor #D4AC0D
+    DiamondFontColor #1A252F
+    StartColor #B7950B
+    EndColor #B7950B
+    BarColor #D4AC0D
+}
+skinparam arrow {
+    Color #2C3E50
+    FontColor #5D6D7E
+    FontSize 11
+}
+skinparam swimlane {
+    BorderColor #AEB6BF
+    TitleFontSize 13
+    TitleFontStyle bold
+}
+
+title <size:16><b>AD07 - Hủy Đơn Hàng</b></size>\n<color:#5D6D7E><size:12>UC06.6 + UC06.7 | CellphoneK</size></color>
+
+|Khách Hàng|
+start
+:Mở màn hình\nDanh sách đơn hàng;
+:Chọn đơn hàng\nmuốn hủy;
+:Nhấn "Hủy đơn hàng";
+
+|Hệ thống (Server)|
+:Tìm đơn hàng\ntheo (orderId, userId);
+
+if (Tìm thấy đơn hàng?) then (Không)
+    |Khách Hàng|
+    :Hiển thị lỗi\n"Không tìm thấy đơn hàng";
+    stop
+else (Có)
+endif
+
+:Kiểm tra trạng thái\nđơn hàng hiện tại;
+
+if (Trạng thái = NEW\nhoặc CONFIRMED?) then (Có)
+    :Tính thời gian kể từ\nlúc đặt hàng\ndiffMinutes = (now - createdAt) / 60000;
+
+    if (diffMinutes > 30 phút?) then (Có)
+        |Khách Hàng|
+        :Hiển thị lỗi\n"Đã quá thời gian 30 phút,\nkhông thể hủy đơn";
+        stop
+    else (Không - còn trong 30 phút)
+        |Hệ thống (Server)|
+        :order.status = CANCELLED\norder.cancelledAt = now();
+
+        |Khách Hàng|
+        :Hiển thị "Hủy đơn thành công";
+        :Cập nhật trạng thái đơn\ntrên giao diện;
+        stop
+    endif
+
+else if (Trạng thái = PREPARING?) then (Có)
+    |Hệ thống (Server)|
+    :order.cancelRequested = true;
+
+    |Khách Hàng|
+    :Hiển thị "Đã gửi yêu cầu hủy\ncho shop, vui lòng chờ";
+
+    |Quản Trị Viên (Admin)|
+    :Nhận thông báo\nyêu cầu hủy;
+    if (Chấp thuận hủy?) then (Có)
+        |Hệ thống (Server)|
+        :order.status = CANCELLED\norder.cancelledAt = now();
+        |Khách Hàng|
+        :Nhận thông báo\n"Đơn hàng đã được hủy";
+        stop
+    else (Không)
+        |Khách Hàng|
+        :Nhận thông báo\n"Yêu cầu hủy bị từ chối,\ntiếp tục giao hàng";
+        stop
+    endif
+
+else (Trạng thái = SHIPPING\nhoặc DELIVERED)
+    |Khách Hàng|
+    :Hiển thị lỗi\n"Đơn hàng đã ở trạng thái\nkhông thể hủy";
+    stop
+endif
+
+@enduml

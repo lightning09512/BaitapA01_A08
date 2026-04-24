@@ -1,0 +1,77 @@
+@startuml UC03_DuyetTimKiemSanPham
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam actor {
+    BorderColor #B7950B
+    BackgroundColor #FEF9E7
+    FontColor #1A252F
+    FontSize 13
+    FontStyle bold
+}
+
+skinparam usecase {
+    BorderColor #D4AC0D
+    BackgroundColor #FEFBD8
+    FontColor #1A252F
+    FontSize 12
+    ArrowColor #5D6D7E
+}
+
+skinparam rectangle {
+    BorderColor #D4AC0D
+    BorderThickness 2
+    BackgroundColor #FDFEFE
+    FontColor #B7950B
+    FontSize 14
+    FontStyle bold
+}
+
+title <size:17><b>UC03 - Duyệt & Tìm Kiếm Sản Phẩm</b></size>\n<color:#5D6D7E><size:12>CellphoneK E-Commerce App</size></color>
+
+' ===================== ACTORS =====================
+actor "Khách Hàng\n(Customer)" as Customer
+
+' ===================== SYSTEM BOUNDARY =====================
+rectangle "Hệ Thống Duyệt & Tìm Kiếm Sản Phẩm" {
+    usecase "UC03.1\nXem trang chủ\n(Banner, SP nổi bật,\nbán chạy, giảm giá)" as UC03_1
+    usecase "UC03.2\nDuyệt SP theo\nDanh mục" as UC03_2
+    usecase "UC03.3\nDuyệt SP theo\nThương hiệu" as UC03_3
+    usecase "UC03.4\nTìm kiếm sản phẩm\n(theo từ khóa)" as UC03_4
+    usecase "UC03.5\nXem chi tiết sản phẩm\n(Thông số, hình ảnh, reviews)" as UC03_5
+    usecase "UC03.6\nChọn biến thể SP\n(RAM / ROM / Màu sắc)" as UC03_6
+    usecase "UC03.7\nXem sản phẩm tương tự" as UC03_7
+    usecase "UC03.8\nGhi nhận lịch sử\nxem sản phẩm" as UC03_8
+    usecase "UC03.9\nXem lịch sử SP\nđã xem" as UC03_9
+}
+
+' ===================== ASSOCIATIONS =====================
+Customer --> UC03_1
+Customer --> UC03_2
+Customer --> UC03_3
+Customer --> UC03_4
+Customer --> UC03_5
+Customer --> UC03_9
+
+' ===================== RELATIONSHIPS =====================
+UC03_2 .> UC03_1 : <<extend>>
+UC03_3 .> UC03_1 : <<extend>>
+UC03_6 .> UC03_5 : <<extend>>
+UC03_7 .> UC03_5 : <<extend>>
+UC03_8 .> UC03_5 : <<include>>
+
+' ===================== NOTES =====================
+note right of UC03_6
+  Giá thay đổi tương ứng
+  theo biến thể được chọn
+  (RAM, ROM, Màu sắc)
+end note
+
+note bottom of UC03_8
+  Tự động lưu lịch sử
+  mỗi khi người dùng
+  mở xem chi tiết SP
+end note
+
+@enduml

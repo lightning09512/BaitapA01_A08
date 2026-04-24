@@ -1,0 +1,102 @@
+@startuml SD01_DangKyXacMinhOTP
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+skinparam participant {
+    BackgroundColor #EBF5FB
+    BorderColor #2980B9
+    FontColor #1A252F
+    FontSize 12
+}
+skinparam actor {
+    BackgroundColor #D5E8D4
+    BorderColor #27AE60
+    FontColor #1A252F
+}
+skinparam sequence {
+    ArrowColor #2C3E50
+    LifeLineBorderColor #AEB6BF
+    LifeLineBackgroundColor #F2F3F4
+    GroupBorderColor #8E44AD
+    GroupBackgroundColor #F5EEF8
+    GroupFontColor #6C3483
+    DividerBackgroundColor #EAECEE
+    DividerBorderColor #AEB6BF
+}
+
+title <size:16><b>SD01 - Đăng Ký Tài Khoản & Xác Minh OTP</b></size>\n<color:#5D6D7E><size:12>UC01.1 + UC01.2 | CellphoneK</size></color>
+
+actor "Khách Hàng" as User
+participant "RegisterScreen" as RegScreen
+participant "VerifyAccountScreen" as VerScreen
+participant "API Server\n(Express)" as Server
+participant "AuthController" as AuthCtrl
+participant "Database\n(MySQL)" as DB
+participant "Email Service\n(Nodemailer)" as Email
+
+== Bước 1: Đăng Ký ==
+
+User -> RegScreen : Nhập username, email, password
+RegScreen -> RegScreen : validateForm()\n(kiểm tra độ dài, format email)
+
+alt Validation thất bại
+    RegScreen --> User : Hiển thị lỗi inline\n(dưới các ô input)
+else Validation thành công
+    RegScreen -> Server : POST /register\n{username, email, password}
+    Server -> AuthCtrl : register(req, res)
+
+    AuthCtrl -> DB : User.findOne(isVerified=true,\nusername OR email)
+    DB --> AuthCtrl : verifiedUser
+
+    alt Tài khoản đã tồn tại (đã xác minh)
+        AuthCtrl --> Server : 400 "Tài khoản đã tồn tại"\nor "Email đã được sử dụng"
+        Server --> RegScreen : Error response
+        RegScreen --> User : Alert thông báo lỗi
+    else Tài khoản chưa tồn tại
+        AuthCtrl -> DB : User.destroy(\nisVerified=false,\nusername OR email)\n[Dọn dẹp đăng ký bỏ dở]
+        AuthCtrl -> AuthCtrl : Tạo OTP 6 số ngẫu nhiên
+        AuthCtrl -> DB : User.create(\nusername, email, password,\nisVerified=false,\nverifyOtp=otp)
+        DB --> AuthCtrl : user đã tạo
+
+        AuthCtrl -> Email : sendOTPEmail(email, otp,\n'Xác minh tài khoản')
+        Email --> AuthCtrl : (async, không chờ)
+
+        AuthCtrl --> Server : 200 {message, requiresVerification: true}
+        Server --> RegScreen : Success response
+        RegScreen --> User : Alert "Đăng ký thành công!\nKiểm tra email để nhập OTP"
+        User -> RegScreen : Nhấn OK
+        RegScreen -> VerScreen : navigation.navigate('VerifyAccount',\n{email})
+    end
+end
+
+== Bước 2: Xác Minh OTP ==
+
+User <-- Email : Nhận email chứa mã OTP 6 số
+User -> VerScreen : Nhập mã OTP 6 số
+VerScreen -> Server : POST /verify-account\n{email, otp}
+Server -> AuthCtrl : verifyAccount(req, res)
+
+AuthCtrl -> DB : User.findOne({email})
+DB --> AuthCtrl : user
+
+alt Không tìm thấy user
+    AuthCtrl --> Server : 404 "Không tìm thấy tài khoản"
+    Server --> VerScreen : Error response
+    VerScreen --> User : Hiển thị lỗi
+else OTP không đúng
+    AuthCtrl --> Server : 400 "Mã OTP không đúng"
+    Server --> VerScreen : Error response
+    VerScreen --> User : Hiển thị lỗi
+else OTP đúng
+    AuthCtrl -> DB : user.isVerified = true\nuser.verifyOtp = null\nuser.save()
+    DB --> AuthCtrl : Đã cập nhật
+
+    AuthCtrl --> Server : 200 "Xác minh tài khoản thành công!"
+    Server --> VerScreen : Success response
+    VerScreen --> User : Thông báo thành công
+    VerScreen -> RegScreen : navigation.navigate('Login')
+end
+
+@enduml

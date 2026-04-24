@@ -1,0 +1,69 @@
+@startuml UC05_GioHang
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam actor {
+    BorderColor #6C3483
+    BackgroundColor #E8DAEF
+    FontColor #1A252F
+    FontSize 13
+    FontStyle bold
+}
+
+skinparam usecase {
+    BorderColor #8E44AD
+    BackgroundColor #F4ECF7
+    FontColor #1A252F
+    FontSize 12
+    ArrowColor #5D6D7E
+}
+
+skinparam rectangle {
+    BorderColor #8E44AD
+    BorderThickness 2
+    BackgroundColor #FDFEFE
+    FontColor #6C3483
+    FontSize 14
+    FontStyle bold
+}
+
+title <size:17><b>UC05 - Giỏ Hàng</b></size>\n<color:#5D6D7E><size:12>CellphoneK E-Commerce App</size></color>
+
+' ===================== ACTORS =====================
+actor "Khách Hàng\n(Customer)" as Customer
+
+' ===================== SYSTEM BOUNDARY =====================
+rectangle "Hệ Thống Giỏ Hàng" {
+    usecase "UC05.1\nThêm sản phẩm\nvào giỏ hàng" as UC05_1
+    usecase "UC05.2\nXem giỏ hàng\n(Danh sách, tổng tiền)" as UC05_2
+    usecase "UC05.3\nCập nhật số lượng\nSP trong giỏ" as UC05_3
+    usecase "UC05.4\nXóa sản phẩm\nkhỏi giỏ hàng" as UC05_4
+    usecase "UC05.5\nXóa toàn bộ\ngiỏ hàng" as UC05_5
+}
+
+' ===================== ASSOCIATIONS =====================
+Customer --> UC05_1 : Từ màn hình\nchi tiết SP
+Customer --> UC05_2
+Customer --> UC05_3
+Customer --> UC05_4
+Customer --> UC05_5
+
+' ===================== RELATIONSHIPS =====================
+UC05_3 .> UC05_2 : <<include>>
+UC05_4 .> UC05_2 : <<include>>
+UC05_5 .> UC05_2 : <<include>>
+
+' ===================== NOTES =====================
+note right of UC05_1
+  Nếu SP + biến thể đã có
+  trong giỏ → cộng thêm
+  số lượng tương ứng
+end note
+
+note bottom of UC05_3
+  Nhập số lượng = 0
+  → tự động xóa SP khỏi giỏ
+end note
+
+@enduml

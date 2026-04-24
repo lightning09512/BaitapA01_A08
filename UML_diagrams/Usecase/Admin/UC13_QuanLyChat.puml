@@ -1,0 +1,71 @@
+@startuml UC13_QuanLyChat
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam actor {
+    BorderColor #1A5276
+    BackgroundColor #D6EAF8
+    FontColor #1A252F
+    FontSize 13
+    FontStyle bold
+}
+
+skinparam usecase {
+    BorderColor #2980B9
+    BackgroundColor #EBF5FB
+    FontColor #1A252F
+    FontSize 12
+    ArrowColor #5D6D7E
+}
+
+skinparam rectangle {
+    BorderColor #2980B9
+    BorderThickness 2
+    BackgroundColor #FDFEFE
+    FontColor #1A5276
+    FontSize 14
+    FontStyle bold
+}
+
+title <size:17><b>UC13 - Quản Lý Chat Hỗ Trợ (Admin)</b></size>\n<color:#5D6D7E><size:12>CellphoneK E-Commerce App</size></color>
+
+' ===================== ACTORS =====================
+actor "Quản Trị Viên\n(Admin)" as Admin
+actor "Khách Hàng\n(Customer)" as Customer
+
+' ===================== SYSTEM BOUNDARY =====================
+rectangle "Hệ Thống Quản Lý Chat (Socket.io)" {
+    usecase "UC13.1\nXem danh sách\nhội thoại\n(Tất cả khách hàng đang chat,\nsắp xếp theo tin nhắn mới nhất)" as UC13_1
+    usecase "UC13.2\nXem chi tiết\nhội thoại với\ntừng khách hàng" as UC13_2
+    usecase "UC13.3\nTrả lời tin nhắn\ncho khách hàng\n(Real-time qua Socket.io)" as UC13_3
+    usecase "UC13.4\nĐánh dấu tin nhắn\nđã đọc" as UC13_4
+}
+
+' ===================== ASSOCIATIONS =====================
+Admin --> UC13_1
+Admin --> UC13_2
+Admin --> UC13_3
+Customer ..> UC13_3 : Nhận phản hồi\nreal-time
+
+' ===================== RELATIONSHIPS =====================
+UC13_2 .> UC13_1 : <<include>>
+UC13_3 .> UC13_2 : <<include>>
+UC13_4 .> UC13_2 : <<include>>
+
+' ===================== NOTES =====================
+note right of UC13_1
+  Hiển thị:
+  - Tên & avatar khách hàng
+  - Nội dung tin nhắn cuối
+  - Thời gian tin nhắn cuối
+  - Số tin nhắn chưa đọc (badge)
+end note
+
+note right of UC13_3
+  Sử dụng Socket.io để
+  gửi/nhận tin nhắn real-time
+  không cần reload trang
+end note
+
+@enduml

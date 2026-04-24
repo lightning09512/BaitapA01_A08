@@ -1,0 +1,85 @@
+@startuml SD03_XemChiTietSanPham
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+skinparam participant {
+    BackgroundColor #FEF9E7
+    BorderColor #D4AC0D
+    FontColor #1A252F
+    FontSize 12
+}
+skinparam actor {
+    BackgroundColor #D5E8D4
+    BorderColor #27AE60
+    FontColor #1A252F
+}
+skinparam sequence {
+    ArrowColor #2C3E50
+    LifeLineBorderColor #AEB6BF
+    LifeLineBackgroundColor #F2F3F4
+    GroupBorderColor #D4AC0D
+    GroupBackgroundColor #FEF9E7
+    GroupFontColor #B7950B
+    DividerBackgroundColor #EAECEE
+    DividerBorderColor #AEB6BF
+}
+
+title <size:16><b>SD03 - Xem Chi Tiết Sản Phẩm & Chọn Biến Thể</b></size>\n<color:#5D6D7E><size:12>UC03.5 + UC03.6 + UC03.8 | CellphoneK</size></color>
+
+actor "Khách Hàng" as User
+participant "HomeScreen\n/ SearchScreen" as HomeScreen
+participant "ProductDetailScreen" as DetailScreen
+participant "API Server\n(Express)" as Server
+participant "ProductController" as ProdCtrl
+participant "UserController" as UserCtrl
+participant "Database\n(MySQL)" as DB
+
+== Bước 1: Mở Trang Chi Tiết ==
+
+User -> HomeScreen : Nhấn vào sản phẩm
+HomeScreen -> DetailScreen : navigation.navigate('ProductDetail',\n{productId})
+
+DetailScreen -> Server : GET /products/:id
+Server -> ProdCtrl : getProductById(req, res)
+ProdCtrl -> DB : Product.findByPk(id,\ninclude: [Variants, Reviews])
+DB --> ProdCtrl : product + variants + reviews
+ProdCtrl --> Server : 200 product data
+Server --> DetailScreen : Product details
+
+par Tải song song
+    DetailScreen -> Server : GET /products/:id/similar
+    Server -> ProdCtrl : getSimilar(req, res)
+    ProdCtrl -> DB : Tìm SP cùng category,\nloại trừ SP hiện tại
+    DB --> ProdCtrl : similarProducts
+    ProdCtrl --> Server : 200 similar products
+    Server --> DetailScreen : Similar products
+
+    DetailScreen -> Server : GET /favorites/check/:id\n(Bearer token)
+    Server -> UserCtrl : checkFavorite(req, res)
+    UserCtrl -> DB : user.hasFavorite(product)
+    DB --> UserCtrl : isFavorite (true/false)
+    UserCtrl --> Server : 200 {isFavorite}
+    Server --> DetailScreen : Trạng thái yêu thích
+end
+
+DetailScreen --> User : Hiển thị đầy đủ:\n- Hình ảnh, tên, giá\n- Thông số kỹ thuật\n- Danh sách biến thể\n- Reviews\n- SP tương tự
+
+== Bước 2: Ghi Nhận Lịch Sử Xem ==
+
+DetailScreen -> Server : POST /products/:id/view\n(Bearer token)
+Server -> ProdCtrl : viewProduct(req, res)
+ProdCtrl -> DB : UserViewedHistory.upsert(\n{UserId, ProductId})
+ProdCtrl -> DB : product.viewCount += 1\nproduct.save()
+DB --> ProdCtrl : Done
+ProdCtrl --> Server : 200 OK
+note right of DetailScreen : Ghi lịch sử xem\nchạy ngầm (fire & forget)
+
+== Bước 3: Chọn Biến Thể ==
+
+User -> DetailScreen : Chọn biến thể\n(VD: 8GB RAM / 256GB / Đen)
+DetailScreen -> DetailScreen : Cập nhật giá hiển thị\ntheo variant.price đã có sẵn\n(không cần gọi API thêm)
+DetailScreen --> User : Cập nhật UI:\n- Giá mới theo biến thể\n- Highlight biến thể đã chọn
+
+@enduml

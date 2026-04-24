@@ -1,0 +1,110 @@
+@startuml AD09_TimKiemDuyetSanPham
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam activity {
+    BackgroundColor #FEF9E7
+    BorderColor #D4AC0D
+    FontColor #1A252F
+    FontSize 12
+    DiamondBackgroundColor #FEF9E7
+    DiamondBorderColor #D4AC0D
+    DiamondFontColor #1A252F
+    StartColor #B7950B
+    EndColor #B7950B
+    BarColor #D4AC0D
+}
+skinparam arrow {
+    Color #2C3E50
+    FontColor #5D6D7E
+    FontSize 11
+}
+skinparam swimlane {
+    BorderColor #AEB6BF
+    TitleFontSize 13
+    TitleFontStyle bold
+}
+
+title <size:16><b>AD09 - Tìm Kiếm & Duyệt Sản Phẩm</b></size>\n<color:#5D6D7E><size:12>UC03 | CellphoneK</size></color>
+
+|Khách Hàng|
+start
+:Mở ứng dụng\nvào Home Screen;
+
+|Hệ thống (Server)|
+fork
+    :Tải sản phẩm bán chạy\nGET /products/best-selling;
+fork again
+    :Tải sản phẩm giảm giá\nGET /products/by-discount;
+fork again
+    :Tải danh mục\nGET /categories;
+fork again
+    :Tải thương hiệu\nGET /brands;
+end fork
+
+|Khách Hàng|
+:Hiển thị trang chủ\nvới các section SP;
+
+if (Chọn cách duyệt?) then (Tìm kiếm từ khóa)
+    :Nhập từ khóa\nvào thanh tìm kiếm;
+    |Hệ thống (Server)|
+    :GET /products?search=keyword\n&category=...&brand=...;
+    :Lọc theo từ khóa\ntrong tên sản phẩm;
+    |Khách Hàng|
+    :Hiển thị danh sách\nkết quả tìm kiếm;
+
+else if (Chọn cách duyệt?) then (Lọc theo Danh mục)
+    :Chọn danh mục\n(VD: Điện thoại, Laptop...);
+    |Hệ thống (Server)|
+    :GET /products?category=Điện thoại;
+    :Lọc theo category;
+    |Khách Hàng|
+    :Hiển thị SP\ntheo danh mục;
+
+else (Lọc theo Thương hiệu)
+    :Chọn thương hiệu\n(VD: Apple, Samsung...);
+    |Hệ thống (Server)|
+    :GET /products?brand=Apple;
+    :Lọc theo brand;
+    |Khách Hàng|
+    :Hiển thị SP\ntheo thương hiệu;
+endif
+
+if (Tìm thấy sản phẩm?) then (Không)
+    :Hiển thị "Không tìm thấy\nsản phẩm phù hợp";
+    stop
+else (Có)
+endif
+
+:Chọn một sản phẩm từ danh sách;
+
+|Hệ thống (Server)|
+fork
+    :GET /products/:id\n(Thông tin + Biến thể + Reviews);
+fork again
+    :GET /products/:id/similar\n(SP tương tự cùng category);
+fork again
+    :GET /favorites/check/:id\n(Trạng thái yêu thích);
+fork again
+    :POST /products/:id/view\n(Ghi nhận lượt xem - background);
+end fork
+
+|Khách Hàng|
+:Hiển thị trang chi tiết SP:\n- Hình ảnh & tên\n- Giá gốc & % giảm giá\n- Chọn biến thể RAM/ROM/Màu\n- Mô tả & thông số kỹ thuật\n- Danh sách đánh giá\n- SP tương tự;
+
+if (Muốn làm gì?) then (Thêm vào giỏ hàng)
+    :Chọn biến thể\n(nếu có);
+    :Nhấn "Thêm vào giỏ";
+    stop
+else if (Muốn làm gì?) then (Yêu thích)
+    :Nhấn icon ❤️;
+    stop
+else (Mua ngay)
+    :Chọn biến thể;
+    :Nhấn "Mua ngay";
+    :Chuyển đến\nCheckout Screen;
+    stop
+endif
+
+@enduml

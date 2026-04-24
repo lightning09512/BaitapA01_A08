@@ -1,0 +1,121 @@
+@startuml SD11_AdminQuanLySanPham
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+skinparam participant {
+    BackgroundColor #E8F8F5
+    BorderColor #17A589
+    FontColor #1A252F
+    FontSize 12
+}
+skinparam actor {
+    BackgroundColor #D2B4DE
+    BorderColor #6C3483
+    FontColor #1A252F
+}
+skinparam sequence {
+    ArrowColor #2C3E50
+    LifeLineBorderColor #AEB6BF
+    LifeLineBackgroundColor #F2F3F4
+    GroupBorderColor #17A589
+    GroupBackgroundColor #E8F8F5
+    GroupFontColor #0E6655
+    DividerBackgroundColor #EAECEE
+    DividerBorderColor #AEB6BF
+}
+
+title <size:16><b>SD11 - Admin Quản Lý Sản Phẩm (CRUD)</b></size>\n<color:#5D6D7E><size:12>UC10 | CellphoneK</size></color>
+
+actor "Quản Trị Viên\n(Admin)" as Admin
+participant "AdminProducts\nScreen" as AdminScreen
+participant "API Server\n(Express + Auth)" as Server
+participant "AdminController" as AdminCtrl
+participant "Database\n(MySQL)" as DB
+
+== Phân Quyền Middleware ==
+
+note over Server
+    Mọi request đến /admin/*
+    đều qua 2 middleware:
+    1. authenticateToken() → verify JWT
+    2. requireAdmin() → kiểm tra role = 'admin'
+    Nếu không đủ quyền → 403 Forbidden
+end note
+
+== UC10.1 - Xem Danh Sách Sản Phẩm ==
+
+Admin -> AdminScreen : Mở màn hình Quản lý Sản phẩm
+AdminScreen -> Server : GET /admin/products\n?search=...&category=...&page=1\n(Bearer token)
+Server -> Server : authenticateToken() + requireAdmin()
+Server -> AdminCtrl : getAllProducts(req, res)
+AdminCtrl -> DB : Product.findAndCountAll(\nwhere: {name LIKE search,\ncategory},\nlimit, offset,\norder: createdAt DESC)
+DB --> AdminCtrl : {rows, count}
+AdminCtrl --> Server : 200 {items, total, page, hasMore}
+Server --> AdminScreen : Danh sách sản phẩm có phân trang
+AdminScreen --> Admin : Hiển thị danh sách + bộ lọc
+
+== UC10.2 - Thêm Sản Phẩm Mới ==
+
+Admin -> AdminScreen : Nhấn "Thêm sản phẩm"
+Admin -> AdminScreen : Điền form:\nTên, Giá, Danh mục,\nMô tả, URL hình ảnh, % giảm giá
+Admin -> AdminScreen : Nhấn "Lưu"
+
+AdminScreen -> Server : POST /admin/products\n{name, price, category,\ndescription, image, discountPercent}\n(Bearer token)
+Server -> AdminCtrl : createProduct(req, res)
+
+AdminCtrl -> AdminCtrl : Validate: name và price\nlà bắt buộc
+AdminCtrl -> DB : Product.create(\n{name, price, category,\ndescription, image,\ndiscountPercent,\nsoldQuantity: 0, viewCount: 0})
+DB --> AdminCtrl : newProduct
+AdminCtrl --> Server : 201 {message, product}
+Server --> AdminScreen : Success
+AdminScreen --> Admin : Thông báo "Thêm thành công"\nvà refresh danh sách
+
+== UC10.3 - Chỉnh Sửa Sản Phẩm ==
+
+Admin -> AdminScreen : Nhấn "Sửa" trên sản phẩm
+Admin -> AdminScreen : Chỉnh sửa thông tin
+Admin -> AdminScreen : Nhấn "Cập nhật"
+
+AdminScreen -> Server : PUT /admin/products/:id\n{name, price, category, ...}\n(Bearer token)
+Server -> AdminCtrl : updateProduct(req, res)
+AdminCtrl -> DB : Product.findByPk(id)
+DB --> AdminCtrl : product
+
+alt Không tìm thấy sản phẩm
+    AdminCtrl --> Server : 404 "Không tìm thấy sản phẩm"
+    Server --> AdminScreen : Error
+    AdminScreen --> Admin : Alert lỗi
+else Tìm thấy
+    AdminCtrl -> DB : Cập nhật các trường thay đổi\nproduct.save()
+    DB --> AdminCtrl : Done
+    AdminCtrl --> Server : 200 {message, product}
+    Server --> AdminScreen : Success
+    AdminScreen --> Admin : Thông báo "Cập nhật thành công"
+end
+
+== UC10.4 - Xóa Sản Phẩm ==
+
+Admin -> AdminScreen : Nhấn "Xóa" trên sản phẩm
+AdminScreen --> Admin : Hiển thị dialog xác nhận
+Admin -> AdminScreen : Xác nhận xóa
+
+AdminScreen -> Server : DELETE /admin/products/:id\n(Bearer token)
+Server -> AdminCtrl : deleteProduct(req, res)
+AdminCtrl -> DB : Product.findByPk(id)
+DB --> AdminCtrl : product
+
+alt Không tìm thấy sản phẩm
+    AdminCtrl --> Server : 404 "Không tìm thấy sản phẩm"
+    Server --> AdminScreen : Error
+    AdminScreen --> Admin : Alert lỗi
+else Tìm thấy
+    AdminCtrl -> DB : product.destroy()
+    DB --> AdminCtrl : Done
+    AdminCtrl --> Server : 200 "Đã xoá sản phẩm thành công"
+    Server --> AdminScreen : Success
+    AdminScreen --> Admin : Thông báo "Xóa thành công"\nvà cập nhật danh sách
+end
+
+@enduml

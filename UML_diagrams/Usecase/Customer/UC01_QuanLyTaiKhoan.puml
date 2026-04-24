@@ -1,0 +1,71 @@
+@startuml UC01_QuanLyTaiKhoan
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam actor {
+    BorderColor #1A5276
+    BackgroundColor #D6EAF8
+    FontColor #1A252F
+    FontSize 13
+    FontStyle bold
+}
+
+skinparam usecase {
+    BorderColor #2980B9
+    BackgroundColor #EBF5FB
+    FontColor #1A252F
+    FontSize 12
+    ArrowColor #5D6D7E
+}
+
+skinparam rectangle {
+    BorderColor #2980B9
+    BorderThickness 2
+    BackgroundColor #FDFEFE
+    FontColor #1A5276
+    FontSize 14
+    FontStyle bold
+}
+
+title <size:17><b>UC01 - Quản Lý Tài Khoản</b></size>\n<color:#5D6D7E><size:12>CellphoneK E-Commerce App</size></color>
+
+' ===================== ACTORS =====================
+actor "Khách Hàng\n(Customer)" as Customer
+actor "Hệ thống Email\n(Email Service)" as EmailSvc
+
+' ===================== SYSTEM BOUNDARY =====================
+rectangle "Hệ Thống Quản Lý Tài Khoản" {
+    usecase "UC01.1\nĐăng ký tài khoản" as UC01_1
+    usecase "UC01.2\nXác minh tài khoản\nqua mã OTP" as UC01_2
+    usecase "UC01.3\nĐăng nhập" as UC01_3
+    usecase "UC01.4\nQuên mật khẩu\n(Gửi OTP email)" as UC01_4
+    usecase "UC01.5\nĐặt lại mật khẩu\n(Nhập OTP + mật khẩu mới)" as UC01_5
+}
+
+' ===================== ASSOCIATIONS =====================
+Customer --> UC01_1 : Nhập username,\npassword, email
+Customer --> UC01_3 : Nhập tài khoản\nvà mật khẩu
+Customer --> UC01_4 : Nhập email\nđã đăng ký
+
+EmailSvc --> UC01_2 : Gửi mã OTP\nxác minh
+EmailSvc --> UC01_4 : Gửi mã OTP\nkhôi phục
+
+' ===================== RELATIONSHIPS =====================
+UC01_1 .> UC01_2 : <<include>>
+UC01_4 .> UC01_5 : <<include>>
+
+' ===================== NOTES =====================
+note right of UC01_2
+  Tài khoản mới bắt buộc
+  phải xác minh OTP
+  mới có thể đăng nhập
+end note
+
+note bottom of UC01_5
+  Người dùng nhập OTP
+  nhận được qua email
+  cùng mật khẩu mới
+end note
+
+@enduml

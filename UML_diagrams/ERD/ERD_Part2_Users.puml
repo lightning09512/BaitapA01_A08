@@ -1,0 +1,91 @@
+@startuml ERD_Part2_Users
+
+title Sơ đồ ERD - Phần 2: Người dùng & Tương tác
+
+skinparam entity {
+  BackgroundColor #EEF4FF
+  BorderColor #2A5FC7
+  FontColor #333333
+}
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 80
+
+' ===================== ENTITIES =====================
+
+entity "users" as users {
+  + **id** : INT <<PK>>
+  --
+  username : VARCHAR(255) <<UNIQUE>>
+  password : VARCHAR(255)
+  email : VARCHAR(255) <<UNIQUE>>
+  name : VARCHAR(255)
+  phone : VARCHAR(255)
+  avatar : TEXT
+  role : VARCHAR(255)
+  bio : VARCHAR(255)
+  gender : VARCHAR(255)
+  birthday : VARCHAR(255)
+  points : INT
+  isVerified : TINYINT
+  verifyOtp : VARCHAR(255)
+  resetOtp : VARCHAR(255)
+  otp : VARCHAR(255)
+  tempEmail : VARCHAR(255)
+  tempPhone : VARCHAR(255)
+  tempName : VARCHAR(255)
+  otpPhone : VARCHAR(255)
+  createdAt : DATETIME
+  updatedAt : DATETIME
+}
+
+entity "coupons" as coupons {
+  + **id** : INT <<PK>>
+  --
+  # userId : INT <<FK>>
+  code : VARCHAR(255) <<UNIQUE>>
+  discountPercent : INT
+  isUsed : TINYINT
+  description : VARCHAR(255)
+  createdAt : DATETIME
+  updatedAt : DATETIME
+}
+
+entity "notifications" as notifications {
+  + **id** : VARCHAR(255) <<PK>>
+  --
+  # userId : VARCHAR(255) <<FK>>
+  title : VARCHAR(255)
+  message : TEXT
+  isRead : TINYINT
+  createdAt : DATETIME
+  updatedAt : DATETIME
+}
+
+entity "chatmessages" as chatmessages {
+  + **id** : INT <<PK>>
+  --
+  # senderId : INT <<FK>>
+  # receiverId : INT <<FK>>
+  content : TEXT
+  isRead : TINYINT
+  createdAt : DATETIME
+  updatedAt : DATETIME
+}
+
+' ===================== NOTE: orders (external) =====================
+entity "orders" as orders #FFF9E6 {
+  + **id** : VARCHAR(255) <<PK>>
+  --
+  (tham chiếu từ Phần 1)
+}
+
+' ===================== RELATIONSHIPS =====================
+
+users ||--o{ coupons : "sở hữu mã giảm giá"
+users ||--o{ notifications : "nhận thông báo"
+users ||--o{ chatmessages : "gửi tin nhắn (sender)"
+users ||--o{ chatmessages : "nhận tin nhắn (receiver)"
+users ||--o{ orders : "đặt hàng"
+
+@enduml

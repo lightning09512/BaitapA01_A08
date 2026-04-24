@@ -1,0 +1,91 @@
+@startuml SD10_HuyDonHang
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+skinparam participant {
+    BackgroundColor #FEF9E7
+    BorderColor #D4AC0D
+    FontColor #1A252F
+    FontSize 12
+}
+skinparam actor {
+    BackgroundColor #D5E8D4
+    BorderColor #27AE60
+    FontColor #1A252F
+}
+skinparam sequence {
+    ArrowColor #2C3E50
+    LifeLineBorderColor #AEB6BF
+    LifeLineBackgroundColor #F2F3F4
+    GroupBorderColor #D4AC0D
+    GroupBackgroundColor #FEF9E7
+    GroupFontColor #B7950B
+    DividerBackgroundColor #EAECEE
+    DividerBorderColor #AEB6BF
+}
+
+title <size:16><b>SD10 - Hủy Đơn Hàng</b></size>\n<color:#5D6D7E><size:12>UC06.6 + UC06.7 | CellphoneK</size></color>
+
+actor "Khách Hàng" as User
+participant "OrdersScreen" as OrdersScreen
+participant "API Server\n(Express)" as Server
+participant "OrderController" as OrderCtrl
+participant "Database\n(MySQL)" as DB
+
+== Xem Đơn Hàng ==
+
+User -> OrdersScreen : Mở màn hình Đơn hàng của tôi
+OrdersScreen -> Server : GET /orders (Bearer token)
+Server -> OrderCtrl : getUserOrders(req, res)
+OrderCtrl -> DB : Order.findAll(\n{userId}, include: [OrderItem])
+DB --> OrderCtrl : orders list
+OrderCtrl --> Server : 200 orders
+Server --> OrdersScreen : Danh sách đơn hàng
+OrdersScreen --> User : Hiển thị đơn hàng\nvà nút "Hủy đơn" nếu đủ điều kiện
+
+== Yêu Cầu Hủy Đơn ==
+
+User -> OrdersScreen : Nhấn "Hủy đơn hàng" trên đơn
+OrdersScreen -> Server : POST /orders/cancel\n{orderId}\n(Bearer token)
+Server -> OrderCtrl : cancelOrder(req, res)
+
+OrderCtrl -> DB : User.findOne({username})
+OrderCtrl -> DB : Order.findOne({id: orderId, userId})
+DB --> OrderCtrl : order
+
+alt Không tìm thấy đơn hàng
+    OrderCtrl --> Server : 404 "Không tìm thấy đơn hàng"
+    Server --> OrdersScreen : Error
+    OrdersScreen --> User : Alert lỗi
+
+else Đơn đang NEW hoặc CONFIRMED
+    OrderCtrl -> OrderCtrl : diffMinutes = (now - order.createdAt) / 60000
+
+    alt diffMinutes > 30
+        OrderCtrl --> Server : 400 "Đã quá thời gian 30 phút,\nkhông thể hủy đơn"
+        Server --> OrdersScreen : Error
+        OrdersScreen --> User : Alert "Đã quá thời gian hủy"
+    else Còn trong 30 phút
+        OrderCtrl -> DB : order.status = 'CANCELLED'\norder.cancelledAt = now()\norder.save()
+        DB --> OrderCtrl : Done
+        OrderCtrl --> Server : 200 "Đã hủy đơn hàng thành công"
+        Server --> OrdersScreen : Success
+        OrdersScreen --> User : Thông báo hủy thành công\nCập nhật trạng thái đơn
+    end
+
+else Đơn đang PREPARING
+    OrderCtrl -> DB : order.cancelRequested = true\norder.save()
+    DB --> OrderCtrl : Done
+    OrderCtrl --> Server : 200 "Đơn đang chuẩn bị hàng.\nĐã gửi yêu cầu hủy đơn cho shop."
+    Server --> OrdersScreen : Success
+    OrdersScreen --> User : Thông báo "Đã gửi yêu cầu hủy"\nAdmin sẽ xem xét và phản hồi
+
+else Đơn đang SHIPPING hoặc DELIVERED
+    OrderCtrl --> Server : 400 "Đơn hàng đã ở trạng thái\nkhông thể hủy"
+    Server --> OrdersScreen : Error
+    OrdersScreen --> User : Alert "Không thể hủy đơn này"
+end
+
+@enduml

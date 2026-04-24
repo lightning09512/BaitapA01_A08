@@ -1,0 +1,128 @@
+@startuml CD04_NhomSanPham
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam class {
+    BackgroundColor #FEF9E7
+    BorderColor #D4AC0D
+    FontColor #1A252F
+    FontSize 12
+    HeaderBackgroundColor #B7950B
+    HeaderFontColor #FFFFFF
+    HeaderFontSize 13
+    HeaderFontStyle bold
+}
+skinparam arrow {
+    Color #2C3E50
+    FontColor #5D6D7E
+    FontSize 11
+}
+
+title <size:17><b>CD04 - Nhóm Sản Phẩm & Đánh Giá</b></size>\n<color:#5D6D7E><size:12>Product, ProductVariant, Review, Favorites, ViewedHistory | CellphoneK</size></color>
+
+class Product {
+    +id : INTEGER <<PK>>
+    +name : STRING <<NOT NULL>>
+    +price : DOUBLE <<NOT NULL>>
+    +category : STRING
+    +brand : STRING
+    +soldQuantity : INTEGER = 0
+    +discountPercent : INTEGER = 0
+    +description : TEXT
+    +image : TEXT
+    +viewCount : INTEGER = 0
+}
+
+class ProductVariant {
+    +id : INTEGER <<PK>>
+    +ram : STRING
+    +rom : STRING
+    +color : STRING
+    +price : DOUBLE
+    +stock : INTEGER = 20
+    +productId : INTEGER <<FK>>
+}
+
+class Review {
+    +id : INTEGER <<PK>>
+    +username : STRING
+    +name : STRING
+    +avatar : TEXT
+    +rating : INTEGER = 5
+    +comment : TEXT
+    +userId : INTEGER <<FK>>
+    +productId : INTEGER <<FK>>
+    +createdAt : DATE
+}
+
+class UserFavorites {
+    <<Junction Table>>
+    +UserId : INTEGER <<FK>>
+    +ProductId : INTEGER <<FK>>
+}
+
+class UserViewedHistory {
+    <<Junction Table>>
+    +UserId : INTEGER <<FK>>
+    +ProductId : INTEGER <<FK>>
+    +updatedAt : DATE
+}
+
+class User {
+    +id : INTEGER <<PK>>
+    +username : STRING
+    +points : INTEGER
+    .. See CD03 for full definition ..
+}
+
+class ProductController {
+    <<Controller>>
+    +getProducts(req, res) : void
+    +getProductById(req, res) : void
+    +getBestSelling(req, res) : void
+    +getByDiscount(req, res) : void
+    +getCategories(req, res) : void
+    +getBrands(req, res) : void
+    +getSimilar(req, res) : void
+    +viewProduct(req, res) : void
+}
+
+class UserController {
+    <<Controller>>
+    +getFavorites(req, res) : void
+    +toggleFavorite(req, res) : void
+    +checkFavorite(req, res) : void
+    +getViewed(req, res) : void
+    +reviewProduct(req, res) : void
+    +getProductReviews(req, res) : void
+}
+
+Product "1" *--o{ "0..*" ProductVariant : has variants >
+Product "1" --o{ "0..*" Review : has >
+User "1" --o{ "0..*" Review : writes >
+User "0..*" -- "0..*" Product : favorites
+(User, Product) .. UserFavorites
+User "0..*" -- "0..*" Product : viewed
+(User, Product) .. UserViewedHistory
+
+ProductController ..> Product : <<uses>>
+ProductController ..> ProductVariant : <<uses>>
+UserController ..> Product : <<uses>>
+UserController ..> Review : <<uses>>
+UserController ..> UserFavorites : <<uses>>
+UserController ..> UserViewedHistory : <<uses>>
+
+note right of ProductVariant
+  Mỗi biến thể có giá riêng
+  VD: iPhone 15 - 8GB/256GB/Đen
+  → price = 28.990.000đ
+end note
+
+note right of Review
+  Chỉ tạo được khi đơn DELIVERED
+  và OrderItem.isRated = false
+  → Sau khi tạo: +100pts + Coupon 10%
+end note
+
+@enduml

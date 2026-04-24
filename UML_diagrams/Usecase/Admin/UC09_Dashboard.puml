@@ -1,0 +1,64 @@
+@startuml UC09_Dashboard
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam actor {
+    BorderColor #6C3483
+    BackgroundColor #D2B4DE
+    FontColor #1A252F
+    FontSize 13
+    FontStyle bold
+}
+
+skinparam usecase {
+    BorderColor #8E44AD
+    BackgroundColor #F5EEF8
+    FontColor #1A252F
+    FontSize 12
+    ArrowColor #5D6D7E
+}
+
+skinparam rectangle {
+    BorderColor #8E44AD
+    BorderThickness 2
+    BackgroundColor #FDFEFE
+    FontColor #6C3483
+    FontSize 14
+    FontStyle bold
+}
+
+title <size:17><b>UC09 - Dashboard & Thống Kê</b></size>\n<color:#5D6D7E><size:12>CellphoneK E-Commerce App</size></color>
+
+' ===================== ACTORS =====================
+actor "Quản Trị Viên\n(Admin)" as Admin
+
+' ===================== SYSTEM BOUNDARY =====================
+rectangle "Hệ Thống Dashboard & Thống Kê" {
+    usecase "UC09.1\nXem tổng quan\nDashboard\n(Tổng SP, Users, Đơn hàng)" as UC09_1
+    usecase "UC09.2\nXem thống kê\ndoanh thu\n(Tổng / Tháng này / Tháng trước)" as UC09_2
+    usecase "UC09.3\nXem phân bổ\ntrạng thái đơn hàng\n(NEW, CONFIRMED, SHIPPING...)" as UC09_3
+    usecase "UC09.4\nXem Top 5 sản phẩm\nbán chạy nhất" as UC09_4
+}
+
+' ===================== ASSOCIATIONS =====================
+Admin --> UC09_1
+
+' ===================== RELATIONSHIPS =====================
+UC09_2 .> UC09_1 : <<include>>
+UC09_3 .> UC09_1 : <<include>>
+UC09_4 .> UC09_1 : <<include>>
+
+' ===================== NOTES =====================
+note right of UC09_2
+  Doanh thu chỉ tính từ
+  các đơn có trạng thái
+  DELIVERED (đã giao thành công)
+end note
+
+note right of UC09_4
+  Sắp xếp theo soldQuantity
+  (số lượng đã bán) giảm dần
+end note
+
+@enduml

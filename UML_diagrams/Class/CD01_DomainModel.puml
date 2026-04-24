@@ -1,0 +1,240 @@
+@startuml CD01_DomainModel
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam class {
+    BackgroundColor #EBF5FB
+    BorderColor #2980B9
+    FontColor #1A252F
+    FontSize 12
+    HeaderBackgroundColor #2980B9
+    HeaderFontColor #FFFFFF
+    HeaderFontSize 13
+    HeaderFontStyle bold
+    AttributeFontColor #1A252F
+    AttributeFontSize 11
+}
+skinparam arrow {
+    Color #2C3E50
+    FontColor #5D6D7E
+    FontSize 11
+}
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #F9A825
+    FontSize 10
+}
+
+title <size:17><b>CD01 - Domain Model Tổng Thể</b></size>\n<color:#5D6D7E><size:12>Toàn bộ 12 Entity | CellphoneK</size></color>
+
+' ===================== USER =====================
+class User {
+    +id : INTEGER <<PK>>
+    +username : STRING <<unique>>
+    +password : STRING <<hashed>>
+    +email : STRING <<unique>>
+    +name : STRING
+    +phone : STRING
+    +avatar : TEXT
+    +bio : STRING
+    +gender : STRING
+    +birthday : STRING
+    +isVerified : BOOLEAN = false
+    +verifyOtp : STRING
+    +resetOtp : STRING
+    +points : INTEGER = 0
+    +role : STRING = 'customer'
+    --
+    +validPassword(password) : Boolean
+}
+
+' ===================== PRODUCT =====================
+class Product {
+    +id : INTEGER <<PK>>
+    +name : STRING
+    +price : DOUBLE
+    +category : STRING
+    +brand : STRING
+    +soldQuantity : INTEGER = 0
+    +discountPercent : INTEGER = 0
+    +description : TEXT
+    +image : TEXT
+    +viewCount : INTEGER = 0
+}
+
+class ProductVariant {
+    +id : INTEGER <<PK>>
+    +ram : STRING
+    +rom : STRING
+    +color : STRING
+    +price : DOUBLE
+    +stock : INTEGER = 20
+    --
+    <<FK>> productId : INTEGER
+}
+
+' ===================== ORDER =====================
+class Order {
+    +id : STRING <<PK>>
+    +status : STRING = 'NEW'
+    +paymentMethod : STRING = 'COD'
+    +address : STRING
+    +phone : STRING
+    +note : TEXT
+    +subTotal : DOUBLE
+    +discountAmount : DOUBLE = 0
+    +totalAmount : DOUBLE
+    +usedCoupon : STRING
+    +usedPoints : INTEGER = 0
+    +cancelRequested : BOOLEAN = false
+    +confirmedAt : DATE
+    +cancelledAt : DATE
+    --
+    <<FK>> userId : INTEGER
+}
+
+class OrderItem {
+    +id : INTEGER <<PK>>
+    +name : STRING
+    +image : TEXT
+    +unitPrice : DOUBLE
+    +quantity : INTEGER
+    +lineTotal : DOUBLE
+    +isRated : BOOLEAN = false
+    +variantInfo : STRING
+    --
+    <<FK>> orderId : STRING
+    <<FK>> productId : INTEGER
+    <<FK>> variantId : INTEGER
+}
+
+' ===================== CART =====================
+class CartItem {
+    +id : INTEGER <<PK>>
+    +quantity : INTEGER = 1
+    --
+    <<FK>> userId : INTEGER
+    <<FK>> productId : INTEGER
+    <<FK>> variantId : INTEGER
+}
+
+' ===================== REVIEW =====================
+class Review {
+    +id : INTEGER <<PK>>
+    +username : STRING
+    +name : STRING
+    +avatar : TEXT
+    +rating : INTEGER = 5
+    +comment : TEXT
+    --
+    <<FK>> userId : INTEGER
+    <<FK>> productId : INTEGER
+}
+
+' ===================== COUPON =====================
+class Coupon {
+    +id : INTEGER <<PK>>
+    +code : STRING <<unique>>
+    +discountPercent : INTEGER
+    +isUsed : BOOLEAN = false
+    +description : STRING
+    --
+    <<FK>> userId : INTEGER
+}
+
+' ===================== NOTIFICATION =====================
+class Notification {
+    +id : STRING <<PK>>
+    +title : STRING
+    +message : TEXT
+    +isRead : BOOLEAN = false
+    --
+    <<FK>> userId : STRING
+}
+
+' ===================== JUNCTION TABLES =====================
+class UserFavorites {
+    <<junction table>>
+    --
+    <<FK>> UserId : INTEGER
+    <<FK>> ProductId : INTEGER
+}
+
+class UserViewedHistory {
+    <<junction table>>
+    --
+    <<FK>> UserId : INTEGER
+    <<FK>> ProductId : INTEGER
+}
+
+' ===================== CHAT =====================
+class ChatMessage {
+    +id : INTEGER <<PK>>
+    +senderId : INTEGER
+    +receiverId : INTEGER
+    +content : TEXT
+    +isRead : BOOLEAN = false
+}
+
+' ===================== RELATIONSHIPS =====================
+
+' User - Order (1 to many)
+User "1" --o{ "0..*" Order : places >
+
+' User - CartItem (1 to many)
+User "1" --o{ "0..*" CartItem : has >
+
+' User - Review (1 to many)
+User "1" --o{ "0..*" Review : writes >
+
+' User - Coupon (1 to many)
+User "1" --o{ "0..*" Coupon : owns >
+
+' User - Notification (1 to many)
+User "1" --o{ "0..*" Notification : receives >
+
+' User - ChatMessage (sent)
+User "1" --o{ "0..*" ChatMessage : sends >
+
+' User - Favorites (many to many)
+User "0..*" ----o{ "0..*" Product : favorites\n(UserFavorites)
+
+' User - ViewedHistory (many to many)
+User "0..*" ----o{ "0..*" Product : viewed\n(UserViewedHistory)
+
+' Product - ProductVariant (1 to many)
+Product "1" *--o{ "0..*" ProductVariant : has variants >
+
+' Product - Review (1 to many)
+Product "1" --o{ "0..*" Review : has >
+
+' Product - CartItem (1 to many)
+Product "1" --o{ "0..*" CartItem : in cart >
+
+' Product - OrderItem (1 to many)
+Product "1" --o{ "0..*" OrderItem : in order >
+
+' Order - OrderItem (1 to many)
+Order "1" *--o{ "1..*" OrderItem : contains >
+
+' ProductVariant - OrderItem
+ProductVariant "0..1" --o{ "0..*" OrderItem : specifies >
+
+' ProductVariant - CartItem
+ProductVariant "0..1" --o{ "0..*" CartItem : specifies >
+
+note bottom of Order
+  status values:
+  NEW | CONFIRMED | PREPARING
+  SHIPPING | DELIVERED | CANCELLED
+end note
+
+note bottom of User
+  role values:
+  'customer' | 'admin'
+  Password tự động hash
+  bằng Bcrypt trước khi lưu
+end note
+
+@enduml

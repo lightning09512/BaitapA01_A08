@@ -1,0 +1,104 @@
+@startuml AD03_VongDoiDonHang
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam activity {
+    BackgroundColor #F5EEF8
+    BorderColor #8E44AD
+    FontColor #1A252F
+    FontSize 12
+    DiamondBackgroundColor #FEF9E7
+    DiamondBorderColor #D4AC0D
+    DiamondFontColor #1A252F
+    StartColor #6C3483
+    EndColor #6C3483
+    BarColor #8E44AD
+}
+skinparam arrow {
+    Color #2C3E50
+    FontColor #5D6D7E
+    FontSize 11
+}
+skinparam swimlane {
+    BorderColor #AEB6BF
+    TitleFontSize 13
+    TitleFontStyle bold
+}
+
+title <size:16><b>AD03 - Vòng Đời Đơn Hàng (Admin Xử Lý)</b></size>\n<color:#5D6D7E><size:12>UC11.1 + UC11.2 | CellphoneK</size></color>
+
+|Khách Hàng|
+start
+:Đặt hàng COD thành công;
+
+|Hệ thống (Server)|
+:Tạo Order\n[Trạng thái: NEW];
+
+|Quản Trị Viên (Admin)|
+:Mở màn hình\nQuản lý Đơn hàng;
+:Lọc đơn hàng\ntheo trạng thái;
+:Xem chi tiết đơn hàng mới;
+
+if (Xác nhận đơn hàng?) then (Có)
+    |Hệ thống (Server)|
+    :order.status = CONFIRMED\norder.confirmedAt = now();
+
+    |Quản Trị Viên (Admin)|
+    :Chuẩn bị hàng;
+
+    |Hệ thống (Server)|
+    :order.status = PREPARING;
+
+    |Khách Hàng|
+    if (Gửi yêu cầu hủy đơn\nkhi đang PREPARING?) then (Có)
+        |Hệ thống (Server)|
+        :order.cancelRequested = true;
+        |Quản Trị Viên (Admin)|
+        if (Admin chấp thuận hủy?) then (Có)
+            |Hệ thống (Server)|
+            :order.status = CANCELLED\norder.cancelledAt = now();
+            |Khách Hàng|
+            :Nhận thông báo đơn bị hủy;
+            stop
+        else (Không)
+            :Tiếp tục xử lý đơn;
+        endif
+    else (Không)
+    endif
+
+    |Quản Trị Viên (Admin)|
+    :Giao cho đơn vị vận chuyển;
+
+    |Hệ thống (Server)|
+    :order.status = SHIPPING;
+
+    |Khách Hàng|
+    :Theo dõi trạng thái\nđơn hàng trên app;
+
+    |Quản Trị Viên (Admin)|
+    :Xác nhận đơn đã giao;
+
+    |Hệ thống (Server)|
+    :order.status = DELIVERED;
+
+    fork
+        :Cộng soldQuantity\ncho từng sản phẩm\ntrong đơn;
+    fork again
+        :Tạo thông báo\n"Đơn hàng đã giao thành công"\ncho khách hàng;
+    end fork
+
+    |Khách Hàng|
+    :Nhận thông báo\n"Đơn hàng đã giao thành công!";
+    :Có thể viết đánh giá\nsản phẩm (isRated = false);
+    stop
+
+else (Không - Hủy đơn)
+    |Hệ thống (Server)|
+    :order.status = CANCELLED\norder.cancelledAt = now();
+    |Khách Hàng|
+    :Nhận thông báo\nđơn hàng bị hủy;
+    stop
+endif
+
+@enduml

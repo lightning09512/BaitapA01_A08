@@ -1,0 +1,69 @@
+@startuml UC12_QuanLyNguoiDung
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam actor {
+    BorderColor #922B21
+    BackgroundColor #FADBD8
+    FontColor #1A252F
+    FontSize 13
+    FontStyle bold
+}
+
+skinparam usecase {
+    BorderColor #E74C3C
+    BackgroundColor #FDEDEC
+    FontColor #1A252F
+    FontSize 12
+    ArrowColor #5D6D7E
+}
+
+skinparam rectangle {
+    BorderColor #E74C3C
+    BorderThickness 2
+    BackgroundColor #FDFEFE
+    FontColor #922B21
+    FontSize 14
+    FontStyle bold
+}
+
+title <size:17><b>UC12 - Quản Lý Người Dùng (Admin)</b></size>\n<color:#5D6D7E><size:12>CellphoneK E-Commerce App</size></color>
+
+' ===================== ACTORS =====================
+actor "Quản Trị Viên\n(Admin)" as Admin
+
+' ===================== SYSTEM BOUNDARY =====================
+rectangle "Hệ Thống Quản Lý Người Dùng" {
+    usecase "UC12.1\nXem danh sách\nngười dùng\n(Tìm kiếm, phân trang)" as UC12_1
+    usecase "UC12.2\nThay đổi quyền\nngười dùng\n(customer ↔ admin)" as UC12_2
+    usecase "UC12.3\nXóa tài khoản\nngười dùng\n(Xóa toàn bộ dữ liệu liên quan)" as UC12_3
+}
+
+' ===================== ASSOCIATIONS =====================
+Admin --> UC12_1
+Admin --> UC12_2
+Admin --> UC12_3
+
+' ===================== RELATIONSHIPS =====================
+UC12_2 .> UC12_1 : <<include>>
+UC12_3 .> UC12_1 : <<include>>
+
+' ===================== NOTES =====================
+note right of UC12_2
+  Có thể nâng quyền từ
+  customer → admin
+  hoặc hạ từ admin → customer
+end note
+
+note right of UC12_3
+  Khi xóa user, hệ thống tự động
+  xóa toàn bộ dữ liệu liên quan:
+  - Giỏ hàng, Thông báo, Coupon
+  - Đánh giá, Đơn hàng
+  - Danh sách yêu thích,
+    lịch sử xem SP
+  ⚠ Không thể xóa tài khoản Admin
+end note
+
+@enduml

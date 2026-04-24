@@ -1,0 +1,98 @@
+@startuml SD07_QuenMatKhau
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+skinparam participant {
+    BackgroundColor #EBF5FB
+    BorderColor #2980B9
+    FontColor #1A252F
+    FontSize 12
+}
+skinparam actor {
+    BackgroundColor #D5E8D4
+    BorderColor #27AE60
+    FontColor #1A252F
+}
+skinparam sequence {
+    ArrowColor #2C3E50
+    LifeLineBorderColor #AEB6BF
+    LifeLineBackgroundColor #F2F3F4
+    GroupBorderColor #2980B9
+    GroupBackgroundColor #EBF5FB
+    GroupFontColor #1A5276
+    DividerBackgroundColor #EAECEE
+    DividerBorderColor #AEB6BF
+}
+
+title <size:16><b>SD07 - Quên Mật Khẩu & Đặt Lại Mật Khẩu</b></size>\n<color:#5D6D7E><size:12>UC01.4 + UC01.5 | CellphoneK</size></color>
+
+actor "Khách Hàng" as User
+participant "LoginScreen" as LoginScreen
+participant "ForgotPassword\nScreen" as ForgotScreen
+participant "API Server\n(Express)" as Server
+participant "AuthController" as AuthCtrl
+participant "Database\n(MySQL)" as DB
+participant "Email Service\n(Nodemailer)" as Email
+
+== Bước 1: Yêu Cầu Đặt Lại Mật Khẩu ==
+
+User -> LoginScreen : Nhấn "Quên mật khẩu?"
+LoginScreen -> ForgotScreen : navigation.navigate('ForgotPassword')
+
+User -> ForgotScreen : Nhập địa chỉ email đã đăng ký
+User -> ForgotScreen : Nhấn "Gửi mã OTP"
+
+ForgotScreen -> Server : POST /forgot-password\n{email}
+Server -> AuthCtrl : forgotPassword(req, res)
+
+AuthCtrl -> DB : User.findOne({email})
+DB --> AuthCtrl : user
+
+alt Email không tồn tại
+    AuthCtrl --> Server : 404 "Không tìm thấy tài khoản\nvới email này"
+    Server --> ForgotScreen : Error
+    ForgotScreen --> User : Hiển thị lỗi
+else Tài khoản chưa xác minh
+    AuthCtrl --> Server : 400 "Tài khoản chưa được\nxác minh, vui lòng\nxác minh trước"
+    Server --> ForgotScreen : Error
+    ForgotScreen --> User : Hiển thị lỗi
+else Email hợp lệ & đã xác minh
+    AuthCtrl -> AuthCtrl : Tạo OTP 6 số ngẫu nhiên
+    AuthCtrl -> DB : user.resetOtp = otp\nuser.save()
+    AuthCtrl -> Email : sendOTPEmail(email, otp,\n'Khôi phục mật khẩu')
+    Email --> AuthCtrl : (async)
+    AuthCtrl --> Server : 200 "Đã gửi mã OTP đến email"
+    Server --> ForgotScreen : Success
+    ForgotScreen --> User : Chuyển sang bước\nnhập OTP & mật khẩu mới
+end
+
+== Bước 2: Xác Minh OTP & Đặt Lại Mật Khẩu ==
+
+User <-- Email : Nhận email chứa mã OTP 6 số
+User -> ForgotScreen : Nhập OTP + mật khẩu mới\n(nhập lại để xác nhận)
+User -> ForgotScreen : Nhấn "Đặt lại mật khẩu"
+
+ForgotScreen -> ForgotScreen : Validate: mật khẩu mới\nvà xác nhận phải khớp
+
+ForgotScreen -> Server : POST /reset-password\n{email, otp, newPassword}
+Server -> AuthCtrl : resetPassword(req, res)
+
+AuthCtrl -> DB : User.findOne({email})
+DB --> AuthCtrl : user
+
+alt OTP không đúng hoặc hết hạn
+    AuthCtrl --> Server : 400 "Mã OTP không đúng\nhoặc đã hết hạn"
+    Server --> ForgotScreen : Error
+    ForgotScreen --> User : Hiển thị lỗi OTP
+else OTP đúng
+    AuthCtrl -> DB : user.password = newPassword\nuser.resetOtp = null\nuser.save()
+    DB --> AuthCtrl : Đã cập nhật
+    AuthCtrl --> Server : 200 "Đổi mật khẩu thành công!"
+    Server --> ForgotScreen : Success
+    ForgotScreen --> User : Thông báo thành công
+    ForgotScreen -> LoginScreen : navigation.navigate('Login')
+end
+
+@enduml

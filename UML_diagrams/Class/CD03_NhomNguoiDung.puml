@@ -1,0 +1,168 @@
+@startuml CD03_NhomNguoiDung
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam class {
+    BackgroundColor #EBF5FB
+    BorderColor #2980B9
+    FontColor #1A252F
+    FontSize 12
+    HeaderBackgroundColor #1A5276
+    HeaderFontColor #FFFFFF
+    HeaderFontSize 13
+    HeaderFontStyle bold
+    AttributeFontColor #1A252F
+    AttributeFontSize 11
+}
+skinparam arrow {
+    Color #2C3E50
+    FontColor #5D6D7E
+    FontSize 11
+}
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #F9A825
+    FontSize 10
+}
+
+title <size:17><b>CD03 - Nhóm Người Dùng & Xác Thực</b></size>\n<color:#5D6D7E><size:12>User, Notification, Coupon, ChatMessage | CellphoneK</size></color>
+
+' ===================== USER =====================
+class User {
+    +id : INTEGER <<PK, AutoIncrement>>
+    --
+    +username : STRING <<unique, NOT NULL>>
+    -password : STRING <<bcrypt hashed>>
+    +email : STRING <<unique, NOT NULL>>
+    +name : STRING
+    +phone : STRING
+    +avatar : TEXT(long)
+    +bio : STRING
+    +gender : STRING
+    +birthday : STRING
+    +isVerified : BOOLEAN = false
+    -verifyOtp : STRING
+    -resetOtp : STRING
+    +points : INTEGER = 0
+    +role : STRING = 'customer'
+    --
+    +validPassword(rawPassword: String) : Boolean
+    ..Sequelize Hooks..
+    -beforeCreate() : hashPassword
+    -beforeUpdate() : hashPasswordIfChanged
+}
+
+' ===================== COUPON =====================
+class Coupon {
+    +id : INTEGER <<PK, AutoIncrement>>
+    --
+    +code : STRING <<unique>>
+    +discountPercent : INTEGER
+    +isUsed : BOOLEAN = false
+    +description : STRING
+    +userId : INTEGER <<FK>>
+}
+
+' ===================== NOTIFICATION =====================
+class Notification {
+    +id : STRING <<PK>>
+    --
+    +title : STRING
+    +message : TEXT
+    +isRead : BOOLEAN = false
+    +userId : STRING <<FK - username>>
+}
+
+' ===================== CHAT MESSAGE =====================
+class ChatMessage {
+    +id : INTEGER <<PK, AutoIncrement>>
+    --
+    +senderId : INTEGER <<FK -> User.id>>
+    +receiverId : INTEGER <<FK -> User.id>>
+    +content : TEXT <<NOT NULL>>
+    +isRead : BOOLEAN = false
+    +createdAt : DATE
+    +updatedAt : DATE
+}
+
+' ===================== AUTH CONTROLLER =====================
+class AuthController {
+    <<Controller>>
+    --
+    -SECRET_KEY : String = "SECRET_KEY_A04"
+    --
+    +register(req, res) : void
+    +login(req, res) : void
+    +verifyAccount(req, res) : void
+    +forgotPassword(req, res) : void
+    +resetPassword(req, res) : void
+}
+
+' ===================== USER CONTROLLER =====================
+class UserController {
+    <<Controller>>
+    --
+    +getProfile(req, res) : void
+    +updateProfile(req, res) : void
+    +getWallet(req, res) : void
+    +getNotifications(req, res) : void
+    +readAllNotifications(req, res) : void
+    +getSupportInfo(req, res) : void
+}
+
+' ===================== EMAIL SERVICE =====================
+class EmailService {
+    <<Service>>
+    --
+    +sendOTPEmail(email, otp, subject) : Promise
+    +sendOrderConfirmationEmail(email, order, items) : Promise
+}
+
+' ===================== RELATIONSHIPS =====================
+
+' User has many Coupons
+User "1" *--o{ "0..*" Coupon : owns\n(userId FK)
+
+' User has many Notifications
+User "1" --o{ "0..*" Notification : receives\n(userId = username FK)
+
+' User sends/receives ChatMessages
+User "1" --o{ "0..*" ChatMessage : sends\n(senderId FK)
+User "1" --o{ "0..*" ChatMessage : receives\n(receiverId FK)
+
+' Controllers use User model
+AuthController ..> User : <<uses>>
+UserController ..> User : <<uses>>
+UserController ..> Notification : <<uses>>
+UserController ..> Coupon : <<uses>>
+UserController ..> ChatMessage : <<uses>>
+
+' AuthController uses EmailService
+AuthController ..> EmailService : <<uses>>\nsendOTP
+
+note right of User
+  Bcrypt hash password tự động
+  trước khi INSERT/UPDATE
+  via Sequelize hooks
+  
+  role = 'customer' → app thông thường
+  role = 'admin' → quản trị viên
+end note
+
+note right of Coupon
+  Coupon được tạo tự động
+  khi user viết đánh giá SP
+  code = 'REVIEW' + timestamp
+  discountPercent = 10%
+end note
+
+note right of ChatMessage
+  senderId & receiverId đều
+  là FK trỏ về User.id
+  Không dùng Sequelize
+  belongsTo trực tiếp
+  mà query thủ công
+end note
+
+@enduml

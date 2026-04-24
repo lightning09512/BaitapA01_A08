@@ -1,0 +1,237 @@
+@startuml CD02_KienTrucMVC
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+skinparam class {
+    BackgroundColor #F5EEF8
+    BorderColor #8E44AD
+    FontColor #1A252F
+    FontSize 11
+    HeaderBackgroundColor #8E44AD
+    HeaderFontColor #FFFFFF
+    HeaderFontSize 12
+    HeaderFontStyle bold
+}
+skinparam package {
+    BackgroundColor #FDFEFE
+    BorderColor #8E44AD
+    FontColor #6C3483
+    FontSize 13
+    FontStyle bold
+}
+skinparam arrow {
+    Color #2C3E50
+    FontColor #5D6D7E
+    FontSize 10
+}
+
+title <size:17><b>CD02 - Kiến Trúc MVC (Model - Controller - Route)</b></size>\n<color:#5D6D7E><size:12>Server Architecture | CellphoneK</size></color>
+
+' ===================== ROUTES LAYER =====================
+package "Routes Layer" #EBF5FB {
+    class Router {
+        <<Express Router>>
+        --
+        +POST /register
+        +POST /login
+        +POST /verify-account
+        +POST /forgot-password
+        +POST /reset-password
+        +GET /products
+        +GET /products/:id
+        +POST /cart/add
+        +GET /cart
+        +PUT /cart/update
+        +POST /orders/checkout-cod
+        +GET /orders
+        +POST /orders/cancel
+        +POST /products/:id/reviews
+        +POST /favorites/toggle
+        +GET /admin/dashboard
+        +GET /admin/products
+        +POST /admin/products
+        +PUT /admin/products/:id
+        +DELETE /admin/products/:id
+        +GET /admin/orders
+        +POST /admin/orders/status
+        +GET /admin/users
+        +DELETE /admin/users/:userId
+        +GET /chat/history/:targetId
+        +POST /chat/send
+    }
+
+    class AuthMiddleware {
+        <<Middleware>>
+        --
+        +authenticateToken(req, res, next)
+        +requireAdmin(req, res, next)
+    }
+}
+
+' ===================== CONTROLLER LAYER =====================
+package "Controller Layer" #E8F8F5 {
+    class AuthController {
+        +register(req, res)
+        +login(req, res)
+        +verifyAccount(req, res)
+        +forgotPassword(req, res)
+        +resetPassword(req, res)
+        --
+        -SECRET_KEY : String
+    }
+
+    class ProductController {
+        +getProducts(req, res)
+        +getProductById(req, res)
+        +getBestSelling(req, res)
+        +getByDiscount(req, res)
+        +getCategories(req, res)
+        +getBrands(req, res)
+        +getSimilar(req, res)
+        +viewProduct(req, res)
+    }
+
+    class CartController {
+        +getCart(req, res)
+        +addToCart(req, res)
+        +updateCart(req, res)
+        +removeFromCart(req, res)
+        +clearCart(req, res)
+    }
+
+    class OrderController {
+        +checkoutCod(req, res)
+        +getUserOrders(req, res)
+        +getOrderById(req, res)
+        +cancelOrder(req, res)
+        +getOrderStatistics(req, res)
+    }
+
+    class UserController {
+        +getProfile(req, res)
+        +updateProfile(req, res)
+        +getWallet(req, res)
+        +getFavorites(req, res)
+        +toggleFavorite(req, res)
+        +checkFavorite(req, res)
+        +getViewed(req, res)
+        +getNotifications(req, res)
+        +readAllNotifications(req, res)
+        +reviewProduct(req, res)
+        +getProductReviews(req, res)
+        +getSupportInfo(req, res)
+    }
+
+    class AdminController {
+        +getDashboardStats(req, res)
+        +getAllProducts(req, res)
+        +createProduct(req, res)
+        +updateProduct(req, res)
+        +deleteProduct(req, res)
+        +getAllOrders(req, res)
+        +updateOrderStatus(req, res)
+        +getAllUsers(req, res)
+        +updateUserRole(req, res)
+        +deleteUser(req, res)
+    }
+
+    class ChatController {
+        +getChatHistory(req, res)
+        +getAdminConversations(req, res)
+        +sendMessage(req, res)
+        +sendMessageInternal(senderId, receiverId, content)
+    }
+}
+
+' ===================== SERVICE LAYER =====================
+package "Service Layer" #FEF9E7 {
+    class EmailService {
+        +sendOTPEmail(email, otp, subject)
+        +sendOrderConfirmationEmail(email, order, items)
+    }
+
+    class SocketService {
+        <<Socket.io>>
+        +handleConnection(socket)
+        +emitToRoom(roomId, event, data)
+        +joinRoom(userId)
+    }
+}
+
+' ===================== MODEL LAYER =====================
+package "Model Layer (Sequelize ORM)" #FDEDEC {
+    class UserModel {
+        <<Sequelize Model>>
+        --
+        +validPassword(password) : Boolean
+        ..hooks..
+        +beforeCreate: hashPassword
+        +beforeUpdate: hashPassword
+    }
+
+    class ProductModel {
+        <<Sequelize Model>>
+    }
+
+    class OrderModel {
+        <<Sequelize Model>>
+    }
+
+    class CartItemModel {
+        <<Sequelize Model>>
+    }
+
+    class ReviewModel {
+        <<Sequelize Model>>
+    }
+
+    class ChatMessageModel {
+        <<Sequelize Model>>
+    }
+}
+
+' ===================== DATABASE =====================
+package "Database Layer" #EAECEE {
+    class Database {
+        <<MySQL via Sequelize>>
+        --
+        +sequelize : Sequelize
+        +connect() : void
+        +sync() : void
+    }
+}
+
+' ===================== RELATIONSHIPS =====================
+Router ..> AuthMiddleware : uses >
+Router ..> AuthController : routes to >
+Router ..> ProductController : routes to >
+Router ..> CartController : routes to >
+Router ..> OrderController : routes to >
+Router ..> UserController : routes to >
+Router ..> AdminController : routes to >
+Router ..> ChatController : routes to >
+
+AuthController ..> EmailService : uses >
+OrderController ..> EmailService : uses >
+
+ChatController ..> SocketService : uses >
+
+AuthController ..> UserModel : uses >
+ProductController ..> ProductModel : uses >
+CartController ..> CartItemModel : uses >
+OrderController ..> OrderModel : uses >
+UserController ..> UserModel : uses >
+AdminController ..> UserModel : uses >
+AdminController ..> ProductModel : uses >
+AdminController ..> OrderModel : uses >
+ChatController ..> ChatMessageModel : uses >
+
+UserModel ..> Database : persisted by >
+ProductModel ..> Database : persisted by >
+OrderModel ..> Database : persisted by >
+CartItemModel ..> Database : persisted by >
+ReviewModel ..> Database : persisted by >
+ChatMessageModel ..> Database : persisted by >
+
+@enduml
